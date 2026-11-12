@@ -166,7 +166,7 @@ const PRODUCTS=[
 const DECOR=[[380,180,60,60,34],[440,180,40,60,26],[330,330,70,50,30],[860,400,70,90,40],[880,560,60,60,28],[520,760,90,70,36],[360,820,60,50,26],[620,880,60,40,22],[840,260,50,50,30],[120,380,70,60,30]];
 const TREES=[[110,130],[360,120],[880,120],[930,190],[80,470],[350,470],[560,380],[600,660],[460,900],[300,720],[930,640],[640,960],[860,880],[120,860],[250,940],[960,420]];
 
-const WORLD_ART = ["<img class=\"world-art\" src=\"assets/images/festival-gate.webp\" alt=\"파스텔빛 대학 축제 입구\" decoding=\"async\">", "<img class=\"world-art\" src=\"assets/images/ch01-ai-module.webp\" alt=\"축제 부스에 적용된 소형 AI 모듈\" decoding=\"async\">", "<img class=\"world-art\" src=\"assets/images/ch02-sensing-campus.webp\" alt=\"주변 상황을 감지하는 캠퍼스 공간\" decoding=\"async\">", "<img class=\"world-art\" src=\"assets/images/ch03-personal-ai.webp\" alt=\"개인 AI와 소통하는 축제 방문객\" decoding=\"async\">", "<img class=\"world-art\" src=\"assets/images/ch04-collaboration.webp\" alt=\"AI 단말을 활용해 협력하는 방문객과 운영자\" decoding=\"async\">", "<img class=\"world-art\" src=\"assets/images/festival-plaza.webp\" alt=\"축제 광장을 걷는 학생들\" decoding=\"async\">"];
+const WORLD_ART = ["<img class=\"world-art\" src=\"assets/images/team-hero.webp\" alt=\"파스텔빛 대학 축제 입구\" decoding=\"async\">", "<img class=\"world-art\" src=\"assets/images/team-environment-01.webp\" alt=\"축제 부스에 적용된 소형 AI 모듈\" decoding=\"async\">", "<img class=\"world-art\" src=\"assets/images/team-environment-02.webp\" alt=\"주변 상황을 감지하는 캠퍼스 공간\" decoding=\"async\">", "<img class=\"world-art\" src=\"assets/images/team-environment-03.webp\" alt=\"개인 AI와 소통하는 축제 방문객\" decoding=\"async\">", "<img class=\"world-art\" src=\"assets/images/team-environment-04.webp\" alt=\"AI 단말을 활용해 협력하는 방문객과 운영자\" decoding=\"async\">", "<img class=\"world-art\" src=\"assets/images/team-environment-05.webp\" alt=\"축제 광장을 걷는 학생들\" decoding=\"async\">"];
 /* ======================= INTRO ======================= */
 const title='College Festival ';
 const h1=$('#heroTitle');
@@ -258,35 +258,47 @@ CHAPTERS.forEach((c,i)=>{
 });
 const wcards=$$('.wcard'), chBtns=$$('#chapters button'), counter=$('#counter'), wvbar=$('#wvbar');
 const worldA={el:$('#world-a'),p:0,t:0,act:-1};
-const waIntro=$('#waIntro'), waProg=$('#waProg');
+const waHead=$('#waHead'), waCopy=$('#waCopy'), waDeck=$('#waDeck'), waProg=$('#waProg');
 CHAPTERS.forEach((c,i)=>{
-  waProg.insertAdjacentHTML('beforebegin',`<div class="wa-slide" aria-hidden="${i?'true':'false'}"><div class="wa-img">${WORLD_ART[i+1]}</div><div class="wa-shade"></div><div class="wa-txt"><small>${c.k}</small><h3>${c.t}</h3><p>${c.d}</p></div></div>`);
-  waProg.insertAdjacentHTML('beforeend',`<button data-wch="${i}">${c.k}</button>`);
+  waCopy.insertAdjacentHTML('beforeend',`<div class="wa-c" aria-hidden="${i?'true':'false'}"><b class="wa-num" aria-hidden="true">0${i+1}</b><small>${c.k}</small><h3>${c.t}</h3><p>${c.d}</p></div>`);
+  waDeck.insertAdjacentHTML('beforeend',`<div class="wa-card">${WORLD_ART[i+1]}<span class="wa-chip">${c.k}</span></div>`);
+  waProg.insertAdjacentHTML('beforeend',`<button data-wch="${i}" aria-label="${c.k} ${c.t}">${WORLD_ART[i+1]}<span>${c.k}</span></button>`);
 });
-const waSlides=$$('.wa-slide'), waImgs2=waSlides.map(s=>s.querySelector('.wa-img')), waTxts=waSlides.map(s=>s.querySelector('.wa-txt')), waBtns=$$('#waProg button');
-const WA_T=[[.1,.22],[.3,.42],[.5,.62],[.7,.82]];
+$$('#waProg .world-art').forEach(im=>{im.alt='';im.loading='lazy'});
+const waCs=$$('.wa-c'), waCards=$$('.wa-card'), waBtns=$$('#waProg button');
+// scattered (intro) poses: [x%, y%, zpx, rotY, rotZ, scale]
+const WA_SC=[[-34,-40,-300,22,-8,.6],[40,-50,-560,-12,7,.5],[-52,44,-420,16,9,.52],[44,42,-180,-18,-6,.62]];
+const WA_SCM=[[-26,-20,-260,16,-6,.6],[30,-26,-420,-10,6,.52],[-30,30,-360,12,7,.52],[28,26,-160,-12,-5,.62]];
 function renderWorldA(p){
-  const io=eIO(range(p,.09,.2));
-  waIntro.style.opacity=(1-io).toFixed(3);
-  waIntro.style.transform=`translateY(${(-40*io).toFixed(1)}px) scale(${(1-.06*io).toFixed(4)})`;
-  waIntro.style.filter=io>.002&&io<.998?`blur(${(8*io).toFixed(2)}px)`:'none';
-  const mob=VW<700; let act=-1;
-  waSlides.forEach((sl,k)=>{
-    const [a,b]=WA_T[k], e=eIO(range(p,a,b)), nx=k<3?eIO(range(p,WA_T[k+1][0],WA_T[k+1][1])):0;
-    if(e<=0||nx>=1){sl.style.visibility='hidden';return}
-    sl.style.visibility='visible'; if(e>.5)act=k;
-    const ix=(mob?12:34)*(1-e), iy=(mob?24:20)*(1-e), r=30*(1-e);
-    sl.style.clipPath=e>=1?'none':`inset(${iy.toFixed(2)}% ${ix.toFixed(2)}% ${iy.toFixed(2)}% ${ix.toFixed(2)}% round ${r.toFixed(1)}px)`;
-    sl.style.transform=nx>0?`scale(${(1-.08*nx).toFixed(4)})`:'';
-    sl.style.filter=nx>0?`brightness(${(1-.45*nx).toFixed(3)})`:'';
-    waImgs2[k].style.transform=`scale(${(1.28-.22*e).toFixed(4)})`;
-    const ti=eOut(range(p,b-.05,b+.03)), to=k<3?eIn(range(p,WA_T[k+1][0],WA_T[k+1][0]+.05)):0, tw=(1-ti)+to;
-    const tx=waTxts[k]; tx.style.opacity=(ti*(1-to)).toFixed(3);
-    tx.style.transform=`translateY(${((1-ti)*40-to*30).toFixed(1)}px)`;
-    tx.style.filter=tw>.004?`blur(${(tw*10).toFixed(2)}px)`:'none';
+  const s=clamp((p-.24)/.62)*3, act=Math.min(3,Math.round(s));
+  if(act!==worldA.act){worldA.act=act;waBtns.forEach((b,i)=>b.classList.toggle('on',i===act));waCs.forEach((c,i)=>c.setAttribute('aria-hidden',i===act?'false':'true'));chBtns.forEach((b,i)=>b.classList.toggle('on',i===act))}
+  waProg.classList.toggle('show',p>.2&&p<.99);
+}
+function tickWorld(now){
+  const el=worldA.el,top=el.offsetTop; if(scrollY+VH<top-10||scrollY>top+el.offsetHeight)return;
+  const p=worldA.p, t=now/1000, mob=VW<700, g=eIO(range(p,.1,.22)), s=clamp((p-.24)/.62)*3;
+  // heading: big statement → small header (desktop) / fades (mobile)
+  const H=waHead.offsetHeight;
+  if(mob){waHead.style.opacity=(1-g).toFixed(3);waHead.style.transform=`translateY(${(-H/2-g*40).toFixed(1)}px)`;}
+  else{waHead.style.opacity=(1-.15*g).toFixed(3);waHead.style.transform=`translateY(${lerp(-H/2,92-VH/2,g).toFixed(1)}px) scale(${lerp(1,.42,g).toFixed(4)})`;}
+  // copy per chapter
+  waCs.forEach((c,k)=>{const d=s-k,ad=Math.abs(d),o=clamp(1-ad*2.4)*g;
+    c.style.opacity=o.toFixed(3);
+    c.style.transform=`translateY(calc(${mob?'0%':'-50%'} + ${(-d*50).toFixed(1)}px))`;
+    c.style.filter=ad>.004?`blur(${Math.min(10,ad*16).toFixed(2)}px)`:'none'});
+  // deck
+  const SC=mob?WA_SCM:WA_SC, tx=tilt.x, ty=tilt.y;
+  waDeck.style.transform=`rotateX(${(-ty*6).toFixed(2)}deg) rotateY(${(tx*8).toFixed(2)}deg)`;
+  waCards.forEach((c,k)=>{
+    const d=k-s; let x,y,z,rx=0,ry,rz,sc,o,br;
+    if(d<0){const a=clamp(-d);x=a*28;y=-a*42;z=-a*120;rx=a*22;ry=-a*18;rz=a*9;sc=1-.08*a;o=1-a;br=1}
+    else{x=d*7;y=-d*6.5;z=-d*150;ry=-d*4;rz=d*2.4;sc=1;o=d<=2.2?1:clamp(3.2-d);br=1-.1*Math.min(d,3)}
+    if(g<1){const q=SC[k],w=1-g,wob=Math.sin(t*.9+k*1.7)*2.2*w;
+      x=lerp(q[0],x,g);y=lerp(q[1],y,g)+wob;z=lerp(q[2],z,g);ry=lerp(q[3],ry,g);rz=lerp(q[4],rz,g)+Math.cos(t*.7+k)*1.4*w;sc=lerp(q[5],sc,g);o=lerp(1,o,g);br=lerp(1,br,g)}
+    c.style.transform=`translate(${x.toFixed(2)}%,${y.toFixed(2)}%) translateZ(${z.toFixed(1)}px) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg) rotateZ(${rz.toFixed(2)}deg) scale(${sc.toFixed(4)})`;
+    c.style.opacity=o.toFixed(3); c.style.filter=br<.995?`brightness(${br.toFixed(3)})`:'none';
+    c.style.zIndex=d<0&&g>=1?20:Math.round(30+z/40);
   });
-  waProg.classList.toggle('show',p>.14&&p<.985);
-  if(act!==worldA.act){worldA.act=act;waBtns.forEach((b,i)=>b.classList.toggle('on',i===act));waSlides.forEach((s,i)=>s.setAttribute('aria-hidden',i===act?'false':'true'));chBtns.forEach((b,i)=>b.classList.toggle('on',i===act))}
 }
 waBtns.forEach(b=>b.addEventListener('click',()=>scrollToY(holdY('world-a',+b.dataset.wch+1))));
 chBtns.forEach(b=>b.addEventListener('click',()=>{const i=+b.dataset.ch;const el=worldA.el;const top=el.offsetTop, h=el.offsetHeight-VH;scrollToY(holdY('world-a',i+1))}));
@@ -620,12 +632,14 @@ function tickTurn(now){
 
 
 /* ======================= SYSTEM v4 · scene demo ======================= */
-const s2Intro=$('#s2Intro'), s2Main=$('#s2Main'), s2Text=$('#s2Text'), s2Steps=$('#s2Steps'), s2Svg=$('#s2Svg');
+const s2Main=$('#s2Main'), s2Wrap=$('#s2SceneWrap'), s2Text=$('#s2Text'), s2Steps=$('#s2Steps'), s2Svg=$('#s2Svg');
 SYS.forEach((s,i)=>{
   s2Text.insertAdjacentHTML('beforeend',`<div class="s2-t"><small>${s.k} ${s.t}</small><h3>${['감지','판단','대응'][i]}</h3><p>${s.h}</p></div>`);
   s2Steps.insertAdjacentHTML('beforeend',`<span><i></i>${s.k} ${s.t}</span>`);
+  s2Wrap.insertAdjacentHTML('beforeend',`<div class="s2-tok" style="left:${[25,60,87][i]}%;top:${[30,13,76][i]}%">${s.ic}</div>`);
 });
-const s2Ts=$$('.s2-t'), s2Pills=$$('#s2Steps span'), s2Fill=$$('#s2Steps span i');
+const s2Lead=$('.s2-lead'), s2Toks=$$('.s2-tok');
+const s2Ts=$$('.s2-t:not(.s2-lead)'), s2Pills=$$('#s2Steps span'), s2Fill=$$('#s2Steps span i');
 (function buildScene(){
   let rnd=7; const R=()=>{rnd=(rnd*16807)%2147483647;return rnd/2147483647};
   const crowd=[]; for(let i=0;i<30;i++){const a=R()*6.283,r=Math.sqrt(R());crowd.push([250+Math.cos(a)*r*130,370+Math.sin(a)*r*68])}
@@ -640,8 +654,8 @@ const s2Ts=$$('.s2-t'), s2Pills=$$('#s2Steps span'), s2Fill=$$('#s2Steps span i'
 <pattern id="awnB" width="24" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="#CFE4F3"/><rect x="12" width="12" height="12" fill="#fff"/></pattern>
 <filter id="s2Blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="7"/></filter>
 </defs>
-<rect x="10" y="10" width="980" height="600" rx="40" fill="#F8F7FD" stroke="#ECEAF6"/>
-${Array.from({length:9},(_,i)=>`<line x1="${110+i*100}" y1="30" x2="${110+i*100}" y2="590" stroke="#EFEDF8"/>`).join('')}
+<rect x="10" y="10" width="980" height="600" rx="40" fill="#FBFAFF" stroke="#E2DEF3" stroke-width="2"/>
+${Array.from({length:9},(_,i)=>`<line x1="${110+i*100}" y1="30" x2="${110+i*100}" y2="590" stroke="#ECE8F7"/>`).join('')}
 ${Array.from({length:5},(_,i)=>`<line x1="30" y1="${110+i*100}" x2="970" y2="${110+i*100}" stroke="#EFEDF8"/>`).join('')}
 <circle id="s2HeatC" cx="250" cy="360" r="200" fill="url(#s2Heat)" opacity="0"/>
 <circle id="s2CalmC" cx="770" cy="370" r="170" fill="url(#s2Calm)" opacity="0"/>
@@ -665,10 +679,11 @@ const S2_T=[[.14,.37],[.37,.6],[.6,1.01]];
 function tickSystem2(now){
   const el=s2.el,top=el.offsetTop; if(scrollY+VH<top-10||scrollY>top+el.offsetHeight)return;
   const p=system.p, t=now/1000;
-  const io=eIO(range(p,.1,.17));
-  s2Intro.style.opacity=(1-io).toFixed(3); s2Intro.style.transform=`translateY(${(-40*io).toFixed(1)}px) scale(${(1-.06*io).toFixed(4)})`;
-  s2Intro.style.filter=io>.002&&io<.998?`blur(${(8*io).toFixed(2)}px)`:'none';
-  const mi=eOut(range(p,.13,.22)); s2Main.style.opacity=mi.toFixed(3); s2Main.style.transform=`translateY(${((1-mi)*40).toFixed(1)}px)`;
+  const mob=VW<700, e=eIO(range(p,.08,.2));
+  const lo=1-eIn(range(p,.1,.15)); s2Lead.style.opacity=lo.toFixed(3);
+  s2Lead.style.transform=`translateY(calc(-50% + ${(-(1-lo)*30).toFixed(1)}px))`; s2Lead.style.filter=lo<.998&&lo>.002?`blur(${((1-lo)*10).toFixed(2)}px)`:'none';
+  const RX=lerp(mob?40:52,mob?10:16,e)-tilt.y*6, RY=lerp(0,mob?-6:-14,e)+tilt.x*9, RZ=lerp(mob?-16:-26,-2,e), SC=lerp(.9,1,e);
+  s2Wrap.style.transform=`perspective(1600px) rotateX(${RX.toFixed(2)}deg) rotateY(${RY.toFixed(2)}deg) rotateZ(${RZ.toFixed(2)}deg) scale(${SC.toFixed(4)})`;
   s2Steps.classList.toggle('show',p>.16);
   // copy per step: crisp at rest, blurred only while crossing
   s2Ts.forEach((e,i)=>{const [a,b]=S2_T[i];const ti=eOut(range(p,a,a+.05)),to=eIn(range(p,b-.03,b+.02)),w=(1-ti)+to;
@@ -676,6 +691,8 @@ function tickSystem2(now){
     e.style.filter=w>.004?`blur(${(w*10).toFixed(2)}px)`:'none'});
   const act=p<S2_T[1][0]?0:p<S2_T[2][0]?1:2;
   s2Pills.forEach((x,i)=>x.classList.toggle('on',i===act));
+  s2Toks.forEach((k,i)=>{const on=p>.14&&i===act, base=p<.14?.92:on?1:.38;k.classList.toggle('on',on);
+    k.style.opacity=base.toFixed(3); k.style.transform=`translateZ(${(on?110:60).toFixed(0)}px) translateY(${(Math.sin(t*1.4+i*2)*6).toFixed(1)}px) rotateZ(${(-RZ).toFixed(2)}deg) rotateX(${(-RX).toFixed(2)}deg) scale(${on?1.15:.95})`});
   s2Fill.forEach((x,i)=>x.style.width=(range(p,S2_T[i][0],Math.min(1,S2_T[i][1]))*100).toFixed(1)+'%');
   // scene
   const S=eOut(range(p,.16,.3)), D=eIO(range(p,.4,.52)), Rt=eIO(range(p,.46,.55)), A=eIO(range(p,.62,.8));
@@ -694,7 +711,6 @@ function tickSystem2(now){
   s2User.setAttribute('transform',`translate(${pt.x.toFixed(1)},${pt.y.toFixed(1)})`);
   const ph=(t*1.2)%1; s2Pulse.setAttribute('r',(16+ph*22).toFixed(1)); s2Pulse.setAttribute('opacity',(A>0?(1-ph)*Math.min(1,A*3):0).toFixed(3));
 }
-
 
 /* ======================= PROJECTS v4 · orbs land → guided tour → free ======================= */
 const pj={el:$('#projects'),p:0,t:0,stop:-2};
@@ -738,9 +754,15 @@ function renderProjects(p){
 }
 ptGo.addEventListener('click',()=>openDetail(+ptGo.dataset.n));
 
+/* ======================= shared pointer tilt + epilogue card ======================= */
+const tilt={x:0,y:0}, wcImgBox=$('#world-c .wc-img');
+function tickTilt(){tilt.x=lerp(tilt.x,tm.x,.06);tilt.y=lerp(tilt.y,tm.y,.06)}
+function tickWorldC(){const el=worldC.el,top=el.offsetTop; if(scrollY+VH<top-10||scrollY>top+el.offsetHeight)return;
+  const mob=VW<700, p=worldC.p, k=eOut(range(p,0,.25));
+  wcImgBox.style.transform=mob?`translateY(${((1-k)*30).toFixed(1)}px)`:`perspective(1600px) rotateY(${(-10+tilt.x*7-(1-k)*14).toFixed(2)}deg) rotateX(${(3-tilt.y*5).toFixed(2)}deg) translateX(${((1-k)*60).toFixed(1)}px)`;}
 /* ======================= SCROLL PAUSES + SNAP ======================= */
 // mapped progress values where the scene should rest (content fully shown)
-const HOLDS={'intro':[0,.27,.62,1],'world-a':[.04,.26,.46,.66,.86],'world-c':[.3,.8],'system':[.05,.31,.53,.8],'turn':[.42,.8],'projects':[.02,...Array.from({length:6},(_,i)=>.17+(.74/6)*(i+.5)),.975]};
+const HOLDS={'intro':[0,.27,.62,1],'world-a':[.04,.24,.4467,.6533,.86],'world-c':[.3,.8],'system':[.05,.31,.53,.8],'turn':[.42,.8],'projects':[.02,...Array.from({length:6},(_,i)=>.17+(.74/6)*(i+.5)),.975]};
 const HOLD_W={'intro':.05,'world-a':.05,'world-c':.08,'system':.05,'turn':.07,'projects':.035};   // raw share of the section each pause takes
 const KNOTS={};
 for(const id in HOLDS){const H=HOLDS[id],w=HOLD_W[id],mv=1-H.length*w,k=[[0,0]];let pr=0,pm=0;
@@ -826,7 +848,7 @@ function loop(){
     cmx=lerp(cmx,mx,.05);cmy=lerp(cmy,my,.05);
     if(!reduce)iorbs.forEach((o,i)=>o.style.transform=`translate(${(cmx*(30+i*14)).toFixed(1)}px,${(cmy*(30+i*14)).toFixed(1)}px)`);
     if(intro.p<.95||particles.list.length)tickParticles();
-    tickMap(); updateChrome(); tickHoldbar(); tickTurn(performance.now()); tickSystem2(performance.now());
+    tickMap(); updateChrome(); tickHoldbar(); tickTilt(); tickWorld(performance.now()); tickWorldC(); tickTurn(performance.now()); tickSystem2(performance.now());
   }
   requestAnimationFrame(loop);
 }
@@ -1093,5 +1115,5 @@ function fxLoop(now){
 addEventListener('resize',()=>{sizeGL();if(chPos.length)measureChs()});
 sizeGL(); requestAnimationFrame(fxLoop);
 
-window.__site={map,openCard,openDetail,closeDetail};
+window.__site={map,openCard,openDetail,closeDetail,holdY};
 })();

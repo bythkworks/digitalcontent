@@ -3,11 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>College Festival 2031 — MYEONGDONG 2031</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css">
+<title>College Festival 2031</title>
+<link rel="stylesheet" href="./assets/css/style.css">
 </head>
 <body>
 
@@ -19,7 +16,7 @@
 </svg>
 
 <header class="nav" id="nav">
-  <a class="logo" href="#top" data-go="intro"><i></i>MYEONGDONG 2031</a>
+  <a class="logo" href="#top" data-go="intro"><i></i>COLLEGE FESTIVAL 2031</a>
   <nav aria-label="주요 메뉴"><ul>
     <li><a href="#world" data-go="world-a" data-sec="world">WORLD</a></li>
     <li><a href="#system" data-go="system" data-sec="system">SYSTEM</a></li>
@@ -51,7 +48,7 @@
       <circle r="450" fill="none" stroke="#E8B0DD" stroke-width="1" stroke-dasharray="1 14" opacity=".7"/>
     </svg></div>
 
-    <div class="ghost" id="ghost" aria-hidden="true"><span>MYEONGDONG 2031</span></div>
+    <div class="ghost" id="ghost" aria-hidden="true"><span>FESTIVAL 2031</span></div>
 
     <div class="intro-title" id="introTitle">
       <div>
@@ -99,7 +96,9 @@
       </div>
     </div>
     <div class="wa-full" id="waFull">
-      <div class="wa-intro" id="waIntro"><span class="label pill">02 · WORLD</span><h2>AI와 함께하는 일상은<br>어떻게 달라졌을까요?</h2></div>
+      <div class="wa-head" id="waHead"><span class="label pill">02 · WORLD</span><h2>AI와 함께하는 일상은<br>어떻게 달라졌을까요?</h2></div>
+      <div class="wa-copy" id="waCopy"></div>
+      <div class="wa-deck" id="waDeck" aria-hidden="true"></div>
       <nav class="wa-prog" id="waProg" aria-label="챕터"></nav>
     </div>
   </div>
@@ -145,8 +144,7 @@
       <div class="sys-desc" id="sysDesc"></div>
     </div>
     <div class="sys2" id="sys2">
-      <div class="s2-intro" id="s2Intro"><span class="label pill">03 · SYSTEM</span><h2>MCUAI는 상황을 감지하고 맥락을 판단해<br>필요한 안내와 대응을 제공합니다.</h2></div>
-      <div class="s2-main" id="s2Main"><div class="s2-text" id="s2Text"></div><div class="s2-scene"><svg id="s2Svg" viewBox="0 0 1000 620" role="img" aria-label="감지, 판단, 대응 과정을 보여주는 축제 장면"></svg></div></div>
+      <div class="s2-main" id="s2Main"><div class="s2-text" id="s2Text"><div class="s2-t s2-lead"><span class="label pill">03 · SYSTEM</span><h2>MCUAI는 상황을 감지하고 맥락을 판단해<br>필요한 안내와 대응을 제공합니다.</h2></div></div><div class="s2-scene" id="s2SceneWrap"><div class="s2-floor"></div><svg id="s2Svg" viewBox="0 0 1000 620" role="img" aria-label="감지, 판단, 대응 과정을 보여주는 축제 장면"></svg></div></div>
       <div class="s2-steps" id="s2Steps" aria-hidden="true"></div>
     </div>
   </div>
@@ -234,7 +232,7 @@
   <div class="pj-tour" id="pjTour" aria-live="polite"><small id="ptK"></small><h3 id="ptN"></h3><p id="ptO"></p><button class="btn dark" id="ptGo">EXPLORE PROJECT <span class="arr">→</span></button></div>
 </div></section>
 </main>
-<footer class="site">© 2031 MYEONGDONG College Festival · A Softer Connection with Technology</footer>
+<footer class="site">© 2031 College Festival · A Softer Connection with Technology</footer>
 
 <!-- DETAIL -->
 <div id="detail" role="dialog" aria-modal="true" aria-label="프로젝트 상세">
@@ -246,6 +244,6 @@
   <button class="btn sm x" id="lbX">닫기 ✕</button>
 </div>
 
-<script src="assets/js/main.js"></script>
+<script src="./assets/js/main.js"></script>
 </body>
 </html>

@@ -1,22 +1,22 @@
-# College Festival 2031 — MYEONGDONG 2031
+# College Festival 2031
 
 AI와 함께하는 2031년 대학 축제를 스크롤 인터랙션으로 보여주는 웹 페이지입니다.
 MCUAI가 축제 공간에서 상황을 감지하고, 판단하고, 대응하는 과정을 장면 중심으로 전달합니다.
 
 ![인트로](docs/preview-intro.jpg)
 
-| 세계관 | 질문 | 지도 투어 |
-|---|---|---|
-| ![세계관](docs/preview-world.jpg) | ![질문](docs/preview-question.jpg) | ![지도 투어](docs/preview-tour.jpg) |
+| 세계관 | 시스템 | 질문 | 지도 투어 |
+|---|---|---|---|
+| ![세계관](docs/preview-world.jpg) | ![시스템](docs/preview-system.jpg) | ![질문](docs/preview-question.jpg) | ![지도 투어](docs/preview-tour.jpg) |
 
 ## 구성
 
 | 순서 | 섹션 | 내용 |
 |---|---|---|
 | 01 | INTRO | 실시간 오로라 배경, 포털 전환, 첫 메시지 |
-| 02 | WORLD | 챕터 4개를 한 화면씩 풀스크린으로 전환 |
-| 02 | EPILOGUE | 핵심 문장 → 개인·공간·운영자 |
-| 03 | SYSTEM | 축제 장면으로 감지 → 판단 → 대응 시연 |
+| 02 | WORLD | 3D 카드 덱과 챕터 번호로 4개 챕터 전환 |
+| 02 | EPILOGUE | 기울어진 장면 카드 위로 핵심 문장 → 개인·공간·운영자 |
+| 03 | SYSTEM | 3D로 기울어진 축제 장면에서 감지 → 판단 → 대응 시연 |
 | — | QUESTION | 어두운 3D 공간, 글래스모피즘·분산·왜곡 효과 |
 | 04 | PROJECTS | 구슬 3개가 지도에 착지 → 제품 6개 투어 → 자유 탐색 |
 | — | DETAIL | 제품별 상세 페이지, 경험 스토리보드 |
@@ -29,14 +29,15 @@ college-festival-2031/
 ├─ assets/
 │  ├─ css/style.css      전체 스타일
 │  ├─ js/main.js         인터랙션·스크롤·3D 지도 스크립트
-│  └─ images/            WebP 이미지 6장
+│  ├─ fonts/             Pretendard Variable (SIL OFL 라이선스 포함)
+│  └─ images/            team-hero.webp, team-environment-01~05.webp
 ├─ docs/                 README용 미리보기 이미지
 ├─ .nojekyll             GitHub Pages가 파일을 그대로 서빙하도록 설정
 └─ .gitignore
 ```
 
 외부 라이브러리나 빌드 과정이 없는 순수 HTML·CSS·JavaScript입니다.
-웹폰트(Noto Sans KR)만 Google Fonts에서 불러오며, 오프라인에서는 기기 기본 한글 글꼴로 표시됩니다.
+폰트와 이미지를 포함한 모든 파일이 프로젝트 안에 있어 **인터넷 연결 없이** 동작하며, 모든 경로는 상대 경로입니다.
 
 ## 실행
 
