@@ -105,10 +105,10 @@ function prodTile(kind,bg){return `<svg viewBox="0 0 600 600" preserveAspectRati
 
 /* ======================= DATA ======================= */
 const CHAPTERS=[
-  {k:'CH.01',t:'AI가 공간으로 들어오다',d:'2031년, 소형 MCU가 탑재된 AI는 개인 기기와 일상 공간 곳곳에서 작동하기 시작했습니다.',m:'orb',pal:'dusk'},
-  {k:'CH.02',t:'공간이 상황을 읽다',d:'벤치와 조명, 길과 무대가 스스로 주변의 소리와 붐빔을 느끼고 지금의 분위기를 이해합니다.',m:'waves',pal:'day'},
-  {k:'CH.03',t:'나를 이해하는 AI',d:'AI는 나의 취향과 컨디션을 기억해, 필요한 순간에만 조용히 말을 겁니다.',m:'person',pal:'lav'},
-  {k:'CH.04',t:'함께 만드는 일상',d:'개인과 공간, 운영자가 연결되어 모두에게 조금 더 편안한 하루를 함께 만들어 갑니다.',m:'network',pal:'peach'},
+  {k:'CH.01',t:'AI가 공간으로 들어옵니다',d:'2031년, 소형 MCU가 탑재된 AI는 개인 기기와 일상 공간 곳곳에서 작동하기 시작했습니다.',m:'orb',pal:'dusk'},
+  {k:'CH.02',t:'공간이 상황을 읽습니다',d:'벤치와 조명, 길과 무대가 스스로 주변의 소리와 붐빔을 느끼고 지금의 분위기를 이해합니다.',m:'waves',pal:'day'},
+  {k:'CH.03',t:'AI가 나를 이해합니다',d:'AI는 나의 취향과 컨디션을 기억해, 필요한 순간에만 조용히 말을 겁니다.',m:'person',pal:'lav'},
+  {k:'CH.04',t:'일상을 함께 만들어 갑니다',d:'개인과 공간, 운영자가 연결되어 모두에게 조금 더 편안한 하루를 함께 만들어 갑니다.',m:'network',pal:'peach'},
 ];
 const SYS=[
   {k:'01',t:'SENSE',h:'공간과 사람의 상황을 감지합니다',p:'작은 MCU 센서들이 축제 곳곳에서 지금의 상태를 조용히 읽어냅니다.',c:['혼잡도','소음','온도','움직임'],
@@ -278,16 +278,18 @@ function tickWorld(now){
   const el=worldA.el,top=el.offsetTop; if(scrollY+VH<top-10||scrollY>top+el.offsetHeight)return;
   const p=worldA.p, t=now/1000, mob=VW<700, g=eIO(range(p,.1,.22)), s=clamp((p-.24)/.62)*3;
   // heading: big statement → small header (desktop) / fades (mobile)
+  const SC=mob?WA_SCM:WA_SC, tx=tilt.x, ty=tilt.y;
   const H=waHead.offsetHeight;
   if(mob){waHead.style.opacity=(1-g).toFixed(3);waHead.style.transform=`translateY(${(-H/2-g*40).toFixed(1)}px)`;}
   else{waHead.style.opacity=(1-.15*g).toFixed(3);waHead.style.transform=`translateY(${lerp(-H/2,92-VH/2,g).toFixed(1)}px) scale(${lerp(1,.42,g).toFixed(4)})`;}
   // copy per chapter
+  waCopy.style.setProperty('--lx',(30+tx*60).toFixed(1)+'%'); waCopy.style.setProperty('--ly',(18+ty*50).toFixed(1)+'%');
   waCs.forEach((c,k)=>{const d=s-k,ad=Math.abs(d),o=clamp(1-ad*2.4)*g;
     c.style.opacity=o.toFixed(3);
     c.style.transform=`translateY(calc(${mob?'0%':'-50%'} + ${(-d*50).toFixed(1)}px))`;
     c.style.filter=ad>.004?`blur(${Math.min(10,ad*16).toFixed(2)}px)`:'none'});
   // deck
-  const SC=mob?WA_SCM:WA_SC, tx=tilt.x, ty=tilt.y;
+
   waDeck.style.transform=`rotateX(${(-ty*6).toFixed(2)}deg) rotateY(${(tx*8).toFixed(2)}deg)`;
   waCards.forEach((c,k)=>{
     const d=k-s; let x,y,z,rx=0,ry,rz,sc,o,br;
