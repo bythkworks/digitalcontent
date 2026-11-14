@@ -319,66 +319,92 @@ const WCG={gl:null,ok:false,u:{},mx:0,my:0,split:0,ferro:0,scale:.6,wave:0};
   const vs='attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
   const fs=`precision highp float;
 uniform vec2 uRes,uOff,uMouse;uniform float uT,uSplit,uFerro,uScale,uWave;
+const float HH=.17, RB=.15;
 mat2 rot(float a){float c=cos(a),s=sin(a);return mat2(c,-s,s,c);}
 float smin(float a,float b,float k){float h=clamp(.5+.5*(b-a)/k,0.,1.);return mix(b,a,h)-k*h*(1.-h);}
-vec3 tw(vec3 p){p.xz*=rot(uT*.18+uMouse.x*.9);p.yz*=rot(-.18+uMouse.y*.6);return p;}
+float ell(vec2 q,vec2 ab){return (length(q/ab)-1.)*min(ab.x,ab.y);}
+float pebble(vec2 q){
+  float t=uT*.35;
+  float d=smin(ell(q-vec2(-.32,.06),vec2(.86,.58)),ell(q-vec2(.44,-.14),vec2(.64,.5)),.45);
+  d=smin(d,ell(q-vec2(.02,.44),vec2(.5,.36)),.35);
+  float a=atan(q.y,q.x);
+  d+=.035*sin(3.*a+t)+.025*sin(5.*a-1.3*t+1.);
+  return d;}
+float shape2(vec2 q){
+  q/=uScale;
+  float s=uSplit, d=pebble(q);
+  if(s>.001){float sc=1.-.36*s; vec2 o=vec2(1.02*s,.1*s*sin(uT*.8));
+    float ds=smin(pebble(rot(.5*s)*(q-o)/sc)*sc,pebble(rot(-.45*s)*(q+o)/sc)*sc,mix(.56,.52,s));
+    d=mix(d,ds,smoothstep(0.,.18,s));}
+  if(uFerro>.001){float a=atan(q.y,q.x);
+    d-=uFerro*(.09*sin(4.*a+uT*.9)+.06*sin(7.*a-uT*1.3))*smoothstep(-.6,0.,d);}
+  return d*uScale*.85;}
+vec3 obj(vec3 p){p.y-=HH+.12;p.xz=rot(uMouse.x*.6+sin(uT*.2)*.18)*p.xz;p.yz=rot(uMouse.y*.18)*p.yz;return p;}
 float map(vec3 p){
-  p=tw(p)/uScale;
-  float s=uSplit, w=sin(uT*.9);
-  vec3 c1=vec3(-1.02*s,.1*s*w,0.), c2=vec3(1.02*s,-.1*s*w,0.);
-  float r=mix(1.,.7,s);
-  float d=smin(length(p-c1)-r,length(p-c2)-r,.08+.5*s);
-  float org=.07*sin(2.6*p.x+uT*.9)*sin(2.2*p.y+uT*1.1)*sin(2.8*p.z+uT*.7)+.04*sin(4.6*p.y-uT*1.3+p.x*2.1);
-  d+=org*(1.-.6*uFerro);
-  if(uFerro>.001){vec3 n=normalize(p+1e-4);
-    float a1=sin(6.5*n.x+uT*1.2)*sin(6.5*n.y-uT)*sin(6.5*n.z+uT*.8);
-    float a2=sin(10.*n.x-uT*.6+n.y*3.)*sin(10.*n.z+uT*1.3);
-    float sp=.30*pow(max(a1,0.),2.)+.14*pow(max(a2,0.),3.);
-    d-=uFerro*sp*smoothstep(1.6,.7,length(p));
-    d+=uFerro*.04*sin(uT*2.3+length(p)*7.);}
-  d+=uWave*.025*sin(length(p)*13.-uT*5.);
-  return d*uScale*.62;}
-vec3 nrm(vec3 p){vec2 e=vec2(.0025,-.0025);return normalize(e.xyy*map(p+e.xyy)+e.yyx*map(p+e.yyx)+e.yxy*map(p+e.yxy)+e.xxx*map(p+e.xxx));}
-vec3 env(vec3 d){
-  float y=d.y;
-  vec3 c=mix(vec3(.93,.90,.99),vec3(.55,.74,.95),smoothstep(-.05,.95,y));
-  c=mix(c,vec3(.42,.38,.80),smoothstep(0.,-.95,y));
-  float a=atan(d.x,d.z);
-  c=mix(c,vec3(.95,.55,.82),.55*smoothstep(.2,1.,sin(a*1.3+.6))*(1.-abs(y)));
-  c=mix(c,vec3(1.,.74,.56),.45*smoothstep(.4,1.,sin(a*1.1-2.2))*(1.-abs(y)));
-  c+=vec3(1.)*1.1*pow(max(dot(d,normalize(vec3(-.35,.8,.45))),0.),40.);
-  c+=vec3(1.,.9,1.)*.5*pow(max(dot(d,normalize(vec3(.75,.25,.6))),0.),12.);
-  c+=.06*sin(d.x*10.+d.y*7.+uT*.3)*vec3(.9,.6,1.);
+  p=obj(p);
+  float d2=shape2(p.xz);
+  vec2 fq=p.xz/uScale; float sp=pow(max(sin(5.6*fq.x+uT*.8)*sin(5.6*fq.y-uT*.6+fq.x*1.3),0.),1.6);
+  float h=HH+uFerro*(.34*sp+.05*sin(uT*1.7+length(fq)*6.))*smoothstep(.05,-.45,d2)+uWave*.018*sin(length(p.xz)*10.-uT*4.);
+  vec2 w=vec2(d2+RB,abs(p.y)-h+RB);
+  return (min(max(w.x,w.y),0.)+length(max(w,0.))-RB)*mix(.8,.55,uFerro);}
+vec3 nrm(vec3 p){vec2 e=vec2(.003,-.003);return normalize(e.xyy*map(p+e.xyy)+e.yyx*map(p+e.yyx)+e.yxy*map(p+e.yxy)+e.xxx*map(p+e.xxx));}
+vec3 pal(float x){x=clamp(x,0.,1.);vec3 a=vec3(.61,.78,.89),b=vec3(.70,.68,.92),c=vec3(.93,.66,.86),d=vec3(.98,.78,.62);
+  return x<.33?mix(a,b,x/.33):x<.66?mix(b,c,(x-.33)/.33):mix(c,d,(x-.66)/.34);}
+vec3 floorC(vec2 x){
+  vec3 c=vec3(.958,.953,.978);
+  vec2 f=fract(x*2.5), e=min(f,1.-f); float ln=1.-smoothstep(0.,.03,min(e.x,e.y));
+  c=mix(c,vec3(.80,.79,.89),ln*.75);
+  float by=x.y-(.28*sin(x.x*.9+.6)+.12); float band=(1.-smoothstep(.12,.16,abs(by)))*(1.-smoothstep(2.4,3.1,abs(x.x)));
+  c=mix(c,pal(x.x*.2+.5),band*.95);
+  float bar=(1.-smoothstep(.06,.09,abs(x.y+1.)))*(1.-smoothstep(1.1,1.2,abs(x.x+.5)));
+  c=mix(c,vec3(.49,.55,.86),bar*.9);
+  c=mix(c,vec3(.95,.74,.88),.5*exp(-dot(x-vec2(1.4,-.75),x-vec2(1.4,-.75))*2.));
+  c=mix(c,vec3(.98,.84,.7),.45*exp(-dot(x-vec2(-1.3,.95),x-vec2(-1.3,.95))*2.2));
+  if(uWave>.001){float r=length(x),acc=0.;for(int k=0;k<4;k++){float ph=fract(uT*.18+float(k)*.25);float R=1.05*uScale+ph*3.2;acc+=exp(-pow((r-R)*6.5,2.))*(1.-ph)*smoothstep(0.,.08,ph);}
+    c=mix(c,vec3(.58,.55,.92),clamp(acc*.65*uWave,0.,1.));}
   return c;}
+vec3 floorS(vec2 x){
+  vec3 c=floorC(x);
+  vec2 q=rot(uMouse.x*.6+sin(uT*.2)*.18)*(x-vec2(.16,.1));
+  float d=shape2(q);
+  c*=1.-.2*(1.-smoothstep(-.3,.42,d));
+  c+=vec3(1.,.96,1.)*.1*exp(-pow((d+.1)*13.,2.));
+  return c;}
+vec3 sky(vec3 d){
+  vec3 c=mix(vec3(.80,.79,.88),vec3(.97,.96,1.),smoothstep(-.2,.9,d.y));
+  c+=vec3(1.)*.7*smoothstep(.93,.985,dot(d,normalize(vec3(-.5,.8,.3))));
+  c+=vec3(1.,.82,.6)*.7*pow(max(dot(d,normalize(vec3(.6,.4,.7))),0.),30.);
+  return c;}
+vec3 trace(vec3 o,vec3 d,float fogT){
+  if(d.y<-.001){float t=-o.y/d.y;vec3 c=floorS((o+d*t).xz);return mix(c,vec3(.985,.98,1.),1.-exp(-(t+fogT)*.055));}
+  return sky(d);}
 void main(){
   vec2 fc=gl_FragCoord.xy, uv=(fc-.5*uRes-uOff)/uRes.y;
-  vec2 bu=fc/uRes;
-  // background: soft lavender field + waves from the form
-  vec3 bg=mix(vec3(1.),vec3(.95,.93,.99),smoothstep(.1,1.1,length(bu-vec2(.62,.5))*1.3));
-  float rr=length(uv);
-  bg+=vec3(.86,.78,1.)*.18*exp(-rr*rr*2.2)*(1.-.4*uWave);
-  if(uWave>.001){float acc=0.,hl=0.;for(int k=0;k<4;k++){float ph=fract(uT*.2+float(k)*.25);float R=.5*uScale+ph*1.25;float fall=(1.-ph)*smoothstep(0.,.08,ph);acc+=exp(-pow((rr-R)*11.,2.))*fall;hl+=exp(-pow((rr-R+.018)*42.,2.))*fall;}
-    bg=mix(bg,vec3(.66,.62,.95),clamp(acc*.75*uWave,0.,1.));bg+=vec3(1.)*hl*.55*uWave;
-    bg+=vec3(.95,.7,.9)*acc*.08*uWave*(.5+.5*sin(atan(uv.y,uv.x)*3.+uT));}
-  vec3 ro=vec3(0.,0.,4.4), rd=normalize(vec3(uv,-1.75));
-  float t=0., d=1.; bool hit=false;
-  for(int i=0;i<84;i++){vec3 p=ro+rd*t;d=map(p);if(d<.0015){hit=true;break;}t+=d;if(t>9.)break;}
-  vec3 col=bg;
-  if(hit){vec3 p=ro+rd*t, n=nrm(p);
-    float fr=.05+.95*pow(1.-max(dot(-rd,n),0.),3.2);
-    vec3 rf=reflect(rd,n);
-    vec3 r1=refract(rd,n,1./1.16), r2=refract(rd,n,1./1.21), r3=refract(rd,n,1./1.27);
-    vec3 refr=vec3(env(r1).r,env(r2).g,env(r3).b);
-    vec3 thin=.5+.5*cos(6.2832*(fr*1.6+vec3(0.,.33,.67)+uT*.04));
-    float edge=pow(1.-max(dot(-rd,n),0.),1.6);
-    col=mix(refr*vec3(.93,.92,1.03),env(rf),fr*.8);
-    col*=1.-.38*edge*(1.-fr*.5);
-    col+=thin*fr*.32;
-    col+=vec3(1.)*pow(max(dot(rf,normalize(vec3(-.35,.8,.45))),0.),90.)*1.4;
-    col+=vec3(1.,.8,.95)*pow(max(dot(rf,normalize(vec3(.7,.3,.6))),0.),40.)*.35;
-    col=mix(col,bg,.04);}
-  else{float sh=exp(-pow(length((uv-vec2(0.,-.62*uScale))*vec2(1.,4.5)),2.)*2.2);col*=1.-.16*sh;}
-  col+=(fract(sin(dot(fc,vec2(12.9898,78.233)))*43758.5453)-.5)*.015;
+  vec3 ro=vec3(0.,3.9,2.3), ta=vec3(0.,.12,.12);
+  vec3 fw=normalize(ta-ro), rt=normalize(cross(fw,vec3(0.,1.,0.))), up=cross(rt,fw);
+  vec3 rd=normalize(uv.x*rt+uv.y*up+1.6*fw);
+  float t=0.,d; bool hit=false;
+  for(int i=0;i<90;i++){vec3 p=ro+rd*t;d=map(p);if(d<.0012){hit=true;break;}t+=d;if(t>9.)break;}
+  vec3 col;
+  if(hit){
+    vec3 p=ro+rd*t, n=nrm(p);
+    float ci=max(dot(-rd,n),0.), F=.04+.96*pow(1.-ci,5.);
+    vec3 r1=refract(rd,n,1./1.5), q=p+r1*.01;
+    for(int i=0;i<32;i++){float dd=map(q);if(dd>0.)break;q+=r1*max(-dd,.015);}
+    vec3 ne=nrm(q);
+    vec3 refr;
+    for(int c=0;c<3;c++){float eta=c==0?1.42:(c==1?1.5:1.6);
+      vec3 a1=refract(rd,n,1./eta), a2=refract(a1,-ne,eta); if(dot(a2,a2)<.01)a2=reflect(a1,-ne);
+      vec3 s=trace(q,a2,t);
+      if(c==0)refr.r=s.r; else if(c==1)refr.g=s.g; else refr.b=s.b;}
+    vec3 rf=reflect(rd,n), refl=trace(p,rf,t);
+    col=mix(refr*vec3(.99,.99,1.01),refl,clamp(F,0.,1.));
+    float rim=pow(1.-ci,2.4);
+    col+=rim*.32*mix(vec3(1.,.7,.42),vec3(.5,.68,1.),.5+.5*dot(n,normalize(vec3(1.,0.,.3))));
+    col+=vec3(1.)*pow(max(dot(rf,normalize(vec3(-.5,.8,.3))),0.),120.)*1.6;
+    col*=1.-.3*pow(1.-ci,4.);
+  } else col=trace(ro,rd,0.);
+  col+=(fract(sin(dot(fc,vec2(12.9898,78.233)))*43758.5453)-.5)*.012;
   gl_FragColor=vec4(col,1.);}`;
   const mk=(t,src)=>{const s=g.createShader(t);g.shaderSource(s,src);g.compileShader(s);if(!g.getShaderParameter(s,g.COMPILE_STATUS)){console.warn(g.getShaderInfoLog(s));return null}return s};
   const v=mk(g.VERTEX_SHADER,vs),f=mk(g.FRAGMENT_SHADER,fs); if(!v||!f)return;
@@ -412,8 +438,8 @@ function tickWorldC(){
   const g=WCG.gl,u=WCG.u,mob=VW<700,now=performance.now()/1000;
   WCG.split=lerp(WCG.split,WCG.tSplit||0,.08);WCG.ferro=lerp(WCG.ferro,WCG.tFerro||0,.08);WCG.scale=lerp(WCG.scale,WCG.tScale||.62,.08);WCG.wave=lerp(WCG.wave,WCG.tWave||0,.08);
   WCG.mx=lerp(WCG.mx,tilt.x,.08);WCG.my=lerp(WCG.my,tilt.y,.08);
-  const W=wcGL.width,H=wcGL.height, sc=mob?.56:.7;
-  g.uniform2f(u.uRes,W,H); g.uniform2f(u.uOff,mob?0:W*.17,mob?H*.2:0); g.uniform2f(u.uMouse,WCG.mx,WCG.my);
+  const W=wcGL.width,H=wcGL.height, sc=mob?.5:.62;
+  g.uniform2f(u.uRes,W,H); g.uniform2f(u.uOff,mob?0:W*.17,mob?H*.16:-H*.02); g.uniform2f(u.uMouse,WCG.mx,WCG.my);
   g.uniform1f(u.uT,reduce?0:now); g.uniform1f(u.uSplit,WCG.split); g.uniform1f(u.uFerro,WCG.ferro); g.uniform1f(u.uScale,WCG.scale*sc); g.uniform1f(u.uWave,WCG.wave);
   g.drawArrays(g.TRIANGLES,0,3);
 }
