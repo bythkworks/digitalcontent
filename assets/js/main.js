@@ -308,16 +308,114 @@ chBtns.forEach(b=>b.addEventListener('click',()=>{const i=+b.dataset.ch;const el
 /* ======================= WORLD C ======================= */
 const worldC={el:$('#world-c'),p:0,t:0};
 const wcEls=[0,1,2,3,4,5,6].map(i=>$('#wc'+i)), wcScene=$('#wcScene'), wcbar=$('#wcbar');
-const wcWho=$('#world-c .who'), wcDim=$('#wcDim');
+/* ======================= EPILOGUE · 3D liquid glass form ======================= */
+const wcGL=$('#wcGL'), wcRight=$('#world-c .wc-right'), wcPhase=$('#wcPhase');
+[3,4,5].forEach((n,k)=>{const li=$('#wc'+n);
+  wcPhase.insertAdjacentHTML('beforeend',`<div class="wc-ph" aria-hidden="${k?'true':'false'}"><span class="wc-pill"><span class="wc-ic">${li.querySelector('.ic').innerHTML}</span>${li.querySelector('b').textContent}</span><h3>${li.querySelector(':scope > div > span').textContent}</h3><div class="wc-dots">${[0,1,2].map(j=>`<i class="${j===k?'on':''}"></i>`).join('')}</div></div>`)});
+const wcPhs=$$('.wc-ph');
+const WCG={gl:null,ok:false,u:{},mx:0,my:0,split:0,ferro:0,scale:.6,wave:0};
+(function initWcGL(){
+  const g=wcGL.getContext('webgl',{antialias:false,alpha:false,powerPreference:'high-performance'}); if(!g)return;
+  const vs='attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
+  const fs=`precision highp float;
+uniform vec2 uRes,uOff,uMouse;uniform float uT,uSplit,uFerro,uScale,uWave;
+mat2 rot(float a){float c=cos(a),s=sin(a);return mat2(c,-s,s,c);}
+float smin(float a,float b,float k){float h=clamp(.5+.5*(b-a)/k,0.,1.);return mix(b,a,h)-k*h*(1.-h);}
+vec3 tw(vec3 p){p.xz*=rot(uT*.18+uMouse.x*.9);p.yz*=rot(-.18+uMouse.y*.6);return p;}
+float map(vec3 p){
+  p=tw(p)/uScale;
+  float s=uSplit, w=sin(uT*.9);
+  vec3 c1=vec3(-1.02*s,.1*s*w,0.), c2=vec3(1.02*s,-.1*s*w,0.);
+  float r=mix(1.,.7,s);
+  float d=smin(length(p-c1)-r,length(p-c2)-r,.08+.5*s);
+  float org=.07*sin(2.6*p.x+uT*.9)*sin(2.2*p.y+uT*1.1)*sin(2.8*p.z+uT*.7)+.04*sin(4.6*p.y-uT*1.3+p.x*2.1);
+  d+=org*(1.-.6*uFerro);
+  if(uFerro>.001){vec3 n=normalize(p+1e-4);
+    float a1=sin(6.5*n.x+uT*1.2)*sin(6.5*n.y-uT)*sin(6.5*n.z+uT*.8);
+    float a2=sin(10.*n.x-uT*.6+n.y*3.)*sin(10.*n.z+uT*1.3);
+    float sp=.30*pow(max(a1,0.),2.)+.14*pow(max(a2,0.),3.);
+    d-=uFerro*sp*smoothstep(1.6,.7,length(p));
+    d+=uFerro*.04*sin(uT*2.3+length(p)*7.);}
+  d+=uWave*.025*sin(length(p)*13.-uT*5.);
+  return d*uScale*.62;}
+vec3 nrm(vec3 p){vec2 e=vec2(.0025,-.0025);return normalize(e.xyy*map(p+e.xyy)+e.yyx*map(p+e.yyx)+e.yxy*map(p+e.yxy)+e.xxx*map(p+e.xxx));}
+vec3 env(vec3 d){
+  float y=d.y;
+  vec3 c=mix(vec3(.93,.90,.99),vec3(.55,.74,.95),smoothstep(-.05,.95,y));
+  c=mix(c,vec3(.42,.38,.80),smoothstep(0.,-.95,y));
+  float a=atan(d.x,d.z);
+  c=mix(c,vec3(.95,.55,.82),.55*smoothstep(.2,1.,sin(a*1.3+.6))*(1.-abs(y)));
+  c=mix(c,vec3(1.,.74,.56),.45*smoothstep(.4,1.,sin(a*1.1-2.2))*(1.-abs(y)));
+  c+=vec3(1.)*1.1*pow(max(dot(d,normalize(vec3(-.35,.8,.45))),0.),40.);
+  c+=vec3(1.,.9,1.)*.5*pow(max(dot(d,normalize(vec3(.75,.25,.6))),0.),12.);
+  c+=.06*sin(d.x*10.+d.y*7.+uT*.3)*vec3(.9,.6,1.);
+  return c;}
+void main(){
+  vec2 fc=gl_FragCoord.xy, uv=(fc-.5*uRes-uOff)/uRes.y;
+  vec2 bu=fc/uRes;
+  // background: soft lavender field + waves from the form
+  vec3 bg=mix(vec3(1.),vec3(.95,.93,.99),smoothstep(.1,1.1,length(bu-vec2(.62,.5))*1.3));
+  float rr=length(uv);
+  bg+=vec3(.86,.78,1.)*.18*exp(-rr*rr*2.2)*(1.-.4*uWave);
+  if(uWave>.001){float acc=0.,hl=0.;for(int k=0;k<4;k++){float ph=fract(uT*.2+float(k)*.25);float R=.5*uScale+ph*1.25;float fall=(1.-ph)*smoothstep(0.,.08,ph);acc+=exp(-pow((rr-R)*11.,2.))*fall;hl+=exp(-pow((rr-R+.018)*42.,2.))*fall;}
+    bg=mix(bg,vec3(.66,.62,.95),clamp(acc*.75*uWave,0.,1.));bg+=vec3(1.)*hl*.55*uWave;
+    bg+=vec3(.95,.7,.9)*acc*.08*uWave*(.5+.5*sin(atan(uv.y,uv.x)*3.+uT));}
+  vec3 ro=vec3(0.,0.,4.4), rd=normalize(vec3(uv,-1.75));
+  float t=0., d=1.; bool hit=false;
+  for(int i=0;i<84;i++){vec3 p=ro+rd*t;d=map(p);if(d<.0015){hit=true;break;}t+=d;if(t>9.)break;}
+  vec3 col=bg;
+  if(hit){vec3 p=ro+rd*t, n=nrm(p);
+    float fr=.05+.95*pow(1.-max(dot(-rd,n),0.),3.2);
+    vec3 rf=reflect(rd,n);
+    vec3 r1=refract(rd,n,1./1.16), r2=refract(rd,n,1./1.21), r3=refract(rd,n,1./1.27);
+    vec3 refr=vec3(env(r1).r,env(r2).g,env(r3).b);
+    vec3 thin=.5+.5*cos(6.2832*(fr*1.6+vec3(0.,.33,.67)+uT*.04));
+    float edge=pow(1.-max(dot(-rd,n),0.),1.6);
+    col=mix(refr*vec3(.93,.92,1.03),env(rf),fr*.8);
+    col*=1.-.38*edge*(1.-fr*.5);
+    col+=thin*fr*.32;
+    col+=vec3(1.)*pow(max(dot(rf,normalize(vec3(-.35,.8,.45))),0.),90.)*1.4;
+    col+=vec3(1.,.8,.95)*pow(max(dot(rf,normalize(vec3(.7,.3,.6))),0.),40.)*.35;
+    col=mix(col,bg,.04);}
+  else{float sh=exp(-pow(length((uv-vec2(0.,-.62*uScale))*vec2(1.,4.5)),2.)*2.2);col*=1.-.16*sh;}
+  col+=(fract(sin(dot(fc,vec2(12.9898,78.233)))*43758.5453)-.5)*.015;
+  gl_FragColor=vec4(col,1.);}`;
+  const mk=(t,src)=>{const s=g.createShader(t);g.shaderSource(s,src);g.compileShader(s);if(!g.getShaderParameter(s,g.COMPILE_STATUS)){console.warn(g.getShaderInfoLog(s));return null}return s};
+  const v=mk(g.VERTEX_SHADER,vs),f=mk(g.FRAGMENT_SHADER,fs); if(!v||!f)return;
+  const pr=g.createProgram();g.attachShader(pr,v);g.attachShader(pr,f);g.linkProgram(pr); if(!g.getProgramParameter(pr,g.LINK_STATUS))return;
+  g.useProgram(pr); const b=g.createBuffer();g.bindBuffer(g.ARRAY_BUFFER,b);g.bufferData(g.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),g.STATIC_DRAW);
+  const l=g.getAttribLocation(pr,'a');g.enableVertexAttribArray(l);g.vertexAttribPointer(l,2,g.FLOAT,false,0,0);
+  ['uRes','uOff','uMouse','uT','uSplit','uFerro','uScale','uWave'].forEach(k=>WCG.u[k]=g.getUniformLocation(pr,k));
+  WCG.gl=g; WCG.ok=true; $('#world-c').classList.add('has-gl');
+})();
+function sizeWcGL(){if(!WCG.ok)return;const s=.5, d=Math.min(devicePixelRatio||1,1.25);wcGL.width=Math.round(VW*s*d);wcGL.height=Math.round(VH*s*d);WCG.gl.viewport(0,0,wcGL.width,wcGL.height)}
+sizeWcGL(); addEventListener('resize',sizeWcGL);
+const WC_PH=[[.22,.44],[.44,.64],[.64,1.01]];
 function renderWorldC(p){
-  wcScene.style.transform=`scale(${(1.14-.14*p).toFixed(4)})`;
-  const st=[[.0,.12],[.04,.18],[.12,.26]], up=eIO(range(p,.42,.56)), whoH=wcWho.offsetHeight+48;
-  [0,1,2].forEach(i=>{const el=wcEls[i],c=eOut(range(p,...st[i]));el.style.opacity=c.toFixed(3);
-    el.style.transform=`translateY(${(24*(1-c)+(1-up)*whoH/2).toFixed(1)}px)`;el.style.filter=c<.998?`blur(${(8*(1-c)).toFixed(2)}px)`:'none'});
-  [3,4,5].forEach((i,k)=>{const el=wcEls[i],c=eOut(range(p,.5+k*.05,.64+k*.05));el.style.opacity=c.toFixed(3);
-    el.style.transform=`translateY(${(40*(1-c)).toFixed(1)}px)`;el.style.filter=c<.998?`blur(${(8*(1-c)).toFixed(2)}px)`:'none'});
-  wcDim.style.opacity=(.82+.18*up).toFixed(3);
+  const mob=VW<700, g=eIO(range(p,.15,.23));
+  // statement: crisp at rest, then becomes a small header (desktop) / fades (mobile)
+  [0,1,2].forEach((i,k)=>{const el=wcEls[i],c=eOut(range(p,k*.03,.08+k*.03));el.style.opacity=c.toFixed(3);el.style.transform=`translateY(${(24*(1-c)).toFixed(1)}px)`;el.style.filter=c<.998?`blur(${(8*(1-c)).toFixed(2)}px)`:'none'});
+  const H=wcRight.offsetHeight;
+  if(mob){wcRight.style.opacity=(1-g).toFixed(3);wcRight.style.transform=`translateY(${(g*24).toFixed(1)}px)`}
+  else{wcRight.style.opacity='1';wcRight.style.transform=`translateY(${lerp(-H/2,92-VH/2,g).toFixed(1)}px) scale(${lerp(1,.46,g).toFixed(4)})`}
+  wcPhs.forEach((e,i)=>{const [a,b]=WC_PH[i],ti=eOut(range(p,a,a+.05)),to=eIn(range(p,b-.03,b+.02)),w=(1-ti)+to;
+    e.style.opacity=(ti*(1-to)).toFixed(3);e.style.transform=`translateY(${mob?'0%':'-50%'}) translateY(${((1-ti)*34-to*30).toFixed(1)}px)`;
+    e.style.filter=w>.004?`blur(${(w*10).toFixed(2)}px)`:'none';e.setAttribute('aria-hidden',ti*(1-to)>.5?'false':'true')});
+  WCG.tSplit=eIO(range(p,.22,.38))*(1-eIO(range(p,.45,.56)));
+  WCG.tFerro=eIO(range(p,.46,.58))*(1-eIO(range(p,.66,.76)));
+  WCG.tScale=(.62+.38*eOut(range(p,0,.12)))*(1+.3*eIO(range(p,.66,.8)));
+  WCG.tWave=eIO(range(p,.66,.78));
   wcbar.style.width=(range(p,.6,.97)*100).toFixed(2)+'%';
+}
+function tickWorldC(){
+  const el=worldC.el,top=el.offsetTop; if(!WCG.ok||scrollY+VH<top-10||scrollY>top+el.offsetHeight)return;
+  const g=WCG.gl,u=WCG.u,mob=VW<700,now=performance.now()/1000;
+  WCG.split=lerp(WCG.split,WCG.tSplit||0,.08);WCG.ferro=lerp(WCG.ferro,WCG.tFerro||0,.08);WCG.scale=lerp(WCG.scale,WCG.tScale||.62,.08);WCG.wave=lerp(WCG.wave,WCG.tWave||0,.08);
+  WCG.mx=lerp(WCG.mx,tilt.x,.08);WCG.my=lerp(WCG.my,tilt.y,.08);
+  const W=wcGL.width,H=wcGL.height, sc=mob?.56:.7;
+  g.uniform2f(u.uRes,W,H); g.uniform2f(u.uOff,mob?0:W*.17,mob?H*.2:0); g.uniform2f(u.uMouse,WCG.mx,WCG.my);
+  g.uniform1f(u.uT,reduce?0:now); g.uniform1f(u.uSplit,WCG.split); g.uniform1f(u.uFerro,WCG.ferro); g.uniform1f(u.uScale,WCG.scale*sc); g.uniform1f(u.uWave,WCG.wave);
+  g.drawArrays(g.TRIANGLES,0,3);
 }
 
 /* ======================= SYSTEM ======================= */
@@ -759,13 +857,10 @@ ptGo.addEventListener('click',()=>openDetail(+ptGo.dataset.n));
 /* ======================= shared pointer tilt + epilogue card ======================= */
 const tilt={x:0,y:0}, wcImgBox=$('#world-c .wc-img');
 function tickTilt(){tilt.x=lerp(tilt.x,tm.x,.06);tilt.y=lerp(tilt.y,tm.y,.06)}
-function tickWorldC(){const el=worldC.el,top=el.offsetTop; if(scrollY+VH<top-10||scrollY>top+el.offsetHeight)return;
-  const mob=VW<700, p=worldC.p, k=eOut(range(p,0,.25));
-  wcImgBox.style.transform=mob?`translateY(${((1-k)*30).toFixed(1)}px)`:`perspective(1600px) rotateY(${(-10+tilt.x*7-(1-k)*14).toFixed(2)}deg) rotateX(${(3-tilt.y*5).toFixed(2)}deg) translateX(${((1-k)*60).toFixed(1)}px)`;}
 /* ======================= SCROLL PAUSES + SNAP ======================= */
 // mapped progress values where the scene should rest (content fully shown)
-const HOLDS={'intro':[0,.27,.62,1],'world-a':[.04,.24,.4467,.6533,.86],'world-c':[.3,.8],'system':[.05,.31,.53,.8],'turn':[.42,.8],'projects':[.02,...Array.from({length:6},(_,i)=>.17+(.74/6)*(i+.5)),.975]};
-const HOLD_W={'intro':.05,'world-a':.05,'world-c':.08,'system':.05,'turn':.07,'projects':.035};   // raw share of the section each pause takes
+const HOLDS={'intro':[0,.27,.62,1],'world-a':[.04,.24,.4467,.6533,.86],'world-c':[.1,.34,.6,.86],'system':[.05,.31,.53,.8],'turn':[.42,.8],'projects':[.02,...Array.from({length:6},(_,i)=>.17+(.74/6)*(i+.5)),.975]};
+const HOLD_W={'intro':.05,'world-a':.05,'world-c':.05,'system':.05,'turn':.07,'projects':.035};   // raw share of the section each pause takes
 const KNOTS={};
 for(const id in HOLDS){const H=HOLDS[id],w=HOLD_W[id],mv=1-H.length*w,k=[[0,0]];let pr=0,pm=0;
   H.forEach(h=>{const r0=pr+(h-pm)*mv;k.push([r0,h],[r0+w,h]);pr=r0+w;pm=h});k.push([1,1]);KNOTS[id]=k}
@@ -1074,7 +1169,7 @@ function tickSystem(){
 }
 
 /* ---------- 10. Velocity skew on scrolling copy ---------- */
-const skewEls=$$('.wa-left,.wc-right,.sys-inner .h-main'); let sv=0, lastY=scrollY;
+const skewEls=$$('.wa-left,.sys-inner .h-main'); let sv=0, lastY=scrollY;
 function tickSkew(){
   if(reduce)return; sv=lerp(sv,scrollY-lastY,.12); lastY=scrollY;
   const k=clamp(sv*.045,-2.2,2.2); skewEls.forEach(el=>el.style.transform=Math.abs(k)<.01?'':`skewY(${(-k).toFixed(3)}deg)`);
