@@ -13,7 +13,7 @@ MCUAI가 축제 공간에서 상황을 감지하고, 판단하고, 대응하는 
 
 | 순서 | 섹션 | 내용 |
 |---|---|---|
-| 01 | INTRO | 실시간 오로라 배경, 포털 전환, 첫 메시지 |
+| 01 | INTRO | 실시간 오로라 배경, 구름을 뚫고 축제 공간으로 내려앉는 비행 전환 |
 | 02 | WORLD | 3D 카드 덱과 챕터 번호로 4개 챕터 전환 |
 | 02 | EPILOGUE | 기울어진 장면 카드 위로 핵심 문장 → 개인·공간·운영자 |
 | 03 | SYSTEM | 3D로 기울어진 축제 장면에서 감지 → 판단 → 대응 시연 |
@@ -29,6 +29,7 @@ college-festival-2031/
 ├─ assets/
 │  ├─ css/style.css      전체 스타일
 │  ├─ js/main.js         인터랙션·스크롤·3D 지도 스크립트
+│  ├─ js/intro-flight.js 인트로 비행 전환 (구름을 지나 축제 공간으로)
 │  ├─ js/map-data.js     3D 지도용 모델 데이터 (environment.glb에서 변환)
 │  ├─ models/            environment.glb (3D 지도 원본 모델)
 │  ├─ fonts/             Pretendard Variable (SIL OFL 라이선스 포함)

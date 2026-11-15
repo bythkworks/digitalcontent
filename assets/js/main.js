@@ -178,51 +178,25 @@ $('#portalScene').innerHTML=WORLD_ART[0];
 $('#wcScene').innerHTML=WORLD_ART[5];
 
 const intro={el:$('#intro'),p:0,t:0};
-const portal=$('#portal'),pScene=$('#portalScene'),halo=$('#halo'),pLabel=$('#portalLabel'),rings=$('#rings'),
-  ghost=$('#ghost'),iTitle=$('#introTitle'),flash=$('#flash'),veil=$('#veil'),hint=$('#scrollHint'),persp=$('#persp');
+const iTitle=$('#introTitle'),veil=$('#veil'),hint=$('#scrollHint'),introStage=$('#intro .stage');
 hint.addEventListener('animationend',()=>{hint.classList.remove('fade-up');hint.style.opacity=(1-range(intro.p,0,.05)).toFixed(3)});
 const copyEls=[...$('#introCopy > div').children];
-persp.innerHTML=[0,1,2,3,4,5,6,7].map(i=>`<line stroke="${['#B8B6E5','#9CC8E2','#E8B0DD','#B8B6E5'][i%4]}" stroke-width="${i<4?1.4:.8}" opacity="${i<4?.9:.55}"/>`).join('');
-const pLines=[...persp.children];
+const FLY_DIR=-1;     // 타이틀이 빠져나가는 방향 (비행 선회 방향과 같게: 화면이 오른쪽으로 넘어간다)
 
+/* 첫 화면 → 비행 전환. 하늘·구름·축제 공간은 window.__flight (아래 별도 스크립트) 가 그린다 */
 function renderIntro(p){
-  const t1=range(p,0,.26), t2=range(p,.26,.64), t3=range(p,.64,.8), t4=range(p,.8,.95);
-  const k=Math.min(1,Math.min(VW,VH)/900);
-  const r1=150*k, r2=Math.min(VW,VH)*.33, r3=Math.hypot(VW,VH)/2+40;
-  let r = t2<=0 ? lerp(0,r1,eOut(t1)) : t3<=0 ? lerp(r1,r2,eIO(t2)) : lerp(r2,r3,eIn(t3));
-  if(reduce) r = p<.05?0:p<.64?r2:lerp(r2,r3,t3);
-  portal.style.clipPath=`circle(${r.toFixed(1)}px at 50% 50%)`;
-  pScene.style.transform=`scale(${(t3>0?lerp(1.12,1,eOut(t3)):lerp(1.3,1.12,eIO(t2))).toFixed(4)})`;
-  const hs=2*r; halo.style.width=halo.style.height=hs+'px';
-  halo.style.opacity=(clamp(t1*3)*(1-t3)).toFixed(3);
-  pLabel.style.opacity=(range(p,.12,.24)*(1-range(p,.42,.54))).toFixed(3);pLabel.style.top=(VH/2+r+34)+'px';
-  // title
-  const tt=eOut(t1);
-  iTitle.style.transform=`scale(${1+.15*tt})`; iTitle.style.opacity=(1-range(p,0,.18)).toFixed(3);
-  iTitle.style.filter=`blur(${(8*range(p,0,.18)).toFixed(2)}px)`;
-  iTitle.style.visibility=p>.2?'hidden':'visible';
-  // ghost
-  const gIn=range(p,.1,.26), gOut=range(p,.36,.6);
-  ghost.style.opacity=(.85*gIn*(1-gOut)).toFixed(3);
-  ghost.style.transform=`translateY(${(-20*gOut).toFixed(1)}px) scale(${(1-.18*gOut).toFixed(3)})`;
-  // rings + lines
-  const ro=eOut(t1)*(1-t3);
-  rings.style.opacity=ro.toFixed(3);
-  rings.style.transform=`scale(${((r1?Math.max(r,r1*.6):1)/150*.9+t3*1.5).toFixed(3)}) rotate(${(p*120).toFixed(1)}deg)`;
-  const cx=VW/2, cy=VH/2, corners=[[0,0],[VW,0],[0,VH],[VW,VH],[VW*.25,0],[VW*.75,0],[VW*.25,VH],[VW*.75,VH]];
-  const inner=Math.max(r*1.18,40);
-  pLines.forEach((l,i)=>{const [x,y]=corners[i];const a=Math.atan2(y-cy,x-cx);
-    const reach=lerp(.0,1,eOut(range(p,.04+i*.012,.3)));
-    const ex=cx+Math.cos(a)*inner, ey=cy+Math.sin(a)*inner;
-    l.setAttribute('x1',x);l.setAttribute('y1',y);l.setAttribute('x2',lerp(x,ex,reach).toFixed(1));l.setAttribute('y2',lerp(y,ey,reach).toFixed(1));});
-  persp.style.opacity=(1-t3).toFixed(3);
-  persp.setAttribute('viewBox',`0 0 ${VW} ${VH}`);
-  // flash + veil + copy
-  flash.style.opacity=reduce?0:(.45*bump(range(p,.7,.86))).toFixed(3);
-  veil.style.opacity=range(p,.76,.88).toFixed(3);
-  copyEls.forEach((el,i)=>{const c=eOut(range(p,.8+i*.035,.9+i*.035));el.style.opacity=c.toFixed(3);el.style.transform=`translateY(${(24*(1-c)).toFixed(1)}px)`;el.style.filter=`blur(${(6*(1-c)).toFixed(2)}px)`});
+  const flat=reduce||!(window.__flight&&window.__flight.gl);
+  const tOut=range(p,.015,.15);
+  iTitle.style.transform=flat?`scale(${1+.15*eOut(tOut)})`:`translateX(${(FLY_DIR*VW*.05*eIn(tOut)).toFixed(1)}px) scale(${(1+1.25*eIn(tOut)).toFixed(4)})`;
+  iTitle.style.opacity=(1-tOut).toFixed(3);
+  iTitle.style.filter=tOut>0?`blur(${(10*tOut).toFixed(2)}px)`:'none';
+  iTitle.style.visibility=p>.16?'hidden':'visible';
   hint.style.opacity=(1-range(p,0,.05)).toFixed(3);
-  particles.level=(eOut(t1)*(1-t3*.2))*(p<.8?1:0); particles.r=r; particles.burst=t3>0&&t3<1?1:0;
+  const ob=(introStage.classList.contains('has-gl')?.18:.45)*(1-range(p,.03,.22));
+  $$('#intro .orb').forEach(o=>o.style.opacity=ob.toFixed(3));
+  veil.style.opacity=range(p,.84,.94).toFixed(3);
+  copyEls.forEach((el,i)=>{const c=eOut(range(p,.86+i*.03,.95+i*.03));el.style.opacity=c.toFixed(3);el.style.transform=`translateY(${(24*(1-c)).toFixed(1)}px)`;el.style.filter=c<1?`blur(${(6*(1-c)).toFixed(2)}px)`:'none'});
+  particles.level=0; particles.r=0; particles.burst=0;     // 원형 포털 주변 입자는 쓰지 않는다 (커서·클릭 입자는 그대로)
 }
 
 /* particles */
@@ -917,8 +891,8 @@ const tilt={x:0,y:0}, wcImgBox=$('#world-c .wc-img');
 function tickTilt(){tilt.x=lerp(tilt.x,tm.x,.06);tilt.y=lerp(tilt.y,tm.y,.06)}
 /* ======================= SCROLL PAUSES + SNAP ======================= */
 // mapped progress values where the scene should rest (content fully shown)
-const HOLDS={'intro':[0,.27,.62,1],'world-a':[.04,.24,.4467,.6533,.86],'world-c':[.1,.34,.6,.86],'system':[.05,.31,.53,.8],'turn':[.42,.8],'projects':[.02,...Array.from({length:6},(_,i)=>.17+(.74/6)*(i+.5)),.975]};
-const HOLD_W={'intro':.05,'world-a':.05,'world-c':.05,'system':.05,'turn':.07,'projects':.035};   // raw share of the section each pause takes
+const HOLDS={'intro':[0,.44,1],'world-a':[.04,.24,.4467,.6533,.86],'world-c':[.1,.34,.6,.86],'system':[.05,.31,.53,.8],'turn':[.42,.8],'projects':[.02,...Array.from({length:6},(_,i)=>.17+(.74/6)*(i+.5)),.975]};
+const HOLD_W={'intro':.07,'world-a':.05,'world-c':.05,'system':.05,'turn':.07,'projects':.035};   // raw share of the section each pause takes
 const KNOTS={};
 for(const id in HOLDS){const H=HOLDS[id],w=HOLD_W[id],mv=1-H.length*w,k=[[0,0]];let pr=0,pm=0;
   H.forEach(h=>{const r0=pr+(h-pm)*mv;k.push([r0,h],[r0+w,h]);pr=r0+w;pm=h});k.push([1,1]);KNOTS[id]=k}
@@ -1079,7 +1053,7 @@ void main(){
 function sizeGL(){if(!GL)return;const s=VW<700?.6:.5;heroBg.width=Math.max(2,Math.round(VW*s));heroBg.height=Math.max(2,Math.round(VH*s));GL.g.viewport(0,0,heroBg.width,heroBg.height)}
 function drawGL(now){
   if(!GL)return;
-  if(intro.p>.84||scrollY>intro.el.offsetHeight)return;
+  if(intro.p>.12||scrollY>intro.el.offsetHeight)return;
   const g=GL.g, tx=pIn?PX/VW:.5+.18*Math.sin(now/2600), ty=pIn?1-PY/VH:.55+.12*Math.cos(now/3100);
   GL.mx=lerp(GL.mx,tx,.05); GL.my=lerp(GL.my,ty,.05); GL.vel=lerp(GL.vel,Math.min(scrollVel,40)/40,.08);
   g.uniform2f(GL.uRes,heroBg.width,heroBg.height); g.uniform1f(GL.uTime,now/1000);
@@ -1256,12 +1230,21 @@ function tickDetail(now){
   s.style.transform=`perspective(900px) rotateX(${(-fxm.y*16).toFixed(2)}deg) rotateY(${(fxm.x*22).toFixed(2)}deg) translate(${(fxm.x*24).toFixed(1)}px,${(Math.sin(now/900)*10+fxm.y*16).toFixed(1)}px)`;
 }
 
+/* ---------- intro flight (매 프레임: 구름·카메라 흔들림이 시간에 따라 움직인다) ---------- */
+let flLast=0;
+function tickFlight(now){
+  const F=window.__flight; if(!F)return;
+  const dt=Math.min(.05,Math.max(.001,(now-(flLast||now))/1000)); flLast=now;
+  if(scrollY>intro.el.offsetTop+intro.el.offsetHeight)return;
+  F.render(intro.p,now/1000,dt);
+}
+
 /* ---------- master fx loop ---------- */
 function fxLoop(now){
   const tx=pIn?PX/VW-.5:0, ty=pIn?PY/VH-.5:0; fxm.x=lerp(fxm.x,tx,.07); fxm.y=lerp(fxm.y,ty,.07);
   tickCursor(); tickMag();
   if(!detail.classList.contains('ready')){
-    drawGL(now); tickTitle(now); tickWorldImgs(); tickSystem(); tickSkew(); tickMapIdle(now);
+    drawGL(now); tickFlight(now); tickTitle(now); tickWorldImgs(); tickSystem(); tickSkew(); tickMapIdle(now);
     if(wcImg&&!reduce)wcImg.style.translate=`${(fxm.x*-22).toFixed(1)}px ${(fxm.y*-14).toFixed(1)}px`;
     const H=document.documentElement.scrollHeight-VH; sprog.style.transform=`scaleX(${(H>0?scrollY/H:0).toFixed(4)})`;
   } else tickDetail(now);
@@ -1270,5 +1253,5 @@ function fxLoop(now){
 addEventListener('resize',()=>{sizeGL();if(chPos.length)measureChs()});
 sizeGL(); requestAnimationFrame(fxLoop);
 
-window.__site={map,openCard,openDetail,closeDetail,holdY};
+window.__site={map,openCard,openDetail,closeDetail};
 })();
