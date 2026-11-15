@@ -828,3 +828,9 @@ body.dark-zone #sprog{box-shadow:0 0 14px rgba(232,176,221,.9)}
 .portal-label small{font-size:12px;opacity:.9}
 .veil{background:radial-gradient(60% 45% at 50% 52%,rgba(255,255,255,.72),rgba(255,255,255,0) 70%),linear-gradient(180deg,rgba(255,255,255,0) 55%,rgba(255,255,255,.9) 92%,#fff)}
 @media (prefers-reduced-motion:reduce){#flightBg,#depthFx{display:none}}
+
+/* ---- PROJECTS map: pastel sunset sky behind the toon-shaded campus ---- */
+.pj-sticky{background:
+  radial-gradient(circle at 80% 18%,rgba(255,214,184,.95) 0,rgba(255,214,184,.55) 9%,rgba(255,214,184,0) 22%),
+  radial-gradient(120% 70% at 30% 0%,rgba(236,206,232,.75),rgba(236,206,232,0) 60%),
+  linear-gradient(180deg,#F4E2EE 0%,#ECE6F7 38%,#F6F0FA 70%,#FBF6FA 100%)}

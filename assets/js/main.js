@@ -449,38 +449,78 @@ function box(x,y,w,d,h,cls=''){
 let mh='';
 PRODUCTS.forEach(p=>{const [x,y,w,d,h]=p.b;mh+=`<div class="pin" data-n="${p.n}" style="left:${x+w/2}px;top:${y+d/2}px;--h:${h}" tabindex="0" role="button" aria-label="${p.n}번 ${p.name}, ${p.place}"><div class="pi"><span class="tip">${p.place} · ${p.name}</span><span class="head">${p.n}</span><span class="stem"></span></div></div>`});
 world.innerHTML=mh;
-/* ---- WebGL campus model (baked from the team's GLB) drawn with the same orthographic camera as the CSS pins ---- */
+/* ---- WebGL campus model, toon-shaded (two-tone light, lavender shade, crisp sun shadows) ---- */
 let MGL=null;
+const TOON_SUN=(()=>{const v=[-.5,-.36,.8],l=Math.hypot(...v);return v.map(c=>c/l)})();   // toward the sun (map x east, y south, z up)
 (function initMapGL(){
   if(typeof MAP_B64==='undefined')return;
   const cv=document.createElement('canvas');cv.className='map-gl';cv.setAttribute('aria-hidden','true');mstage.insertBefore(cv,world);
   const g=cv.getContext('webgl',{antialias:true,alpha:true,premultipliedAlpha:true}); if(!g){cv.remove();return}
   const der=g.getExtension('OES_standard_derivatives');
+  const L=TOON_SUN, U=(()=>{const c=[L[1]*0-0*L[2],0*L[0]-L[0]*1,L[0]*0-L[1]*0];const u=[-L[1],L[0],0],n=Math.hypot(...u);return u.map(x=>x/n)})();
+  const V=[L[1]*U[2]-L[2]*U[1],L[2]*U[0]-L[0]*U[2],L[0]*U[1]-L[1]*U[0]];
+  const LS=`uniform vec3 uL,uU,uV;
+vec3 lsp(vec3 p){p-=vec3(500.,500.,0.);return vec3(dot(p,uU)/1150.,dot(p,uV)/1150.,.5-dot(p,uL)/4000.);}`;
+  // shadow pass
+  const svs=`attribute vec4 a;${LS}varying float vD;void main(){vec3 s=lsp(a.xyz/16.);vD=s.z;gl_Position=vec4(s.xy,s.z*2.-1.,1.);}`;
+  const sfs=`precision highp float;varying float vD;void main(){vec4 e=fract(vD*vec4(1.,255.,65025.,16581375.));e-=e.yzww*vec4(1./255.,1./255.,1./255.,0.);gl_FragColor=e;}`;
+  // main pass
   const vs=`attribute vec4 a;uniform vec2 uRes,uC,uT;uniform float uS,uRot,uTilt;varying vec3 vP;varying float vCat;
 void main(){vec3 p=a.xyz/16.;vP=p;vCat=a.w;vec2 q=p.xy-500.+uT;float cr=cos(uRot),sr=sin(uRot),ct=cos(uTilt),st=sin(uTilt);
 float x=q.x*cr-q.y*sr,y=q.x*sr+q.y*cr;float y2=y*ct-p.z*st,z2=y*st+p.z*ct;vec2 sc=uC+uS*vec2(x,y2);
 gl_Position=vec4(sc.x/uRes.x*2.-1.,1.-sc.y/uRes.y*2.,-z2*uS/6000.,1.);}`;
   const fs=`${der?'#extension GL_OES_standard_derivatives : enable\n':''}precision highp float;
-varying vec3 vP;varying float vCat;uniform vec3 uView,uHL;
+varying vec3 vP;varying float vCat;uniform vec3 uView,uHL;uniform sampler2D uSh;uniform float uTx;${LS}
+float unpack(vec4 c){return dot(c,vec4(1.,1./255.,1./65025.,1./16581375.));}
+float shadowAt(vec3 s,float bias){float lit=0.;
+  for(int i=0;i<4;i++){vec2 o=vec2(mod(float(i),2.)-.5,floor(float(i)/2.)-.5)*uTx*1.2;lit+=step(s.z-bias,unpack(texture2D(uSh,s.xy*.5+.5+o)));}
+  return lit*.25;}
 void main(){
 ${der?'vec3 n=normalize(cross(dFdx(vP),dFdy(vP)));if(dot(n,uView)<0.)n=-n;':'vec3 n=vec3(0.,0.,1.);'}
-float dif=max(dot(n,normalize(vec3(-.45,-.55,.7))),0.),up=n.z;vec3 col;
-if(vCat<.5){col=mix(vec3(.962,.957,.984),vec3(.905,.95,.935),smoothstep(2.,16.,vP.z)*.6);
-  vec2 f=fract(vP.xy/50.),e=min(f,1.-f);col=mix(col,vec3(.84,.83,.92),(1.-smoothstep(0.,.03,min(e.x,e.y)))*.45*up);col*=.9+.1*dif;}
-else if(vCat<1.5){col=up>.7?vec3(1.):vec3(.93,.925,.965)*(.78+.3*dif);col=mix(col,vec3(.97,.93,.98),clamp(vP.z/140.,0.,1.)*.35);}
-else if(vCat<2.5){col=vec3(.74,.73,.91);}
-else{col=vec3(.76,.90,.85)*(.84+.24*dif);}
-float h=uHL.z*(1.-smoothstep(36.,100.,length(vP.xy-uHL.xy)));
-col=mix(col,mix(vec3(.74,.84,.97),vec3(.95,.76,.91),clamp(vP.z/80.,0.,1.)),h*(vCat<.5?.5:.62));
-float al=1.-smoothstep(540.,770.,length(vP.xy-500.));gl_FragColor=vec4(col*al,al);}`;
+  float ndl=dot(n,uL);
+  vec3 s=lsp(vP);
+  float sh=ndl>0.?shadowAt(s,.00035+.0012*(1.-ndl)):0.;
+  float lit=smoothstep(.04,.1,ndl)*smoothstep(.35,.65,sh);
+  float hi=smoothstep(.62,.7,ndl)*lit;
+  vec3 cL,cS;
+  if(vCat<.5){
+    float hill=smoothstep(2.,16.,vP.z);
+    cL=mix(vec3(.992,.952,.958),vec3(.90,.96,.91),hill);cS=mix(vec3(.865,.845,.962),vec3(.70,.80,.90),hill);
+    vec2 f=fract(vP.xy/50.),e=min(f,1.-f);float gl=(1.-smoothstep(0.,.03,min(e.x,e.y)))*n.z;
+    cL=mix(cL,vec3(.90,.86,.95),gl*.55);cS=mix(cS,vec3(.73,.71,.90),gl*.4);
+  }else if(vCat<1.5){
+    float h=clamp(vP.z/140.,0.,1.);
+    cL=mix(vec3(1.,.968,.955),vec3(1.,.94,.95),h);cS=mix(vec3(.79,.775,.94),vec3(.84,.78,.94),h);
+    if(n.z>.7){cL=vec3(1.,.985,.975);cS=vec3(.86,.84,.965);}
+  }else if(vCat<2.5){cL=vec3(.70,.69,.93);cS=vec3(.56,.55,.84);}
+  else{cL=vec3(.78,.94,.82);cS=vec3(.58,.79,.80);}
+  vec3 col=mix(cS,cL,lit);
+  col=mix(col,vec3(1.,.93,.86),hi*.35);
+  float hl=uHL.z*(1.-smoothstep(36.,100.,length(vP.xy-uHL.xy)));
+  col=mix(col,mix(vec3(.74,.84,.97),vec3(.95,.76,.91),clamp(vP.z/80.,0.,1.)),hl*(vCat<.5?.5:.62));
+  float r=length(vP.xy-500.);
+  col=mix(col,vec3(.975,.91,.94),smoothstep(380.,700.,r)*.55);
+  float al=1.-smoothstep(560.,780.,r);gl_FragColor=vec4(col*al,al);}`;
   const mk=(t,s)=>{const o=g.createShader(t);g.shaderSource(o,s);g.compileShader(o);if(!g.getShaderParameter(o,g.COMPILE_STATUS)){console.warn(g.getShaderInfoLog(o));return null}return o};
-  const v=mk(g.VERTEX_SHADER,vs),f=mk(g.FRAGMENT_SHADER,fs);if(!v||!f){cv.remove();return}
-  const pr=g.createProgram();g.attachShader(pr,v);g.attachShader(pr,f);g.linkProgram(pr);if(!g.getProgramParameter(pr,g.LINK_STATUS)){cv.remove();return}
+  const link=(a,b)=>{const v=mk(g.VERTEX_SHADER,a),f=mk(g.FRAGMENT_SHADER,b);if(!v||!f)return null;const p=g.createProgram();g.attachShader(p,v);g.attachShader(p,f);g.linkProgram(p);return g.getProgramParameter(p,g.LINK_STATUS)?p:null};
+  const pr=link(vs,fs), sp=link(svs,sfs); if(!pr||!sp){cv.remove();return}
   const dec=s=>{const b=atob(s),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u.buffer};
   const vb=g.createBuffer();g.bindBuffer(g.ARRAY_BUFFER,vb);g.bufferData(g.ARRAY_BUFFER,new Int16Array(dec(MAP_B64.v)),g.STATIC_DRAW);
   const idx=new Uint16Array(dec(MAP_B64.i));const ib=g.createBuffer();g.bindBuffer(g.ELEMENT_ARRAY_BUFFER,ib);g.bufferData(g.ELEMENT_ARRAY_BUFFER,idx,g.STATIC_DRAW);
-  const u={};['uRes','uC','uT','uS','uRot','uTilt','uView','uHL'].forEach(k=>u[k]=g.getUniformLocation(pr,k));
-  MGL={g,cv,pr,vb,ib,n:idx.length,u,loc:g.getAttribLocation(pr,'a'),hl:0,hx:500,hy:500,w:1,h:1};
+  // bake the sun's shadow map once (the scene and sun never move)
+  const SZ=Math.min(2048,g.getParameter(g.MAX_TEXTURE_SIZE));
+  const tex=g.createTexture();g.bindTexture(g.TEXTURE_2D,tex);g.texImage2D(g.TEXTURE_2D,0,g.RGBA,SZ,SZ,0,g.RGBA,g.UNSIGNED_BYTE,null);
+  [g.TEXTURE_MIN_FILTER,g.TEXTURE_MAG_FILTER].forEach(k=>g.texParameteri(g.TEXTURE_2D,k,g.NEAREST));
+  [g.TEXTURE_WRAP_S,g.TEXTURE_WRAP_T].forEach(k=>g.texParameteri(g.TEXTURE_2D,k,g.CLAMP_TO_EDGE));
+  const fb=g.createFramebuffer(),rb=g.createRenderbuffer();g.bindRenderbuffer(g.RENDERBUFFER,rb);g.renderbufferStorage(g.RENDERBUFFER,g.DEPTH_COMPONENT16,SZ,SZ);
+  g.bindFramebuffer(g.FRAMEBUFFER,fb);g.framebufferTexture2D(g.FRAMEBUFFER,g.COLOR_ATTACHMENT0,g.TEXTURE_2D,tex,0);g.framebufferRenderbuffer(g.FRAMEBUFFER,g.DEPTH_ATTACHMENT,g.RENDERBUFFER,rb);
+  g.viewport(0,0,SZ,SZ);g.clearColor(1,1,1,1);g.clear(g.COLOR_BUFFER_BIT|g.DEPTH_BUFFER_BIT);g.enable(g.DEPTH_TEST);g.disable(g.CULL_FACE);
+  g.useProgram(sp);const sl=g.getAttribLocation(sp,'a');g.enableVertexAttribArray(sl);g.vertexAttribPointer(sl,4,g.SHORT,false,0,0);
+  g.uniform3fv(g.getUniformLocation(sp,'uL'),L);g.uniform3fv(g.getUniformLocation(sp,'uU'),U);g.uniform3fv(g.getUniformLocation(sp,'uV'),V);
+  g.drawElements(g.TRIANGLES,idx.length,g.UNSIGNED_SHORT,0);g.bindFramebuffer(g.FRAMEBUFFER,null);
+  const u={};['uRes','uC','uT','uS','uRot','uTilt','uView','uHL','uSh','uTx','uL','uU','uV'].forEach(k=>u[k]=g.getUniformLocation(pr,k));
+  g.useProgram(pr);g.uniform3fv(u.uL,L);g.uniform3fv(u.uU,U);g.uniform3fv(u.uV,V);g.uniform1i(u.uSh,0);g.uniform1f(u.uTx,1/SZ);
+  MGL={g,cv,pr,vb,ib,tex,n:idx.length,u,loc:g.getAttribLocation(pr,'a'),hl:0,hx:500,hy:500,w:1,h:1};
 })();
 function sizeMapGL(w,h){if(!MGL)return;const d=Math.min(devicePixelRatio||1,1.5);MGL.w=w;MGL.h=h;MGL.cv.width=Math.round(w*d);MGL.cv.height=Math.round(h*d)}
 function drawMapGL(){
@@ -488,7 +528,8 @@ function drawMapGL(){
   const n=map.sel||map.hover||0; if(n){const b=PRODUCTS[n-1].b;MGL.hx=b[0]+b[2]/2;MGL.hy=b[1]+b[3]/2}
   const tg=n?1:0; MGL.hl+=(tg-MGL.hl)*.14; if(Math.abs(tg-MGL.hl)>.01)map.dirty=true; else MGL.hl=tg;
   g.viewport(0,0,MGL.cv.width,MGL.cv.height);g.clearColor(0,0,0,0);g.clear(g.COLOR_BUFFER_BIT|g.DEPTH_BUFFER_BIT);g.enable(g.DEPTH_TEST);g.disable(g.CULL_FACE);
-  g.useProgram(MGL.pr);g.bindBuffer(g.ARRAY_BUFFER,MGL.vb);g.bindBuffer(g.ELEMENT_ARRAY_BUFFER,MGL.ib);g.enableVertexAttribArray(MGL.loc);g.vertexAttribPointer(MGL.loc,4,g.SHORT,false,0,0);
+  g.useProgram(MGL.pr);g.activeTexture(g.TEXTURE0);g.bindTexture(g.TEXTURE_2D,MGL.tex);
+  g.bindBuffer(g.ARRAY_BUFFER,MGL.vb);g.bindBuffer(g.ELEMENT_ARRAY_BUFFER,MGL.ib);g.enableVertexAttribArray(MGL.loc);g.vertexAttribPointer(MGL.loc,4,g.SHORT,false,0,0);
   g.uniform2f(u.uRes,MGL.w,MGL.h);g.uniform2f(u.uC,world.offsetLeft+500,world.offsetTop+500);g.uniform2f(u.uT,c.tx,c.ty);
   g.uniform1f(u.uS,s);g.uniform1f(u.uRot,r);g.uniform1f(u.uTilt,t);
   g.uniform3f(u.uView,Math.sin(t)*Math.sin(r),Math.sin(t)*Math.cos(r),Math.cos(t));g.uniform3f(u.uHL,MGL.hx,MGL.hy,MGL.hl);
