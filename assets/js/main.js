@@ -461,7 +461,8 @@ function renderSystem(p){
 
 /* ======================= MAP (CSS 3D) ======================= */
 const world=$('#mapWorld'), mstage=$('#mapStage');
-const map={rot:-38,tilt:56,zoom:1,base:1,tx:0,ty:0, cur:{rot:-38,tilt:56,zoom:1,tx:0,ty:0}, sel:null, hover:null};
+const MAP_ROT=70;
+const map={rot:MAP_ROT,tilt:56,zoom:1,base:1,tx:0,ty:0, cur:{rot:MAP_ROT,tilt:56,zoom:1,tx:0,ty:0}, sel:null, hover:null};
 function box(x,y,w,d,h,cls=''){
   return `<div class="shadow" style="left:${x+8}px;top:${y+10}px;width:${w+h*.35}px;height:${d+h*.25}px"></div>
 <div class="bx ${cls}" style="left:${x}px;top:${y}px;width:${w}px;height:${d}px">
@@ -543,7 +544,7 @@ mstage.addEventListener('pointerup',endDrag);mstage.addEventListener('pointercan
 mstage.addEventListener('wheel',e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDefault();map.zoom=clamp(map.zoom*Math.exp(-e.deltaY*.004),.6,2.2)},{passive:false});
 $('#zIn').onclick=()=>map.zoom=clamp(map.zoom*1.2,.6,2.2);
 $('#zOut').onclick=()=>map.zoom=clamp(map.zoom/1.2,.6,2.2);
-$('#zReset').onclick=()=>{map.rot=-38;map.tilt=56;map.zoom=1;map.tx=0;map.ty=0;closeCard()};
+$('#zReset').onclick=()=>{map.rot=MAP_ROT;map.tilt=56;map.zoom=1;map.tx=0;map.ty=0;closeCard()};
 // hover + select
 function setHL(n){map.hover=n;map.dirty=true;$$('.bx.prod').forEach(b=>b.classList.toggle('hl',b.classList.contains('p'+n)));pins.forEach(p=>p.classList.toggle('hl',+p.dataset.n===n));world.classList.toggle('focus',!!n)}
 pins.forEach(p=>{const n=+p.dataset.n;
@@ -894,9 +895,9 @@ function renderProjects(p){
   if(st!==pj.stop){pj.stop=st;
     if(st>=0&&st<99){const n=TOUR[st],pr=PRODUCTS[n-1],[x,y,w,d]=pr.b;
       if(map.sel)closeCard();
-      map.tx=-(x+w/2-500);map.ty=-(y+d/2-500);map.zoom=VW<700?1.45:1.7;map.rot=-38+(st-2.5)*12;map.tilt=52;setHL(n);
+      map.tx=-(x+w/2-500);map.ty=-(y+d/2-500);map.zoom=VW<700?1.45:1.7;map.rot=MAP_ROT+(st-2.5)*12;map.tilt=52;setHL(n);
       ptK.textContent=`0${n} · ${CAT[pr.cat]} · ${pr.place}`;ptN.textContent=pr.name;ptO.textContent=pr.one;ptGo.dataset.n=n;
-    } else {if(!map.sel){map.tx=0;map.ty=0;map.zoom=1;map.rot=-38;map.tilt=56;setHL(0)}}
+    } else {if(!map.sel){map.tx=0;map.ty=0;map.zoom=1;map.rot=MAP_ROT;map.tilt=56;setHL(0)}}
   }
   if(st>=0&&st<99){const local=(p-PJ_T0)/PJ_TW-st, ti=eOut(clamp(local/.28)), to=eIn(clamp((local-.84)/.16)), w=(1-ti)+to;
     pjTour.style.opacity=(ti*(1-to)).toFixed(3);
@@ -1236,7 +1237,7 @@ function tickSkew(){
 world.classList.add('pre'); pins.forEach((p,i)=>p.style.setProperty('--i',i));
 let mapEntered=false, lastMapInt=performance.now();
 new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting&&!mapEntered){mapEntered=true;
-  if(!reduce){map.cur.rot=-150;map.cur.tilt=80;map.cur.zoom=.45;map.dirty=true}
+  if(!reduce){map.cur.rot=MAP_ROT-112;map.cur.tilt=80;map.cur.zoom=.45;map.dirty=true}
   world.classList.remove('pre');world.classList.add('enter');lastMapInt=performance.now()}}),{threshold:.02}).observe($('#projects'));
 ['pointerdown','wheel'].forEach(t=>mstage.addEventListener(t,()=>lastMapInt=performance.now(),{passive:true}));
 function tickMapIdle(now){
