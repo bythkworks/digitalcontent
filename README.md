@@ -29,6 +29,8 @@ college-festival-2031/
 ├─ assets/
 │  ├─ css/style.css      전체 스타일
 │  ├─ js/main.js         인터랙션·스크롤·3D 지도 스크립트
+│  ├─ js/map-data.js     3D 지도용 모델 데이터 (environment.glb에서 변환)
+│  ├─ models/            environment.glb (3D 지도 원본 모델)
 │  ├─ fonts/             Pretendard Variable (SIL OFL 라이선스 포함)
 │  └─ images/            team-hero.webp, team-environment-01~05.webp
 ├─ docs/                 README용 미리보기 이미지

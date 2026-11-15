@@ -120,42 +120,42 @@ const SYS=[
 ];
 const CAT={personal:'개인',space:'공간',operator:'운영'};
 const PRODUCTS=[
- {n:1,name:'MCUAI 웨어러블 PUI',place:'웰컴 파빌리온',cat:'personal',kind:'band',b:[170,190,150,130,90],
+ {n:1,name:'MCUAI 웨어러블 PUI',place:'웰컴 파빌리온',cat:'personal',kind:'band',b:[534,603,20,20,16],
   one:'손목 위의 빛과 진동으로, 붐비는 축제 속 나만의 길을 안내합니다.',
   problem:'수만 명이 모이는 축제에서 사람들은 지도 앱을 보느라 고개를 숙이고, 혼잡한 동선 속에서 보고 싶던 공연과 부스를 놓칩니다.',
   points:['화면을 보지 않는 안내','혼잡도 기반 동선 추천','취향을 기억하는 하루'],
   steps:[['착용과 연결','입장 게이트에서 밴드를 착용하면 오늘의 관심사가 가볍게 연결됩니다.'],['빛으로 안내','가야 할 방향을 손목 위의 빛이 은은하게 가리킵니다.'],['진동으로 알림','기다리던 공연이 시작되기 전, 짧은 진동으로 알려줍니다.'],['기억으로 이어짐','다녀간 부스와 순간이 하루의 기록으로 남습니다.']],
   sda:['걸음과 위치, 주변 혼잡도와 소음을 감지합니다.','관심사와 현재 동선을 비교해 가장 편안한 경로를 판단합니다.','빛의 방향과 진동 패턴으로 화면 없이 안내합니다.'],
   feat:[['PUI 라이트 링','방향과 상태를 빛의 흐름으로 표현합니다.'],['햅틱 패턴','알림의 중요도에 따라 다른 진동 리듬을 사용합니다.'],['글래스 모듈','반투명 모듈 안에서 MCU가 조용히 작동합니다.'],['하루 배터리','축제가 끝날 때까지 충전 없이 사용합니다.']]},
- {n:2,name:'글래스 스테이지 라이트',place:'메인 스테이지',cat:'space',kind:'light',b:[560,140,260,200,150],
+ {n:2,name:'글래스 스테이지 라이트',place:'메인 스테이지',cat:'space',kind:'light',b:[618,343,20,20,0],
   one:'관객의 반응을 읽어 무대 조명의 색과 밝기를 스스로 조절합니다.',
   problem:'무대 조명은 미리 정해진 큐에 따라 움직여, 관객의 실제 분위기와 컨디션을 반영하지 못합니다.',
   points:['관객 반응에 맞춘 조명','눈부심 없는 밝기','공연 흐름과 연동'],
   steps:[['분위기 읽기','관객석의 소리와 움직임으로 지금의 열기를 읽습니다.'],['색 바꾸기','분위기에 맞춰 파스텔 톤의 빛이 천천히 변합니다.'],['밝기 맞추기','가까운 관객의 눈부심을 줄이도록 밝기를 조절합니다.'],['함께 마무리','공연의 끝에서 모두의 빛이 하나로 이어집니다.']],
   sda:['관객석의 소리 크기와 움직임의 리듬을 감지합니다.','곡의 흐름과 관객의 반응을 비교해 어울리는 빛을 판단합니다.','색, 밝기, 확산 각도를 부드럽게 바꿉니다.'],
   feat:[['글래스 돔','빛을 부드럽게 퍼뜨리는 반투명 돔 구조입니다.'],['반응형 색 온도','분위기에 맞춰 색 온도가 자연스럽게 변합니다.'],['눈부심 보호','관객과의 거리에 따라 밝기를 낮춥니다.'],['무대 연동','음향 콘솔과 연결되어 공연 흐름을 따릅니다.']]},
- {n:3,name:'쉼 포드',place:'휴식 정원',cat:'space',kind:'pod',b:[130,560,180,170,72],
+ {n:3,name:'쉼 포드',place:'휴식 정원',cat:'space',kind:'pod',b:[704,620,20,20,19],
   one:'주변 소음과 체온을 감지해, 지금 쉬어 가기 좋은 자리를 만들어 줍니다.',
   problem:'오래 서 있거나 시끄러운 공간에 지친 사람들이 잠시 쉴 곳을 찾기 어렵습니다.',
   points:['소음을 줄여 주는 공간','체온에 맞춘 온도','빈자리 알림'],
   steps:[['빈자리 확인','가까운 포드의 빈자리가 빛으로 표시됩니다.'],['조용히 앉기','포드에 앉으면 주변 소음이 부드럽게 줄어듭니다.'],['온도 맞춤','체온에 맞춰 바람과 온기가 조절됩니다.'],['다시 축제로','충분히 쉬면 다음 공연 시간을 알려줍니다.']],
   sda:['주변 소음, 기온, 앉아 있는 사람의 체온을 감지합니다.','쉬는 사람의 상태와 주변 환경을 비교해 필요한 조절을 판단합니다.','차음, 조명, 공기 흐름을 조절해 편안한 자리를 만듭니다.'],
   feat:[['돔 셸','소리를 흡수하는 반투명 셸 구조입니다.'],['무드 라이트','휴식에 맞춘 은은한 빛을 냅니다.'],['온도 조절','좌석과 공기의 온도를 함께 조절합니다.'],['점유 표시','빈자리 여부를 바깥에서도 알 수 있습니다.']]},
- {n:4,name:'푸드 큐 사인',place:'푸드 스트리트',cat:'operator',kind:'sign',b:[420,420,120,230,62],
+ {n:4,name:'푸드 큐 사인',place:'푸드 스트리트',cat:'operator',kind:'sign',b:[763,259,20,20,-10],
   one:'대기 줄을 분석해 지금 가장 빨리 먹을 수 있는 부스를 알려줍니다.',
   problem:'인기 부스 앞에는 긴 줄이, 다른 부스는 한산한 불균형이 생겨 방문객과 운영자 모두 지칩니다.',
   points:['실시간 대기 시간','붐비지 않는 부스 추천','운영자 알림'],
   steps:[['줄 읽기','부스 앞 대기 인원과 속도를 읽습니다.'],['시간 표시','예상 대기 시간이 사인에 표시됩니다.'],['대안 추천','가까운 덜 붐비는 부스를 함께 보여줍니다.'],['운영 조율','운영자에게 인력 배치 제안이 전달됩니다.']],
   sda:['부스 앞 대기 인원과 줄이 줄어드는 속도를 감지합니다.','주변 부스와 비교해 동선이 고르게 나뉠 방법을 판단합니다.','사인 표시와 운영자 알림으로 흐름을 분산시킵니다.'],
   feat:[['글래스 패널','멀리서도 읽기 쉬운 반투명 디스플레이입니다.'],['대기 바','대기 시간을 막대의 길이로 직관적으로 보여줍니다.'],['방향 표시','추천 부스 방향을 빛으로 가리킵니다.'],['운영 연동','운영 스테이션과 실시간으로 연결됩니다.']]},
- {n:5,name:'분실물 비컨',place:'라운지',cat:'personal',kind:'beacon',b:[640,470,120,120,110],
+ {n:5,name:'분실물 비컨',place:'라운지',cat:'personal',kind:'beacon',b:[452,448,20,20,-30],
   one:'소중한 물건에 붙여 두면, 멀어지는 순간 부드럽게 알려줍니다.',
   problem:'붐비는 축제에서 지갑, 카드, 소지품을 잃어버리면 찾기 어렵고 하루의 경험이 망가집니다.',
   points:['멀어지면 알림','마지막 위치 기억','분실물 센터 연결'],
   steps:[['붙이기','작은 비컨을 소지품에 붙입니다.'],['거리 감지','물건과 멀어지면 손목에 진동이 전해집니다.'],['위치 확인','마지막으로 머문 위치를 빛으로 안내받습니다.'],['돌려받기','누군가 발견하면 분실물 센터로 연결됩니다.']],
   sda:['소유자와 물건 사이의 거리와 움직임을 감지합니다.','일시적으로 내려놓은 것인지, 잃어버린 것인지 판단합니다.','진동과 빛으로 알리고 필요하면 분실물 센터에 연결합니다.'],
   feat:[['페블 셰이프','손에 쥐기 좋은 조약돌 형태입니다.'],['라이트 링','상태를 빛의 색으로 보여줍니다.'],['저전력 MCU','작은 배터리로 축제 기간 내내 작동합니다.'],['프라이버시','위치 정보는 소유자에게만 공유됩니다.']]},
- {n:6,name:'운영 관제 스테이션',place:'컨트롤 타워',cat:'operator',kind:'station',b:[700,700,140,140,200],
+ {n:6,name:'운영 관제 스테이션',place:'컨트롤 타워',cat:'operator',kind:'station',b:[511,668,20,20,99],
   one:'축제 전체의 흐름을 살피고, 운영자에게 필요한 대응을 먼저 제안합니다.',
   problem:'운영자는 넓은 축제장을 한눈에 볼 수 없어, 혼잡이나 안전 문제를 늦게 알아차리기 쉽습니다.',
   points:['한눈에 보는 축제 흐름','위험 상황 조기 감지','대응 제안'],
@@ -471,25 +471,62 @@ function box(x,y,w,d,h,cls=''){
 <div class="face e" style="width:${h}px;height:${d}px;transform:translate3d(${w}px,0,${h}px) rotateY(90deg)">${cls.includes('prod')?`<div class="win" style="left:${h*.3}px;top:${d*.2}px;width:${Math.max(8,h*.22)}px;height:${d*.6}px"></div>`:''}</div>
 <div class="face t" style="width:${w}px;height:${d}px;transform:translateZ(${h}px)"></div></div>`;
 }
-let mh=`<div class="ground"></div>
-<div class="road" style="left:60px;top:470px;width:880px;height:46px"></div>
-<div class="road" style="left:470px;top:60px;width:46px;height:880px"></div>
-<div class="road" style="left:150px;top:380px;width:300px;height:30px;background:#F3F0FA"></div>
-<div class="lawn" style="left:90px;top:520px;width:260px;height:260px"></div>
-<div class="lawn" style="left:600px;top:110px;width:320px;height:260px;background:radial-gradient(circle,#F9EAF4,#F3E2EF)"></div>`;
-DECOR.forEach(b=>mh+=box(...b));
-PRODUCTS.forEach(p=>{const [x,y,w,d,h]=p.b;mh+=box(x,y,w,d,h,'prod p'+p.n)});
-TREES.forEach(([x,y],i)=>{const s=18+(i*7)%16;mh+=`<div class="tree" style="left:${x}px;top:${y}px;--h:${s}"><i style="width:${s*2}px;height:${s*2}px"></i></div>`});
+let mh='';
 PRODUCTS.forEach(p=>{const [x,y,w,d,h]=p.b;mh+=`<div class="pin" data-n="${p.n}" style="left:${x+w/2}px;top:${y+d/2}px;--h:${h}" tabindex="0" role="button" aria-label="${p.n}번 ${p.name}, ${p.place}"><div class="pi"><span class="tip">${p.place} · ${p.name}</span><span class="head">${p.n}</span><span class="stem"></span></div></div>`});
 world.innerHTML=mh;
+/* ---- WebGL campus model (baked from the team's GLB) drawn with the same orthographic camera as the CSS pins ---- */
+let MGL=null;
+(function initMapGL(){
+  if(typeof MAP_B64==='undefined')return;
+  const cv=document.createElement('canvas');cv.className='map-gl';cv.setAttribute('aria-hidden','true');mstage.insertBefore(cv,world);
+  const g=cv.getContext('webgl',{antialias:true,alpha:true,premultipliedAlpha:true}); if(!g){cv.remove();return}
+  const der=g.getExtension('OES_standard_derivatives');
+  const vs=`attribute vec4 a;uniform vec2 uRes,uC,uT;uniform float uS,uRot,uTilt;varying vec3 vP;varying float vCat;
+void main(){vec3 p=a.xyz/16.;vP=p;vCat=a.w;vec2 q=p.xy-500.+uT;float cr=cos(uRot),sr=sin(uRot),ct=cos(uTilt),st=sin(uTilt);
+float x=q.x*cr-q.y*sr,y=q.x*sr+q.y*cr;float y2=y*ct-p.z*st,z2=y*st+p.z*ct;vec2 sc=uC+uS*vec2(x,y2);
+gl_Position=vec4(sc.x/uRes.x*2.-1.,1.-sc.y/uRes.y*2.,-z2*uS/6000.,1.);}`;
+  const fs=`${der?'#extension GL_OES_standard_derivatives : enable\n':''}precision highp float;
+varying vec3 vP;varying float vCat;uniform vec3 uView,uHL;
+void main(){
+${der?'vec3 n=normalize(cross(dFdx(vP),dFdy(vP)));if(dot(n,uView)<0.)n=-n;':'vec3 n=vec3(0.,0.,1.);'}
+float dif=max(dot(n,normalize(vec3(-.45,-.55,.7))),0.),up=n.z;vec3 col;
+if(vCat<.5){col=mix(vec3(.962,.957,.984),vec3(.905,.95,.935),smoothstep(2.,16.,vP.z)*.6);
+  vec2 f=fract(vP.xy/50.),e=min(f,1.-f);col=mix(col,vec3(.84,.83,.92),(1.-smoothstep(0.,.03,min(e.x,e.y)))*.45*up);col*=.9+.1*dif;}
+else if(vCat<1.5){col=up>.7?vec3(1.):vec3(.93,.925,.965)*(.78+.3*dif);col=mix(col,vec3(.97,.93,.98),clamp(vP.z/140.,0.,1.)*.35);}
+else if(vCat<2.5){col=vec3(.74,.73,.91);}
+else{col=vec3(.76,.90,.85)*(.84+.24*dif);}
+float h=uHL.z*(1.-smoothstep(36.,100.,length(vP.xy-uHL.xy)));
+col=mix(col,mix(vec3(.74,.84,.97),vec3(.95,.76,.91),clamp(vP.z/80.,0.,1.)),h*(vCat<.5?.5:.62));
+float al=1.-smoothstep(540.,770.,length(vP.xy-500.));gl_FragColor=vec4(col*al,al);}`;
+  const mk=(t,s)=>{const o=g.createShader(t);g.shaderSource(o,s);g.compileShader(o);if(!g.getShaderParameter(o,g.COMPILE_STATUS)){console.warn(g.getShaderInfoLog(o));return null}return o};
+  const v=mk(g.VERTEX_SHADER,vs),f=mk(g.FRAGMENT_SHADER,fs);if(!v||!f){cv.remove();return}
+  const pr=g.createProgram();g.attachShader(pr,v);g.attachShader(pr,f);g.linkProgram(pr);if(!g.getProgramParameter(pr,g.LINK_STATUS)){cv.remove();return}
+  const dec=s=>{const b=atob(s),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u.buffer};
+  const vb=g.createBuffer();g.bindBuffer(g.ARRAY_BUFFER,vb);g.bufferData(g.ARRAY_BUFFER,new Int16Array(dec(MAP_B64.v)),g.STATIC_DRAW);
+  const idx=new Uint16Array(dec(MAP_B64.i));const ib=g.createBuffer();g.bindBuffer(g.ELEMENT_ARRAY_BUFFER,ib);g.bufferData(g.ELEMENT_ARRAY_BUFFER,idx,g.STATIC_DRAW);
+  const u={};['uRes','uC','uT','uS','uRot','uTilt','uView','uHL'].forEach(k=>u[k]=g.getUniformLocation(pr,k));
+  MGL={g,cv,pr,vb,ib,n:idx.length,u,loc:g.getAttribLocation(pr,'a'),hl:0,hx:500,hy:500,w:1,h:1};
+})();
+function sizeMapGL(w,h){if(!MGL)return;const d=Math.min(devicePixelRatio||1,1.5);MGL.w=w;MGL.h=h;MGL.cv.width=Math.round(w*d);MGL.cv.height=Math.round(h*d)}
+function drawMapGL(){
+  if(!MGL)return;const {g,u}=MGL,c=map.cur,s=map.base*c.zoom,r=c.rot*Math.PI/180,t=c.tilt*Math.PI/180;
+  const n=map.sel||map.hover||0; if(n){const b=PRODUCTS[n-1].b;MGL.hx=b[0]+b[2]/2;MGL.hy=b[1]+b[3]/2}
+  const tg=n?1:0; MGL.hl+=(tg-MGL.hl)*.14; if(Math.abs(tg-MGL.hl)>.01)map.dirty=true; else MGL.hl=tg;
+  g.viewport(0,0,MGL.cv.width,MGL.cv.height);g.clearColor(0,0,0,0);g.clear(g.COLOR_BUFFER_BIT|g.DEPTH_BUFFER_BIT);g.enable(g.DEPTH_TEST);g.disable(g.CULL_FACE);
+  g.useProgram(MGL.pr);g.bindBuffer(g.ARRAY_BUFFER,MGL.vb);g.bindBuffer(g.ELEMENT_ARRAY_BUFFER,MGL.ib);g.enableVertexAttribArray(MGL.loc);g.vertexAttribPointer(MGL.loc,4,g.SHORT,false,0,0);
+  g.uniform2f(u.uRes,MGL.w,MGL.h);g.uniform2f(u.uC,world.offsetLeft+500,world.offsetTop+500);g.uniform2f(u.uT,c.tx,c.ty);
+  g.uniform1f(u.uS,s);g.uniform1f(u.uRot,r);g.uniform1f(u.uTilt,t);
+  g.uniform3f(u.uView,Math.sin(t)*Math.sin(r),Math.sin(t)*Math.cos(r),Math.cos(t));g.uniform3f(u.uHL,MGL.hx,MGL.hy,MGL.hl);
+  g.drawElements(g.TRIANGLES,MGL.n,g.UNSIGNED_SHORT,0);
+}
 const pins=$$('.pin'), trees=$$('.tree');
-function fitMap(){const w=mstage.clientWidth,h=mstage.clientHeight;map.base=Math.min(w/1350,h/950)*(w<700?1.3:1);}
+function fitMap(){const w=mstage.clientWidth,h=mstage.clientHeight;map.base=Math.min(w/1350,h/950)*(w<700?1.3:1);sizeMapGL(w,h);map.dirty=true}
 function applyMap(){
   const c=map.cur, s=map.base*c.zoom;
   world.style.transform=`scale(${s.toFixed(4)}) rotateX(${c.tilt.toFixed(2)}deg) rotateZ(${c.rot.toFixed(2)}deg) translate3d(${c.tx.toFixed(1)}px,${c.ty.toFixed(1)}px,0)`;
   const bb=`rotateZ(${(-c.rot).toFixed(2)}deg) rotateX(${(-c.tilt).toFixed(2)}deg)`;
   pins.forEach(p=>p.style.transform=`translate3d(0,0,${(+p.style.getPropertyValue('--h')+4)}px) ${bb} translate(-50%,-100%)`);
-  trees.forEach(t=>{const s=+t.style.getPropertyValue('--h');t.style.transform=`translate3d(0,0,${s*.9}px) ${bb} translate(-50%,-60%)`});
+  drawMapGL();
 }
 function tickMap(){
   const c=map.cur;let moving=false;
@@ -508,7 +545,7 @@ $('#zIn').onclick=()=>map.zoom=clamp(map.zoom*1.2,.6,2.2);
 $('#zOut').onclick=()=>map.zoom=clamp(map.zoom/1.2,.6,2.2);
 $('#zReset').onclick=()=>{map.rot=-38;map.tilt=56;map.zoom=1;map.tx=0;map.ty=0;closeCard()};
 // hover + select
-function setHL(n){$$('.bx.prod').forEach(b=>b.classList.toggle('hl',b.classList.contains('p'+n)));pins.forEach(p=>p.classList.toggle('hl',+p.dataset.n===n));world.classList.toggle('focus',!!n)}
+function setHL(n){map.hover=n;map.dirty=true;$$('.bx.prod').forEach(b=>b.classList.toggle('hl',b.classList.contains('p'+n)));pins.forEach(p=>p.classList.toggle('hl',+p.dataset.n===n));world.classList.toggle('focus',!!n)}
 pins.forEach(p=>{const n=+p.dataset.n;
   p.addEventListener('pointerenter',()=>{if(!map.sel)setHL(n)});
   p.addEventListener('pointerleave',()=>{if(!map.sel)setHL(0)});
