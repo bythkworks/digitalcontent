@@ -930,6 +930,20 @@ ptGo.addEventListener('click',()=>openDetail(+ptGo.dataset.n));
 /* ======================= shared pointer tilt + epilogue card ======================= */
 const tilt={x:0,y:0}, wcImgBox=$('#world-c .wc-img');
 function tickTilt(){tilt.x=lerp(tilt.x,tm.x,.06);tilt.y=lerp(tilt.y,tm.y,.06)}
+
+/* ---- PROJECTS sky: fades in from white as the section arrives, sun rises; fades out on leave ---- */
+const pjSky=$('#pjSky'), pjMapCv=()=>$('.map-gl');
+function tickPjSky(){
+  const r=pjSticky.getBoundingClientRect(); if(r.bottom<0||r.top>VH)return;
+  const kin=eIO(clamp(1-r.top/VH)), kout=eIO(clamp(r.bottom/VH));
+  const k=Math.min(kin,kout);
+  pjSky.style.opacity=k.toFixed(3);
+  pjSticky.style.setProperty('--t',(VH*.45*clamp(r.top/(VH*.3))).toFixed(1)+'px');
+  pjSticky.style.setProperty('--b',(VH*.45*clamp((VH-r.bottom)/(VH*.3))).toFixed(1)+'px');
+  pjSky.style.setProperty('--sy',(30*(1-kin)).toFixed(2)+'vh');
+  pjSky.style.setProperty('--ss',(.8+.2*kin).toFixed(3));
+  const cv=pjMapCv(); if(cv){cv.style.opacity=k.toFixed(3);cv.style.transform=`translateY(${(6*(1-kin)).toFixed(2)}vh) scale(${(1.04-.04*kin).toFixed(4)})`}
+}
 /* ======================= SCROLL PAUSES + SNAP ======================= */
 // mapped progress values where the scene should rest (content fully shown)
 const HOLDS={'intro':[0,.44,1],'world-a':[.04,.24,.4467,.6533,.86],'world-c':[.1,.34,.6,.86],'system':[.05,.31,.53,.8],'turn':[.42,.8],'projects':[.02,...Array.from({length:6},(_,i)=>.17+(.74/6)*(i+.5)),.975]};
@@ -1018,7 +1032,7 @@ function loop(){
     cmx=lerp(cmx,mx,.05);cmy=lerp(cmy,my,.05);
     if(!reduce)iorbs.forEach((o,i)=>o.style.transform=`translate(${(cmx*(30+i*14)).toFixed(1)}px,${(cmy*(30+i*14)).toFixed(1)}px)`);
     if(intro.p<.95||particles.list.length)tickParticles();
-    tickMap(); updateChrome(); tickHoldbar(); tickTilt(); tickWorld(performance.now()); tickWorldC(); tickTurn(performance.now()); tickSystem2(performance.now());
+    tickMap(); updateChrome(); tickHoldbar(); tickTilt(); tickWorld(performance.now()); tickWorldC(); tickTurn(performance.now()); tickSystem2(performance.now()); tickPjSky();
   }
   requestAnimationFrame(loop);
 }
