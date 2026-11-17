@@ -322,6 +322,7 @@ function renderWorldC(p){
   ecTyping.classList.toggle('on',typing); ecState.textContent=typing?'입력 중…':n?'방금 전':'대기 중';
   // the person picks (their own tap wins; otherwise the middle option is chosen by scroll)
   ecSetPick(p>=EC_PICK?(EC.user>=0?EC.user:1):(EC.user>=0?EC.user:-1));
+  ecPhone.classList.toggle('spot',n===5&&!typing);
   ecPhone.classList.toggle('done',p>=EC_MSG[6].at+.04);
   const ent=eOut(range(p,0,.06)); ecPhone.style.opacity=ent.toFixed(3); ecPhone.style.transform=`translateY(${(40*(1-ent)).toFixed(1)}px)`;
   ecLabel.style.opacity=ent.toFixed(3);
