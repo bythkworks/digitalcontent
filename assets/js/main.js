@@ -293,7 +293,7 @@ const EC_MSG=[ // at: scroll progress where the message lands
   {at:.31,who:'me',reply:true},                                                                 // [초안] "○○(으)로 갈게요."
   {at:.40,who:'me',html:'그런데 AI가 다 정해 주는 건가요?'},                                     // [초안]
   {at:.50,who:'ai',kind:'big',html:'AI는 모든 것을<br>대신 결정하지 않습니다.'},
-  {at:.60,who:'ai',html:'사람과 공간의 상황을 이해하고, 더 나은 선택을 돕습니다.'},
+  {at:.60,who:'ai',kind:'lead',html:'사람과 공간의 상황을 이해하고, 더 나은 선택을 돕습니다.'},
   {at:.70,who:'ai',kind:'roles'}];
 const EC_PICK=.26, EC_TYPE=.045;
 const worldC={el:$('#world-c'),p:0,t:0};
@@ -323,7 +323,7 @@ function renderWorldC(p){
   ecLabel.style.opacity=ent.toFixed(3);
   const nxt=eOut(range(p,.8,.88)); wcNext.style.opacity=nxt.toFixed(3); wcNext.style.transform=`translateY(${(16*(1-nxt)).toFixed(1)}px)`;
   wcbar.style.width=(range(p,.84,.98)*100).toFixed(2)+'%';
-  wcScene.style.setProperty('--dusk',eIO(range(p,0,.7)).toFixed(3));
+  
 }
 function tickWorldC(){}
 
