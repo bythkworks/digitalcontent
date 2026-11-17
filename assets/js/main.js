@@ -252,74 +252,29 @@ function tickWorld(now){
   const el=worldA.el,top=el.offsetTop; if(scrollY+VH<top-10||scrollY>top+el.offsetHeight)return;
   const p=worldA.p, t=now/1000, mob=VW<700, g=eIO(range(p,.1,.22)), s=clamp((p-.24)/.62)*3;
   // heading: big statement → small header (desktop) / fades (mobile)
-  const tx=tilt.x, ty=tilt.y;
+  const SC=mob?WA_SCM:WA_SC, tx=tilt.x, ty=tilt.y;
   const H=waHead.offsetHeight;
   if(mob){waHead.style.opacity=(1-g).toFixed(3);waHead.style.transform=`translateY(${(-H/2-g*40).toFixed(1)}px)`;}
   else{waHead.style.opacity=(1-.15*g).toFixed(3);waHead.style.transform=`translateY(${lerp(-H/2,92-VH/2,g).toFixed(1)}px) scale(${lerp(1,.42,g).toFixed(4)})`;}
   // copy per chapter
-  waCopy.style.setProperty('--lx',(30+tx*60).toFixed(1)+'%'); waCopy.style.setProperty('--ly',(18+ty*50).toFixed(1)+'%');
   waCs.forEach((c,k)=>{const d=s-k,ad=Math.abs(d),o=clamp(1-ad*2.4)*g;
     c.style.opacity=o.toFixed(3);
     c.style.transform=`translateY(calc(${mob?'0%':'-50%'} + ${(-d*50).toFixed(1)}px))`;
     c.style.filter=ad>.004?`blur(${Math.min(10,ad*16).toFixed(2)}px)`:'none'});
-  tickWorldLens(now,p,g,s);
-}
+  // deck
 
-/* ======================= WORLD · dark scene + AI lens ======================= */
-// glowing points per chapter, in % of the (square) chapter image
-const WL_HS=[[[36,60],[70,32],[72,73]],[[17,59],[92,55],[43,48]],[[49,47],[11,42],[86,44]],[[46,50],[76,41],[14,53]]];
-const waFull=$('#waFull');
-waFull.insertAdjacentHTML('beforebegin',`<div class="wl-dark" id="wlDark"></div>
-<div class="wl-scene" id="wlScene" aria-hidden="true">${CHAPTERS.map((c,i)=>`<div class="wl-img">${WORLD_ART[i+1]}</div>`).join('')}
-<div class="wl-shade"></div><div class="wl-ai"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><defs>
-<pattern id="wlGrid" width="4" height="4" patternUnits="userSpaceOnUse"><path d="M4 0H0V4" fill="none" stroke="rgba(207,203,255,.55)" stroke-width=".12"/></pattern>
-<linearGradient id="wlLine" x1="0" x2="1"><stop offset="0" stop-color="#9CC8E2"/><stop offset=".5" stop-color="#C9C6FF"/><stop offset="1" stop-color="#F2B6E3"/></linearGradient></defs>
-<rect class="grid" width="100" height="100"/><g id="wlLinks"></g></svg></div>
-<div class="wl-hs" id="wlHs"></div>
-<div class="wl-lens" id="wlLens"><span class="wl-hint" id="wlHint">빛나는 곳을 비춰 보세요</span></div></div>
-<div class="wl-count" id="wlCount"><b><i></i><i></i><i></i></b><span>AI 신호 <em id="wlN">0</em>/3</span></div>`);
-const wlDark=$('#wlDark'),wlScene=$('#wlScene'),wlImgs=$$('.wl-img'),wlHs=$('#wlHs'),wlLinks=$('#wlLinks'),wlLens=$('#wlLens'),wlHint=$('#wlHint'),wlCount=$('#wlCount'),wlN=$('#wlN'),wlPips=$$('#wlCount b i');
-const WL={vis:false,ch:-1,found:WL_HS.map(h=>h.map(()=>false)),lx:.6,ly:.45,tx:.6,ty:.45,user:0,auto:0,dwell:0,hinted:false,rest:.9,lit:0};
-$$('#waFull .world-art').forEach(im=>{im.style.objectFit='cover'});
-function wlBuild(ch){
-  const H=WL_HS[ch];
-  wlHs.innerHTML=H.map(([x,y],i)=>`<span class="wl-dot${WL.found[ch][i]?' found':''}" style="left:${x}%;top:${y}%"><i></i></span>`).join('');
-  wlLinks.innerHTML=H.map(([x,y],i)=>{const [x2,y2]=H[(i+1)%H.length];return `<line x1="${x}" y1="${y}" x2="${x2}" y2="${y2}" vector-effect="non-scaling-stroke"/><circle cx="${x}" cy="${y}" r="3.2" vector-effect="non-scaling-stroke"/>`}).join('');
-  wlImgs.forEach((im,i)=>im.classList.toggle('on',i===ch));
-  wlCountUpdate(ch);
+  waDeck.style.transform=`rotateX(${(-ty*6).toFixed(2)}deg) rotateY(${(tx*8).toFixed(2)}deg)`;
+  waCards.forEach((c,k)=>{
+    const d=k-s; let x,y,z,rx=0,ry,rz,sc,o,br;
+    if(d<0){const a=clamp(-d);x=a*28;y=-a*42;z=-a*120;rx=a*22;ry=-a*18;rz=a*9;sc=1-.08*a;o=1-a;br=1}
+    else{x=d*7;y=-d*6.5;z=-d*150;ry=-d*4;rz=d*2.4;sc=1;o=d<=2.2?1:clamp(3.2-d);br=1-.1*Math.min(d,3)}
+    if(g<1){const q=SC[k],w=1-g,wob=Math.sin(t*.9+k*1.7)*2.2*w;
+      x=lerp(q[0],x,g);y=lerp(q[1],y,g)+wob;z=lerp(q[2],z,g);ry=lerp(q[3],ry,g);rz=lerp(q[4],rz,g)+Math.cos(t*.7+k)*1.4*w;sc=lerp(q[5],sc,g);o=lerp(1,o,g);br=lerp(1,br,g)}
+    c.style.transform=`translate(${x.toFixed(2)}%,${y.toFixed(2)}%) translateZ(${z.toFixed(1)}px) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg) rotateZ(${rz.toFixed(2)}deg) scale(${sc.toFixed(4)})`;
+    c.style.opacity=o.toFixed(3); c.style.filter=br<.995?`brightness(${br.toFixed(3)})`:'none';
+    c.style.zIndex=d<0&&g>=1?20:Math.round(30+z/40);
+  });
 }
-function wlCountUpdate(ch){const n=WL.found[ch].filter(Boolean).length;wlN.textContent=n;wlPips.forEach((p,i)=>p.classList.toggle('on',i<n))}
-// pointer / touch drive the lens
-function wlFromEvent(e){const r=wlScene.getBoundingClientRect();return [(e.clientX-r.left)/r.width,(e.clientY-r.top)/r.height]}
-addEventListener('pointermove',e=>{if(e.pointerType==='touch'&&!WL.vis)return;const [x,y]=wlFromEvent(e);if(x<0||x>1||y<0||y>1)return;WL.tx=x;WL.ty=y;WL.user=performance.now()},{passive:true});
-addEventListener('pointerdown',e=>{if(!WL.vis)return;const [x,y]=wlFromEvent(e);if(x<0||x>1||y<0||y>1)return;WL.tx=x;WL.ty=y;WL.user=performance.now()},{passive:true});
-function tickWorldLens(now,p,g,s){
-  WL.vis=p>.2&&p<.93;
-  const mob=VW<700, dk=g*(1-eIO(range(p,.9,.985)));            // darkness: falls in, lifts on the way out
-  wlDark.style.opacity=dk.toFixed(3); waFull.style.setProperty('--aura',(1-dk).toFixed(3));
-  document.body.classList.toggle('wl-dark-on',dk>.5); 
-  wlScene.style.opacity=(eIO(range(p,.16,.26))*(1-eIO(range(p,.9,.975)))).toFixed(3);
-  wlCount.style.opacity=(eIO(range(p,.24,.3))*(1-eIO(range(p,.88,.93)))).toFixed(3);
-  const ch=Math.min(3,Math.round(s)); if(ch!==WL.ch){WL.ch=ch;wlBuild(ch);WL.auto=0;WL.dwell=0}
-  const dots=$$('.wl-dot',wlHs); dots.forEach(d=>d.classList.toggle('on',p>.22));
-  const R=wlScene.getBoundingClientRect(), lr=Math.min(mob?VW*.3:Math.min(VW*.13,190),R.width*.3);
-  // lens target: the pointer, or an automatic tour of the glowing points when idle / on touch
-  const idle=now-WL.user>(mob?1200:2600);
-  if(idle&&p>.22){const H=WL_HS[ch];let k=WL.found[ch].findIndex(f=>!f);if(k<0)k=Math.floor(now/2600)%H.length;
-    WL.tx=H[k][0]/100+Math.sin(now/900)*.012;WL.ty=H[k][1]/100+Math.cos(now/1100)*.012;}
-  const sp=idle?.035:.2; WL.lx=lerp(WL.lx,WL.tx,sp); WL.ly=lerp(WL.ly,WL.ty,sp);
-  const px=WL.lx*R.width, py=WL.ly*R.height;
-  wlScene.style.setProperty('--lx',px.toFixed(1)+'px');wlScene.style.setProperty('--ly',py.toFixed(1)+'px');wlScene.style.setProperty('--lr',lr.toFixed(1)+'px');
-  wlLens.style.transform=`translate(${(px-lr*.76).toFixed(1)}px,${(py-lr*.76).toFixed(1)}px)`;
-  wlLens.style.opacity=(p>.2&&p<.93?1:0).toString(); wlLens.style.setProperty('--la',((now/25)%360).toFixed(1)+'deg');
-  // discovery
-  WL_HS[ch].forEach(([x,y],i)=>{if(WL.found[ch][i])return;const d=Math.hypot(x/100*R.width-px,y/100*R.height-py);
-    if(d<lr*.45&&p>.24){WL.found[ch][i]=true;dots[i]&&dots[i].classList.add('found');wlCountUpdate(ch);WL.hinted=true}});
-  wlHint.style.opacity=WL.hinted?'0':'1';
-  const all=WL.found[ch].every(Boolean); WL.rest=lerp(WL.rest,all?.42:.9,.05);
-  wlScene.style.setProperty('--rest',WL.rest.toFixed(3));
-}
-
 waBtns.forEach(b=>b.addEventListener('click',()=>scrollToY(holdY('world-a',+b.dataset.wch+1))));
 chBtns.forEach(b=>b.addEventListener('click',()=>{const i=+b.dataset.ch;const el=worldA.el;const top=el.offsetTop, h=el.offsetHeight-VH;scrollToY(holdY('world-a',i+1))}));
 
@@ -765,7 +720,7 @@ function sizeTurn(){dDpr=Math.min(devicePixelRatio||1,1.5);dW=innerWidth;dH=inne
 function renderTurn(p){turn.rp=p}
 function tickTurn(now){
   const el=turn.el,top=el.offsetTop,inView=scrollY+VH>top-10&&scrollY<top+el.offsetHeight+10;
-  if(!inView){document.body.classList.toggle('dark-zone',document.body.classList.contains('wl-dark-on'));return}
+  if(!inView){document.body.classList.remove('dark-zone');return}
   const p=turn.p, t=now/1000;
   tm.cx=lerp(tm.cx,tm.x,.06); tm.cy=lerp(tm.cy,tm.y,.06);
   // ---- lens: white → deep space → back to white
