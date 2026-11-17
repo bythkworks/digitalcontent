@@ -254,7 +254,11 @@ function renderWorldA(p){
 }
 function tickWorld(now){
   const el=worldA.el,top=el.offsetTop; if(scrollY+VH<top-10||scrollY>top+el.offsetHeight)return;
-  const p=worldA.p, t=now/1000, mob=VW<700, g=eIO(range(p,.1,.22)), s=clamp((p-.24)/.62)*3;
+  const p=worldA.p, t=now/1000, mob=VW<700, g=eIO(range(p,.1,.22)), sT=clamp((p-.24)/.62)*3;
+  const dt=Math.min(3,(now-(worldA.lt||now))/16.7)||1; worldA.lt=now;
+  if(worldA.ss===undefined||Math.abs(sT-worldA.ss)>2.5){worldA.ss=sT;worldA.sv=0}
+  for(let k=0;k<Math.round(dt);k++){worldA.sv=(worldA.sv+(sT-worldA.ss)*.075)*.8;worldA.ss+=worldA.sv}
+  const s=reduce?sT:worldA.ss, sv=reduce?0:worldA.sv, jel=clamp(sv*6,-1,1);
   // heading: big statement → small header (desktop) / fades (mobile)
   const SC=mob?WA_SCM:WA_SC, tx=tilt.x, ty=tilt.y;
   const H=waHead.offsetHeight;
@@ -263,7 +267,8 @@ function tickWorld(now){
   // copy per chapter
   waCs.forEach((c,k)=>{const d=s-k,ad=Math.abs(d),o=clamp(1-ad*2.4)*g;
     c.style.opacity=o.toFixed(3);
-    c.style.transform=`translateY(calc(${mob?'0%':'-50%'} + ${(-d*50).toFixed(1)}px))`;
+    c.style.transform=`translateY(calc(${mob?'0%':'-50%'} + ${(-d*50).toFixed(1)}px)) skewY(${(-jel*2.2).toFixed(2)}deg)`;
+    const nm=c.firstElementChild; if(nm)nm.style.transform=`translateY(${(-d*36).toFixed(1)}px) scale(${(1+Math.abs(jel)*.06).toFixed(3)},${(1-Math.abs(jel)*.08).toFixed(3)})`;
     c.style.filter=ad>.004?`blur(${Math.min(10,ad*16).toFixed(2)}px)`:'none'});
   // deck
 
@@ -274,6 +279,8 @@ function tickWorld(now){
     else{x=d*7;y=-d*6.5;z=-d*150;ry=-d*4;rz=d*2.4;sc=1;o=d<=2.2?1:clamp(3.2-d);br=1-.1*Math.min(d,3)}
     if(g<1){const q=SC[k],w=1-g,wob=Math.sin(t*.9+k*1.7)*2.2*w;
       x=lerp(q[0],x,g);y=lerp(q[1],y,g)+wob;z=lerp(q[2],z,g);ry=lerp(q[3],ry,g);rz=lerp(q[4],rz,g)+Math.cos(t*.7+k)*1.4*w;sc=lerp(q[5],sc,g);o=lerp(1,o,g);br=lerp(1,br,g)}
+    c.style.transform=`translate(${x.toFixed(2)}%,${y.toFixed(2)}%) translateZ(${z.toFixed(1)}px) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg) rotateZ(${rz.toFixed(2)}deg) scale(${sc.toFixed(4)})`;
+    if(g>=1&&Math.abs(d)<1){const q=1-Math.abs(d);rz+=jel*4*q;sc*=1+Math.abs(jel)*.03*q;y+=jel*3*q}
     c.style.transform=`translate(${x.toFixed(2)}%,${y.toFixed(2)}%) translateZ(${z.toFixed(1)}px) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg) rotateZ(${rz.toFixed(2)}deg) scale(${sc.toFixed(4)})`;
     c.style.opacity=o.toFixed(3); c.style.filter=br<.995?`brightness(${br.toFixed(3)})`:'none';
     c.style.zIndex=d<0&&g>=1?20:Math.round(30+z/40);
@@ -882,6 +889,31 @@ const maxY=()=>document.documentElement.scrollHeight-innerHeight;
 function smoothTo(y,k){if(reduce){window.scrollTo(0,y);return}SS.cur=SS.on?SS.cur:scrollY;SS.tgt=clamp(Math.round(y),0,maxY());SS.k=k||.075;SS.on=true}
 function tickSS(){if(!SS.on)return;SS.cur=lerp(SS.cur,SS.tgt,SS.k);if(Math.abs(SS.tgt-SS.cur)<.5){SS.cur=SS.tgt;SS.on=false}SS.set=Math.round(SS.cur);window.scrollTo(0,SS.cur)}
 const ownScroller=t=>t&&t.closest&&t.closest('#detail,.lightbox,.pcard');
+
+/* ---- WORLD: one gesture = one chapter (sticky stepping) ---- */
+const WS={armed:true,acc:0,lock:0,last:0,ty:0};
+function waZone(){const a=holdY('world-a',0),b=holdY('world-a',4);return [a,b]}
+function waIdx(y){let bi=0,bd=1e9;for(let i=0;i<5;i++){const d=Math.abs(holdY('world-a',i)-y);if(d<bd){bd=d;bi=i}}return bi}
+function waStep(d){const y=SS.on?SS.tgt:scrollY,[a,b]=waZone();
+  if(d>0?y<a-VH*.6||y>=b-2:y>b+VH*.6||y<=a+2)return false;          // outside, or leaving at the ends → normal scroll
+  const now=performance.now(); if(now<WS.lock)return true;
+  let i=waIdx(y); const hy=holdY('world-a',i); if(d>0?hy>y+4:hy<y-4){}else i=clamp(i+(d>0?1:-1),0,4);
+  smoothTo(holdY('world-a',i),.085); WS.lock=now+720; return true}
+addEventListener('wheel',e=>{
+  if(e.ctrlKey||reduce||detail.classList.contains('open')||ownScroller(e.target))return;
+  const d=e.deltaY; if(Math.abs(e.deltaX)>Math.abs(d)||!d)return;
+  const y=SS.on?SS.tgt:scrollY,[a,b]=waZone(); if(y<a-VH*.6||y>b+VH*.6)return;
+  if(d>0&&y>=b-2||d<0&&y<=a+2)return;
+  e.preventDefault();e.stopImmediatePropagation();
+  const now=performance.now(); if(now-WS.last>180){WS.acc=0;WS.armed=true} WS.last=now;
+  if(!WS.armed||now<WS.lock)return; WS.acc+=d;
+  if(Math.abs(WS.acc)>28){waStep(WS.acc);WS.acc=0;WS.armed=false}
+},{passive:false,capture:true});
+addEventListener('touchstart',e=>{WS.ty=e.touches[0].clientY;WS.y0=scrollY},{passive:true});
+addEventListener('touchend',e=>{const t=e.changedTouches[0];if(!t)return;const dy=WS.ty-t.clientY;
+  const [a,b]=waZone(); if(WS.y0<a-4&&dy>0&&scrollY<a-VH*.3||WS.y0>b+4)return;
+  if(Math.abs(dy)>24&&WS.y0>=a-VH*.4&&WS.y0<=b+4){const i=clamp(waIdx(WS.y0)+(dy>0?1:-1),0,4);
+    if(!(dy>0&&WS.y0>=b-2)&&!(dy<0&&WS.y0<=a+2)){setTimeout(()=>smoothTo(holdY('world-a',i),.09),0);WS.lock=performance.now()+700}}},{passive:true});
 addEventListener('wheel',e=>{
   if(e.ctrlKey||reduce||detail.classList.contains('open')||ownScroller(e.target))return;
   if(Math.abs(e.deltaX)>Math.abs(e.deltaY))return;

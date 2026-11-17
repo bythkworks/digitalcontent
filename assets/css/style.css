@@ -945,3 +945,9 @@ body.dark-zone #sprog{box-shadow:0 0 14px rgba(232,176,221,.9)}
 @keyframes ecSweep2{0%{left:-60%}60%,100%{left:130%}}
 @media (max-width:900px){.ec-phone.spot .ec-m:not(.big),.ec-phone.spot .ec-top{filter:blur(1.5px)}.ec-phone.spot .ec-m.big .ec-b{transform:translateY(-4px) scale(1.03)}}
 @media (prefers-reduced-motion:reduce){.ec-m.big .ec-b::before,.ec-m.big .ec-b::after{animation:none!important}}
+
+/* ---- WORLD numerals: clean solid gradient ---- */
+.wa-num{font-size:clamp(84px,8.6vw,140px);font-weight:800;line-height:.86;letter-spacing:-.05em;font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1;
+  -webkit-text-stroke:0;color:transparent;background:linear-gradient(135deg,#9CC8E2 0%,#B8B6E5 48%,#E8B0DD 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 10px 24px rgba(142,138,216,.18));transform-origin:0 100%;will-change:transform}
+@media (max-width:900px){.wa-num{font-size:15vw}}
