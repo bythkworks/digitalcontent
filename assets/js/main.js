@@ -401,19 +401,24 @@ ${der?'vec3 n=normalize(cross(dFdx(vP),dFdy(vP)));if(dot(n,uCam-vP)<0.)n=-n;':'v
     // ambient occlusion near buildings
     float ao=mix(.80,1.,mk.a);cL*=ao;cS*=mix(.86,1.,mk.a);
   }else if(vCat<1.5||vCat>14.5){
-    float mat=vCat<1.5?0.:vCat<15.5?1.:2.;
+    float mat=vCat<1.5?0.:vCat-14.;
+    float brick=float(abs(mat-1.)<.5||abs(mat-4.)<.5||abs(mat-5.)<.5);
     float hb=fract(sin(dot(floor(vP.xy/22.),vec2(27.17,91.3)))*4375.85);
     vec3 wL=vec3(1.,.97,.945),wS=vec3(.80,.78,.93);
-    if(mat>.5&&mat<1.5){wL=vec3(1.,.80,.71);wS=vec3(.80,.62,.74);}
-    if(mat>1.5){wL=hb<.3?vec3(1.,.95,.90):hb<.5?vec3(1.,.86,.78):hb<.7?vec3(.94,.90,1.):hb<.85?vec3(.92,.97,.93):vec3(1.,.82,.76);
+    if(brick>.5){wL=vec3(1.,.80,.71);wS=vec3(.80,.62,.74);}
+    if(abs(mat-4.)<.5&&vP.z>62.){wL=vec3(1.,.97,.95);wS=vec3(.82,.79,.93);}
+    if(abs(mat-3.)<.5){wL=vec3(.975,.975,.995);wS=vec3(.78,.78,.92);}
+    if(abs(mat-2.)<.5){wL=hb<.3?vec3(1.,.95,.90):hb<.5?vec3(1.,.86,.78):hb<.7?vec3(.94,.90,1.):hb<.85?vec3(.92,.97,.93):vec3(1.,.82,.76);
       wS=hb<.3?vec3(.80,.77,.92):hb<.5?vec3(.84,.68,.80):hb<.7?vec3(.74,.70,.92):hb<.85?vec3(.70,.78,.86):vec3(.82,.64,.76);}
-    if(mat>1.5){wL=mix(wL,vec3(1.,.96,.95),.4);wS=mix(wS,vec3(.80,.78,.93),.35);}
+    if(abs(mat-2.)<.5){wL=mix(wL,vec3(1.,.96,.95),.4);wS=mix(wS,vec3(.80,.78,.93),.35);}
     cL=wL;cS=wS;
     if(n.z>.97){                                    // flat roofs
       float rr=fract(hb*7.3);
-      vec3 rL=mat<.5?vec3(.80,.93,.92):mat<1.5?(rr<.45?vec3(.82,.94,.86):vec3(.97,.95,.95)):(rr<.4?vec3(.78,.93,.84):rr<.6?vec3(1.,.82,.76):vec3(.96,.95,.97));
-      vec3 rS=mat<.5?vec3(.62,.77,.86):mat<1.5?(rr<.45?vec3(.62,.78,.80):vec3(.84,.82,.95)):(rr<.4?vec3(.60,.77,.80):rr<.6?vec3(.84,.66,.78):vec3(.82,.81,.95));
+      vec3 rL=mat<.5?vec3(.80,.93,.92):brick>.5?(rr<.45||mat>4.5?vec3(.82,.94,.86):vec3(.97,.95,.95)):abs(mat-3.)<.5?vec3(.95,.95,.98):(rr<.4?vec3(.78,.93,.84):rr<.6?vec3(1.,.82,.76):vec3(.96,.95,.97));
+      vec3 rS=mat<.5?vec3(.62,.77,.86):brick>.5?(rr<.45||mat>4.5?vec3(.62,.78,.80):vec3(.84,.82,.95)):abs(mat-3.)<.5?vec3(.80,.80,.93):(rr<.4?vec3(.60,.77,.80):rr<.6?vec3(.84,.66,.78):vec3(.82,.81,.95));
       cL=rL;cS=rS;
+      if(abs(mat-3.)<.5){vec2 pf=fract(vP.xy/vec2(4.2,6.5));float pnl=step(.08,pf.x)*step(.08,pf.y)*step(.35,fract(vP.y/26.));
+        cL=mix(cL,mix(vec3(.58,.64,.90),vec3(.78,.82,1.),pf.y*.6),pnl);cS=mix(cS,vec3(.44,.47,.76),pnl);}
       vec2 rf=fract(vP.xy/9.),re=min(rf,1.-rf);float rl=1.-smoothstep(0.,.04,min(re.x,re.y));cL*=1.-.03*rl;cS*=1.-.03*rl;}
     else if(n.z>.15){                               // curved / pitched roofs: brushed metal
       float rib=step(.82,fract(dot(vP.xy,normalize(vec2(-n.y,n.x)))/2.4));
@@ -429,7 +434,7 @@ ${der?'vec3 n=normalize(cross(dFdx(vP),dFdy(vP)));if(dot(n,uCam-vP)<0.)n=-n;':'v
       float rnd=fract(sin(dot(id,vec2(41.3,289.1)))*15731.7);
       vec3 gl=mix(vec3(.78,.82,.98),vec3(.92,.88,1.),f.y);
       vec3 gL=mix(gl,vec3(1.,.90,.78),step(.86,rnd)), gS=mix(vec3(.60,.62,.88),vec3(.74,.66,.86),step(.86,rnd));
-      if(mat>.5&&mat<1.5){cL=mix(cL,vec3(1.,.97,.95),frame);cS=mix(cS,vec3(.86,.82,.94),frame);}   // white frames on brick
+      if(brick>.5){cL=mix(cL,vec3(1.,.97,.95),frame);cS=mix(cS,vec3(.86,.82,.94),frame);}   // white frames on brick
       cL=mix(cL,gL,win*.9);cS=mix(cS,gS,win*.9);
       cL=mix(cL,cL*.93,slab);cS=mix(cS,cS*.95,slab);
     }
