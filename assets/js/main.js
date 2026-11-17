@@ -257,8 +257,8 @@ function tickWorld(now){
   const p=worldA.p, t=now/1000, mob=VW<700, g=eIO(range(p,.1,.22)), sT=clamp((p-.24)/.62)*3;
   const dt=Math.min(3,(now-(worldA.lt||now))/16.7)||1; worldA.lt=now;
   if(worldA.ss===undefined||Math.abs(sT-worldA.ss)>2.5){worldA.ss=sT;worldA.sv=0}
-  for(let k=0;k<Math.round(dt);k++){worldA.sv=(worldA.sv+(sT-worldA.ss)*.075)*.8;worldA.ss+=worldA.sv}
-  const s=reduce?sT:worldA.ss, sv=reduce?0:worldA.sv, jel=clamp(sv*6,-1,1);
+  {const prev=worldA.ss;worldA.ss+=(sT-worldA.ss)*(1-Math.pow(1-.13,dt));if(Math.abs(sT-worldA.ss)<.0015)worldA.ss=sT;worldA.sv=(worldA.ss-prev)/dt}
+  const s=reduce?sT:worldA.ss, sv=reduce?0:worldA.sv, jel=clamp(sv*9,-1,1);
   // heading: big statement → small header (desktop) / fades (mobile)
   const SC=mob?WA_SCM:WA_SC, tx=tilt.x, ty=tilt.y;
   const H=waHead.offsetHeight;
@@ -283,7 +283,7 @@ function tickWorld(now){
     if(g>=1&&Math.abs(d)<1){const q=1-Math.abs(d);rz+=jel*4*q;sc*=1+Math.abs(jel)*.03*q;y+=jel*3*q}
     c.style.transform=`translate(${x.toFixed(2)}%,${y.toFixed(2)}%) translateZ(${z.toFixed(1)}px) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg) rotateZ(${rz.toFixed(2)}deg) scale(${sc.toFixed(4)})`;
     c.style.opacity=o.toFixed(3); c.style.filter=br<.995?`brightness(${br.toFixed(3)})`:'none';
-    c.style.zIndex=d<0&&g>=1?20:Math.round(30+z/40);
+    c.style.zIndex=d<0&&g>=1?(d>-1?40:20):Math.round(30+z/40);
   });
 }
 waBtns.forEach(b=>b.addEventListener('click',()=>scrollToY(holdY('world-a',+b.dataset.wch+1))));
