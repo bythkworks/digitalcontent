@@ -279,137 +279,53 @@ waBtns.forEach(b=>b.addEventListener('click',()=>scrollToY(holdY('world-a',+b.da
 chBtns.forEach(b=>b.addEventListener('click',()=>{const i=+b.dataset.ch;const el=worldA.el;const top=el.offsetTop, h=el.offsetHeight-VH;scrollToY(holdY('world-a',i+1))}));
 
 /* ======================= WORLD C ======================= */
+/* ======================= WORLD EPILOGUE · 대화 ======================= */
+// [초안] 표시된 줄은 팀 문구로 바꿔 주세요. 나머지는 기존 에필로그 문구입니다.
+const EC_CHOICES=['조용한 쉼터','공연 무대 앞','푸드 트럭 거리'];                     // [초안]
+const EC_ROLES=[
+  {k:'개인',t:'자신의 경험을 이어가고',ic:'<svg width="22" height="22" viewBox="0 0 26 26" fill="none" stroke="#8E8AD8" stroke-width="1.8"><circle cx="13" cy="9" r="4"/><path d="M5 22c1.2-4.2 4.2-6 8-6s6.8 1.8 8 6" stroke-linecap="round"/></svg>'},
+  {k:'공간',t:'변화에 반응하며',ic:'<svg width="22" height="22" viewBox="0 0 26 26" fill="none" stroke="#7FAFD0" stroke-width="1.8"><path d="M4 21V11l9-6 9 6v10" stroke-linejoin="round"/><path d="M10 21v-6h6v6"/></svg>'},
+  {k:'운영자',t:'더 넓은 상황을 살필 수 있습니다',ic:'<svg width="22" height="22" viewBox="0 0 26 26" fill="none" stroke="#D08FC6" stroke-width="1.8"><circle cx="13" cy="13" r="8"/><circle cx="13" cy="13" r="3"/><path d="M13 2v4M13 20v4M2 13h4M20 13h4" stroke-linecap="round"/></svg>'}];
+const josa=w=>{const c=w.charCodeAt(w.length-1)-0xAC00;return c>=0&&c%28&&c%28!==8?'으로':'로'};
+const EC_MSG=[ // at: scroll progress where the message lands
+  {at:.06,who:'ai',html:'오후 7시예요. 지금 축제 공간이 가장 붐비고 있어요.'},                 // [초안]
+  {at:.15,who:'ai',kind:'choice',html:'지금 상황에 맞는 곳을 골라 봤어요.'},                    // [초안]
+  {at:.31,who:'me',reply:true},                                                                 // [초안] "○○(으)로 갈게요."
+  {at:.40,who:'me',html:'그런데 AI가 다 정해 주는 건가요?'},                                     // [초안]
+  {at:.50,who:'ai',kind:'big',html:'AI는 모든 것을<br>대신 결정하지 않습니다.'},
+  {at:.60,who:'ai',html:'사람과 공간의 상황을 이해하고, 더 나은 선택을 돕습니다.'},
+  {at:.70,who:'ai',kind:'roles'}];
+const EC_PICK=.26, EC_TYPE=.045;
 const worldC={el:$('#world-c'),p:0,t:0};
-const wcEls=[0,1,2,3,4,5,6].map(i=>$('#wc'+i)), wcScene=$('#wcScene'), wcbar=$('#wcbar');
-/* ======================= EPILOGUE · 3D liquid glass form ======================= */
-const wcGL=$('#wcGL'), wcRight=$('#world-c .wc-right'), wcPhase=$('#wcPhase');
-[3,4,5].forEach((n,k)=>{const li=$('#wc'+n);
-  wcPhase.insertAdjacentHTML('beforeend',`<div class="wc-ph" aria-hidden="${k?'true':'false'}"><span class="wc-pill"><span class="wc-ic">${li.querySelector('.ic').innerHTML}</span>${li.querySelector('b').textContent}</span><h3>${li.querySelector(':scope > div > span').textContent}</h3><div class="wc-dots">${[0,1,2].map(j=>`<i class="${j===k?'on':''}"></i>`).join('')}</div></div>`)});
-const wcPhs=$$('.wc-ph');
-const WCG={gl:null,ok:false,u:{},mx:0,my:0,split:0,ferro:0,scale:.7,wave:0};
-(function initWcGL(){
-  const g=wcGL.getContext('webgl',{antialias:false,alpha:false,powerPreference:'high-performance'}); if(!g)return;
-  const vs='attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
-  // 2D liquid glass — parameters from the Liquid Glass Lab preset the user chose
-  const fs=`precision highp float;
-uniform vec2 uRes,uC,uPtr;uniform float uT,uSplit,uFerro,uScale,uWave,uU,uDpr,uMob;
-const float REFR=46.,BEV=19.,MAG=.3,DISP=.79,BLUR=30.,TINT=.13,SAT=1.3,BRIGHT=.02,SPEC=.8,RIMW=1.6,SHADOW=.45,ZOOM=1.08;
-mat2 rot(float a){float c=cos(a),s=sin(a);return mat2(c,-s,s,c);}
-float smin(float a,float b,float k){float h=clamp(.5+.5*(b-a)/k,0.,1.);return mix(b,a,h)-k*h*(1.-h);}
-float ell(vec2 q,vec2 ab){return (length(q/ab)-1.)*min(ab.x,ab.y);}
-float pebble(vec2 q){
-  float t=uT*.35;
-  float d=smin(ell(q-vec2(-.34,.05),vec2(.86,.6)),ell(q-vec2(.46,-.16),vec2(.64,.5)),.45);
-  d=smin(d,ell(q-vec2(.04,.44),vec2(.5,.36)),.35);
-  float a=atan(q.y,q.x);
-  d+=.03*sin(3.*a+t)+.022*sin(5.*a-1.3*t+1.);
-  return d;}
-float shape(vec2 q){
-  float s=uSplit, d=pebble(q);
-  if(s>.001){float sc=1.-.34*s; vec2 o=vec2(1.08*s,.1*s*sin(uT*.8));
-    float ds=smin(pebble(rot(.5*s)*(q-o)/sc)*sc,pebble(rot(-.45*s)*(q+o)/sc)*sc,mix(.55,.5,s));
-    d=mix(d,ds,smoothstep(0.,.18,s));}
-  if(uFerro>.001){float a=atan(q.y,q.x);
-    float sp=.13*pow(max(sin(7.*a+uT*1.1),0.),2.)+.08*pow(max(sin(11.*a-uT*1.5+1.7),0.),2.5)+.05*sin(4.*a-uT*.6);
-    d-=uFerro*sp;}
-  if(uWave>.001){float a=atan(q.y,q.x);d+=uWave*.018*sin(6.*a+uT*2.2);}
-  return d*.9;}
-float sdf(vec2 p){float u=uU*uScale;return shape((p-uC)/u)*u;}
-vec3 bgc(vec2 p){
-  float t=uT*.5;
-  vec2 uv=p/uRes.y, c=.5*uRes/uRes.y, g=uC/uRes.y;
-  uv=(uv-c)/ZOOM+c+vec2(sin(t*.7)*.035+sin(t*.31)*.018,cos(t*.53)*.03);
-  vec3 col=vec3(.975,.97,.996);
-  vec2 q=uv-g;
-  col=mix(col,vec3(.93,.60,.84),.78*exp(-dot(q-vec2(-.2+.04*sin(t),-.15),q-vec2(-.2+.04*sin(t),-.15))*10.));
-  col=mix(col,vec3(.48,.74,.95),.75*exp(-dot(q-vec2(.2,.16+.04*cos(t*.8)),q-vec2(.2,.16+.04*cos(t*.8)))*9.));
-  col=mix(col,vec3(.62,.58,.96),.7*exp(-dot(q-vec2(-.06,.2),q-vec2(-.06,.2))*12.));
-  col=mix(col,vec3(.99,.76,.58),.65*exp(-dot(q-vec2(.26,-.22),q-vec2(.26,-.22))*13.));
-  float y1=q.y-.07*sin(q.x*4.+t*.5)+.03;
-  col=mix(col,vec3(1.),.8*exp(-pow(y1*40.,2.)));
-  float y2=q.y-.13-.06*sin(q.x*5.-t*.4);
-  col=mix(col,vec3(.42,.38,.86),.55*exp(-pow(y2*70.,2.)));
-  float y3=q.y+.12-.05*sin(q.x*3.5+t*.3+1.);
-  col=mix(col,vec3(1.,.97,1.),.6*exp(-pow(y3*55.,2.)));
-  float x1=q.x-.08-.05*sin(q.y*6.+t*.45);
-  col=mix(col,vec3(.36,.6,.92),.4*exp(-pow(x1*75.,2.))*exp(-q.y*q.y*8.));
-  if(uWave>.001){float r=length(q),acc=0.,hl=0.;
-    for(int k=0;k<4;k++){float ph=fract(uT*.2+float(k)*.25);float R=.24*uScale+ph*.95;float fa=(1.-ph)*smoothstep(0.,.08,ph);
-      acc+=exp(-pow((r-R)*30.,2.))*fa;hl+=exp(-pow((r-R+.008)*90.,2.))*fa;}
-    col=mix(col,vec3(.5,.46,.9),clamp(acc*.6*uWave,0.,1.));col+=hl*.5*uWave;}
-  vec2 sp=p/uRes;
-  float fade=uMob>.5?smoothstep(.55,.95,sp.y):smoothstep(.5,.06,sp.x);
-  return mix(col,vec3(.985,.98,1.),fade*.72);}
-vec3 blurS(vec2 p,float b){
-  float r=b*.55;
-  vec3 c=bgc(p)*.28;
-  c+=bgc(p+vec2(r,.2*r))*.18;c+=bgc(p+vec2(-r,-.2*r))*.18;
-  c+=bgc(p+vec2(-.2*r,r))*.18;c+=bgc(p+vec2(.2*r,-r))*.18;
-  return c;}
-void main(){
-  vec2 p=vec2(gl_FragCoord.x,uRes.y-gl_FragCoord.y);
-  float d=sdf(p);
-  vec3 outside=bgc(p);
-  float ds=sdf(p-vec2(0.,8.*uDpr));
-  outside*=1.-SHADOW*.32*(1.-smoothstep(-6.*uDpr,30.*uDpr,ds));
-  if(d>1.5*uDpr){gl_FragColor=vec4(outside,1.);return;}
-  float e=uDpr;
-  vec2 gr=vec2(sdf(p+vec2(e,0.))-sdf(p-vec2(e,0.)),sdf(p+vec2(0.,e))-sdf(p-vec2(0.,e)));
-  vec2 N=gr/max(length(gr),1e-4);
-  float t=max(-d,0.), bev=BEV*uDpr, x=clamp(t/bev,0.,1.);
-  float f=1.-sqrt(max(1.-(1.-x)*(1.-x),0.));
-  float o=1.08*uSplit*uU*uScale; vec2 cc=uC+vec2(o*sign(p.x-uC.x)*smoothstep(0.,.3,uSplit),0.);
-  vec2 off=N*(REFR*uDpr)*f, base=p+(cc-p)*MAG;
-  float bpx=BLUR*uDpr, k=DISP*.5; vec2 dx=N*DISP*6.*uDpr*f;
-  vec3 col=vec3(blurS(base+off*(1.-k)-dx,bpx).r,blurS(base+off,bpx).g,blurS(base+off*(1.+k)+dx,bpx).b);
-  col=mix(col,vec3(1.),TINT);
-  float l=dot(col,vec3(.2126,.7152,.0722)); col=mix(vec3(l),col,SAT); col+=BRIGHT;
-  vec2 L=normalize(uPtr-cc+1e-3); float ndl=dot(N,L);
-  float sp=pow(max(ndl,0.)+.5*max(-ndl,0.),1.6);
-  float rim=1.-smoothstep(0.,RIMW*uDpr,t), glow=1.-smoothstep(0.,bev*.8,t);
-  col+=vec3(1.)*SPEC*(rim*(sp*.85+.12)+glow*sp*.16);
-  float a=1.-smoothstep(-.75*uDpr,.75*uDpr,d);
-  gl_FragColor=vec4(mix(outside,clamp(col,0.,1.),a),1.);}`;
-  const mk=(t,src)=>{const s=g.createShader(t);g.shaderSource(s,src);g.compileShader(s);if(!g.getShaderParameter(s,g.COMPILE_STATUS)){console.warn(g.getShaderInfoLog(s));return null}return s};
-  const v=mk(g.VERTEX_SHADER,vs),f=mk(g.FRAGMENT_SHADER,fs); if(!v||!f)return;
-  const pr=g.createProgram();g.attachShader(pr,v);g.attachShader(pr,f);g.linkProgram(pr); if(!g.getProgramParameter(pr,g.LINK_STATUS))return;
-  g.useProgram(pr); const b=g.createBuffer();g.bindBuffer(g.ARRAY_BUFFER,b);g.bufferData(g.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),g.STATIC_DRAW);
-  const l=g.getAttribLocation(pr,'a');g.enableVertexAttribArray(l);g.vertexAttribPointer(l,2,g.FLOAT,false,0,0);
-  ['uRes','uC','uPtr','uT','uSplit','uFerro','uScale','uWave','uU','uDpr','uMob'].forEach(k=>WCG.u[k]=g.getUniformLocation(pr,k));
-  WCG.gl=g; WCG.ok=true; $('#world-c').classList.add('has-gl');
-})();
-let wcDpr=1;
-function sizeWcGL(){if(!WCG.ok)return;wcDpr=Math.min(devicePixelRatio||1,1.25);wcGL.width=Math.round(VW*wcDpr);wcGL.height=Math.round(VH*wcDpr);WCG.gl.viewport(0,0,wcGL.width,wcGL.height)}
-sizeWcGL(); addEventListener('resize',sizeWcGL);
-const WC_PH=[[.22,.44],[.44,.64],[.64,1.01]];
+const ecList=$('#ecList'), ecState=$('#ecState'), ecLabel=$('#ecLabel'), ecPhone=$('#ecPhone'), wcScene=$('#wcScene'), wcbar=$('#wcbar'), wcNext=$('#wc6');
+const EC={pick:-1,user:-1,n:-1,typing:false};
+ecList.innerHTML=EC_MSG.map((m,i)=>{
+  let body=m.html||'';
+  if(m.kind==='choice')body+=`<div class="ec-opts">${EC_CHOICES.map((c,k)=>`<button type="button" data-k="${k}"><span>${c}</span><i aria-hidden="true"></i></button>`).join('')}</div>`;
+  if(m.kind==='roles')body=`<div class="ec-roles">${EC_ROLES.map(r=>`<div><span class="ec-ic">${r.ic}</span><b>${r.k}</b><span>${r.t}</span></div>`).join('')}</div>`;
+  if(m.reply)body='<span class="ec-reply"></span>';
+  return `<div class="ec-m ${m.who}${m.kind?' '+m.kind:''}" data-i="${i}">${m.who==='ai'?'<i class="ec-av" aria-hidden="true"></i>':''}<div class="ec-b">${body}</div></div>`}).join('')+
+  '<div class="ec-m ai typing" id="ecTyping"><i class="ec-av" aria-hidden="true"></i><div class="ec-b"><i></i><i></i><i></i></div></div>';
+const ecMs=$$('.ec-m[data-i]',ecList), ecTyping=$('#ecTyping'), ecOpts=$$('.ec-opts button',ecList), ecReply=$('.ec-reply',ecList);
+ecOpts.forEach(b=>b.addEventListener('click',()=>{EC.user=+b.dataset.k;ecSetPick(EC.user);
+  const target=EC_MSG[2].at+.01; if(worldC.p<target)scrollToY(holdY('world-c',2))}));
+function ecSetPick(k){if(k===EC.pick)return;EC.pick=k;ecOpts.forEach((b,i)=>b.classList.toggle('on',i===k));
+  if(k>=0){const c=EC_CHOICES[k];ecReply.textContent=`${c}${josa(c)} 갈게요.`}}
 function renderWorldC(p){
-  const mob=VW<700, g=eIO(range(p,.15,.23));
-  [0,1,2].forEach((i,k)=>{const el=wcEls[i],c=eOut(range(p,k*.03,.08+k*.03));el.style.opacity=c.toFixed(3);el.style.transform=`translateY(${(24*(1-c)).toFixed(1)}px)`;el.style.filter=c<.998?`blur(${(8*(1-c)).toFixed(2)}px)`:'none'});
-  const H=wcRight.offsetHeight;
-  if(mob){wcRight.style.opacity=(1-g).toFixed(3);wcRight.style.transform=`translateY(${(g*24).toFixed(1)}px)`}
-  else{wcRight.style.opacity='1';wcRight.style.transform=`translateY(${lerp(-H/2,92-VH/2,g).toFixed(1)}px) scale(${lerp(1,.46,g).toFixed(4)})`}
-  wcPhs.forEach((e,i)=>{const [a,b]=WC_PH[i],ti=eOut(range(p,a,a+.05)),to=eIn(range(p,b-.03,b+.02)),w=(1-ti)+to;
-    e.style.opacity=(ti*(1-to)).toFixed(3);e.style.transform=`translateY(${mob?'0%':'-50%'}) translateY(${((1-ti)*34-to*30).toFixed(1)}px)`;
-    e.style.filter=w>.004?`blur(${(w*10).toFixed(2)}px)`:'none';e.setAttribute('aria-hidden',ti*(1-to)>.5?'false':'true')});
-  WCG.tSplit=eIO(range(p,.22,.38))*(1-eIO(range(p,.45,.56)));
-  WCG.tFerro=eIO(range(p,.46,.58))*(1-eIO(range(p,.66,.76)));
-  WCG.tScale=(.7+.3*eOut(range(p,0,.12)))*(1+.3*eIO(range(p,.66,.8)));
-  WCG.tWave=eIO(range(p,.66,.78));
-  wcbar.style.width=(range(p,.6,.97)*100).toFixed(2)+'%';
+  const n=EC_MSG.filter(m=>p>=m.at).length;
+  if(n!==EC.n){ecMs.forEach((m,i)=>m.classList.toggle('on',i<n));EC.n=n}
+  const nx=EC_MSG[n], typing=!!nx&&nx.who==='ai'&&p>=nx.at-EC_TYPE;
+  ecTyping.classList.toggle('on',typing); ecState.textContent=typing?'입력 중…':n?'방금 전':'대기 중';
+  // the person picks (their own tap wins; otherwise the middle option is chosen by scroll)
+  ecSetPick(p>=EC_PICK?(EC.user>=0?EC.user:1):(EC.user>=0?EC.user:-1));
+  ecPhone.classList.toggle('done',p>=EC_MSG[6].at+.04);
+  const ent=eOut(range(p,0,.06)); ecPhone.style.opacity=ent.toFixed(3); ecPhone.style.transform=`translateY(${(40*(1-ent)).toFixed(1)}px)`;
+  ecLabel.style.opacity=ent.toFixed(3);
+  const nxt=eOut(range(p,.8,.88)); wcNext.style.opacity=nxt.toFixed(3); wcNext.style.transform=`translateY(${(16*(1-nxt)).toFixed(1)}px)`;
+  wcbar.style.width=(range(p,.84,.98)*100).toFixed(2)+'%';
+  wcScene.style.setProperty('--dusk',eIO(range(p,0,.7)).toFixed(3));
 }
-function tickWorldC(){
-  const el=worldC.el,top=el.offsetTop; if(!WCG.ok||scrollY+VH<top-10||scrollY>top+el.offsetHeight)return;
-  const g=WCG.gl,u=WCG.u,mob=VW<700,now=performance.now()/1000,W=wcGL.width,H=wcGL.height;
-  WCG.split=lerp(WCG.split,WCG.tSplit||0,.08);WCG.ferro=lerp(WCG.ferro,WCG.tFerro||0,.08);WCG.scale=lerp(WCG.scale,WCG.tScale||.7,.08);WCG.wave=lerp(WCG.wave,WCG.tWave||0,.08);
-  const cx=mob?W*.5:W*.66, cy=mob?H*.36:H*.5, unit=mob?W*.27:Math.min(W,H)*.2;
-  // light follows the pointer (as in the preset); without one it sits at 104°
-  let lx,ly; if(typeof tm!=='undefined'&&(tm.x||tm.y)){lx=(tm.x+.5)*W;ly=(tm.y+.5)*H}else{const a=104*Math.PI/180;lx=cx+Math.cos(a)*1e3;ly=cy-Math.sin(a)*1e3}
-  WCG.mx=lerp(WCG.mx||lx,lx,.12);WCG.my=lerp(WCG.my||ly,ly,.12);
-  g.uniform2f(u.uRes,W,H);g.uniform2f(u.uC,cx,cy);g.uniform2f(u.uPtr,WCG.mx,WCG.my);
-  g.uniform1f(u.uT,reduce?0:now);g.uniform1f(u.uSplit,WCG.split);g.uniform1f(u.uFerro,WCG.ferro);g.uniform1f(u.uScale,WCG.scale);g.uniform1f(u.uWave,WCG.wave);
-  g.uniform1f(u.uU,unit);g.uniform1f(u.uDpr,wcDpr);g.uniform1f(u.uMob,mob?1:0);
-  g.drawArrays(g.TRIANGLES,0,3);
-}
+function tickWorldC(){}
 
 /* ======================= SYSTEM ======================= */
 const nodesEl=$('#nodes'), sysDesc=$('#sysDesc');
@@ -945,7 +861,7 @@ function tickPjSky(){
 }
 /* ======================= SCROLL PAUSES + SNAP ======================= */
 // mapped progress values where the scene should rest (content fully shown)
-const HOLDS={'intro':[0,.44,1],'world-a':[.04,.24,.4467,.6533,.86],'world-c':[.1,.34,.6,.86],'system':[.05,.31,.53,.8],'turn':[.42,.8],'projects':[.02,...Array.from({length:6},(_,i)=>.17+(.74/6)*(i+.5)),.975]};
+const HOLDS={'intro':[0,.44,1],'world-a':[.04,.24,.4467,.6533,.86],'world-c':[.11,.22,.35,.45,.55,.65,.78,.92],'system':[.05,.31,.53,.8],'turn':[.42,.8],'projects':[.02,...Array.from({length:6},(_,i)=>.17+(.74/6)*(i+.5)),.975]};
 const HOLD_W={'intro':.07,'world-a':.05,'world-c':.05,'system':.05,'turn':.07,'projects':.035};   // raw share of the section each pause takes
 const KNOTS={};
 for(const id in HOLDS){const H=HOLDS[id],w=HOLD_W[id],mv=1-H.length*w,k=[[0,0]];let pr=0,pm=0;

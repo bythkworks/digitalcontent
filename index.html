@@ -98,19 +98,14 @@
 
 <!-- 02 WORLD C -->
 <section id="world-c" aria-label="세계관 마무리">
-  <div class="stage"><div class="wc-grid">
-    <canvas class="wc-gl" id="wcGL" aria-hidden="true"></canvas>
-    <div class="wc-phase" id="wcPhase" aria-live="polite"></div>
-    <div class="wc-img"><div class="full-scene" id="wcScene"></div><span class="tag pill">축제 공간과 방문객 — 오후 7시</span><div class="wc-dim" id="wcDim"></div></div>
-    <div class="wc-right">
-      <span class="label" id="wc0">02 · WORLD — EPILOGUE</span>
-      <h2 class="h-main" id="wc1">AI는 모든 것을<br>대신 결정하지 않습니다.</h2>
-      <p class="body" id="wc2">사람과 공간의 상황을 이해하고, 더 나은 선택을 돕습니다.</p>
-      <ul class="who">
-        <li id="wc3"><span class="ic"><svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="#8E8AD8" stroke-width="1.6"><circle cx="13" cy="9" r="4"/><path d="M5 22c1.2-4.2 4.2-6 8-6s6.8 1.8 8 6" stroke-linecap="round"/></svg></span><div><b>개인</b><span>자신의 경험을 이어가고</span></div></li>
-        <li id="wc4"><span class="ic"><svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="#7FAFD0" stroke-width="1.6"><path d="M4 21V11l9-6 9 6v10" stroke-linejoin="round"/><path d="M10 21v-6h6v6"/></svg></span><div><b>공간</b><span>변화에 반응하며</span></div></li>
-        <li id="wc5"><span class="ic"><svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="#D08FC6" stroke-width="1.6"><circle cx="13" cy="13" r="8"/><circle cx="13" cy="13" r="3"/><path d="M13 2v4M13 20v4M2 13h4M20 13h4" stroke-linecap="round"/></svg></span><div><b>운영자</b><span>더 넓은 상황을 살필 수 있습니다</span></div></li>
-      </ul>
+  <div class="stage"><div class="ec">
+    <div class="ec-scene"><div class="full-scene" id="wcScene"></div><span class="tag pill">축제 공간과 방문객 — 오후 7시</span></div>
+    <div class="ec-side">
+      <span class="label" id="ecLabel">02 · WORLD — EPILOGUE</span>
+      <div class="ec-phone" id="ecPhone">
+        <div class="ec-top"><i class="ec-av" aria-hidden="true"></i><div><b>나의 AI</b><small id="ecState">대기 중</small></div></div>
+        <div class="ec-thread"><div class="ec-list" id="ecList" aria-live="polite"></div></div>
+      </div>
       <div class="to-system" id="wc6">
         <div class="row"><span>NEXT</span><button data-go="system">SYSTEM으로 <span aria-hidden="true">→</span></button></div>
         <div class="hbar"><i id="wcbar"></i></div>
