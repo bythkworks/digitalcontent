@@ -233,8 +233,12 @@ CHAPTERS.forEach((c,i)=>{
 const wcards=$$('.wcard'), chBtns=$$('#chapters button'), counter=$('#counter'), wvbar=$('#wvbar');
 const worldA={el:$('#world-a'),p:0,t:0,act:-1};
 const waHead=$('#waHead'), waCopy=$('#waCopy'), waDeck=$('#waDeck'), waProg=$('#waProg');
+
+const SYS_LEAD='MCUAI는 상황을 감지하고 맥락을 판단해 필요한 안내와 대응을 제공합니다.';
+function waSys(i){const a=i-1, st=SYS.map((s,k)=>`<span class="${a<0||k===a?'on':''}">${s.k} ${s.t}</span>`).join('<em></em>');
+  return `<div class="wa-sys"><div class="wa-steps">${st}</div>${a<0?`<h4>${SYS_LEAD}</h4>`:`<h4>${SYS[a].h}</h4><div class="wa-chips">${SYS[a].c.map(x=>`<span>${x}</span>`).join('')}</div>`}</div>`}
 CHAPTERS.forEach((c,i)=>{
-  waCopy.insertAdjacentHTML('beforeend',`<div class="wa-c" aria-hidden="${i?'true':'false'}"><b class="wa-num" aria-hidden="true">0${i+1}</b><small>${c.k}</small><h3>${c.t}</h3><p>${c.d}</p></div>`);
+  waCopy.insertAdjacentHTML('beforeend',`<div class="wa-c" aria-hidden="${i?'true':'false'}"><b class="wa-num" aria-hidden="true">0${i+1}</b><small>${c.k}</small><h3>${c.t}</h3><p>${c.d}</p>${waSys(i)}</div>`);
   waDeck.insertAdjacentHTML('beforeend',`<div class="wa-card">${WORLD_ART[i+1]}<span class="wa-chip">${c.k}</span></div>`);
   waProg.insertAdjacentHTML('beforeend',`<button data-wch="${i}" aria-label="${c.k} ${c.t}">${WORLD_ART[i+1]}<span>${c.k}</span></button>`);
 });
@@ -599,7 +603,7 @@ $('#lbX').onclick=closeLB; lbx.addEventListener('click',e=>{if(e.target===lbx)cl
 
 /* ======================= NAV / SCROLL ======================= */
 const nav=$('#nav'), dots=$('#dots');
-const secOrder=['intro','world-a','system','projects'];
+const secOrder=['intro','world-a','projects'];
 function scrollToY(y){smoothTo(y)}
 function goTo(id){const el=$('#'+id); let y=HOLDS[id]?holdY(id,0):el.offsetTop; if(id==='intro')y=0; scrollToY(y)}
 $$('[data-go]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();goTo(a.dataset.go)}));
@@ -923,7 +927,6 @@ function progressOf(el){const top=el.offsetTop, h=el.offsetHeight-VH;return rema
 function updateChrome(){
   const y=scrollY+VH*.45; let cur=0;
   secOrder.forEach((id,i)=>{const el=$('#'+id);if(el.offsetTop<=y)cur=i});
-  if($('#world-c').offsetTop<=y && $('#system').offsetTop>y) cur=1;
   const show=intro.t>.8||scrollY>intro.el.offsetHeight-VH;
   nav.classList.toggle('show',show); dots.classList.toggle('show',show);
   nav.classList.toggle('glass',scrollY>intro.el.offsetHeight-VH*1.05);
