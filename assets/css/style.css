@@ -951,3 +951,15 @@ body.dark-zone #sprog{box-shadow:0 0 14px rgba(232,176,221,.9)}
   -webkit-text-stroke:0;color:transparent;background:linear-gradient(135deg,#9CC8E2 0%,#B8B6E5 48%,#E8B0DD 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
   filter:drop-shadow(0 10px 24px rgba(142,138,216,.18));transform-origin:0 100%;will-change:transform}
 @media (max-width:900px){.wa-num{font-size:15vw}}
+/* ---- PROJECTS · first-person walk ---- */
+#projects{height:1000vh}
+#mapWorld,.filters,.map-ctrl,.pcard,.pj-orbs{display:none!important}
+.map-stage{touch-action:pan-y;cursor:grab}
+.fp-tag{position:absolute;left:0;top:0;z-index:6;display:flex;align-items:center;gap:8px;padding:6px 14px 6px 6px;border-radius:999px;font:inherit;cursor:pointer;opacity:0;white-space:nowrap;
+  background:rgba(255,255,255,.82);border:1px solid #fff;box-shadow:0 10px 26px rgba(110,100,180,.22);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);transition:box-shadow .4s var(--ease)}
+.fp-tag b{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;font-size:12px;font-weight:800;color:#fff;background:linear-gradient(135deg,#8E8AD8,#B98BD6)}
+.fp-tag span{font-size:14px;font-weight:700;color:#2B2A36}
+.fp-tag.on{box-shadow:0 0 0 4px rgba(201,198,255,.45),0 14px 34px rgba(110,100,180,.32)}
+.fp-tag::after{content:"";position:absolute;left:50%;top:100%;width:1px;height:14px;background:linear-gradient(#fff,rgba(255,255,255,0))}
+.map-hint{opacity:0}
+@media (max-width:700px){.fp-tag{padding:4px 11px 4px 4px}.fp-tag b{width:24px;height:24px;font-size:11px}.fp-tag span{font-size:12px}}

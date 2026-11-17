@@ -119,50 +119,16 @@ const SYS=[
    ic:'<svg width="34" height="34" viewBox="0 0 34 34" fill="none" stroke="#D08FC6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 4 8 19h8l-2 11 11-16h-8l1-10z"/></svg>'},
 ];
 const CAT={personal:'개인',space:'공간',operator:'운영'};
+// ▼ 조원 3명의 제품 — 이름·장소·설명이 정해지면 이 배열만 고치면 됩니다.
+//   at: 지도 좌표 [x, y, 지면 높이] — 제품 아이템이 떠 있을 위치 (입구 → 운동장 동선 위)
+const TBD='내용 입력 필요';
 const PRODUCTS=[
- {n:1,name:'MCUAI 웨어러블 PUI',place:'웰컴 파빌리온',cat:'personal',kind:'band',b:[534,603,20,20,16],
-  one:'손목 위의 빛과 진동으로, 붐비는 축제 속 나만의 길을 안내합니다.',
-  problem:'수만 명이 모이는 축제에서 사람들은 지도 앱을 보느라 고개를 숙이고, 혼잡한 동선 속에서 보고 싶던 공연과 부스를 놓칩니다.',
-  points:['화면을 보지 않는 안내','혼잡도 기반 동선 추천','취향을 기억하는 하루'],
-  steps:[['착용과 연결','입장 게이트에서 밴드를 착용하면 오늘의 관심사가 가볍게 연결됩니다.'],['빛으로 안내','가야 할 방향을 손목 위의 빛이 은은하게 가리킵니다.'],['진동으로 알림','기다리던 공연이 시작되기 전, 짧은 진동으로 알려줍니다.'],['기억으로 이어짐','다녀간 부스와 순간이 하루의 기록으로 남습니다.']],
-  sda:['걸음과 위치, 주변 혼잡도와 소음을 감지합니다.','관심사와 현재 동선을 비교해 가장 편안한 경로를 판단합니다.','빛의 방향과 진동 패턴으로 화면 없이 안내합니다.'],
-  feat:[['PUI 라이트 링','방향과 상태를 빛의 흐름으로 표현합니다.'],['햅틱 패턴','알림의 중요도에 따라 다른 진동 리듬을 사용합니다.'],['글래스 모듈','반투명 모듈 안에서 MCU가 조용히 작동합니다.'],['하루 배터리','축제가 끝날 때까지 충전 없이 사용합니다.']]},
- {n:2,name:'글래스 스테이지 라이트',place:'메인 스테이지',cat:'space',kind:'light',b:[618,343,20,20,0],
-  one:'관객의 반응을 읽어 무대 조명의 색과 밝기를 스스로 조절합니다.',
-  problem:'무대 조명은 미리 정해진 큐에 따라 움직여, 관객의 실제 분위기와 컨디션을 반영하지 못합니다.',
-  points:['관객 반응에 맞춘 조명','눈부심 없는 밝기','공연 흐름과 연동'],
-  steps:[['분위기 읽기','관객석의 소리와 움직임으로 지금의 열기를 읽습니다.'],['색 바꾸기','분위기에 맞춰 파스텔 톤의 빛이 천천히 변합니다.'],['밝기 맞추기','가까운 관객의 눈부심을 줄이도록 밝기를 조절합니다.'],['함께 마무리','공연의 끝에서 모두의 빛이 하나로 이어집니다.']],
-  sda:['관객석의 소리 크기와 움직임의 리듬을 감지합니다.','곡의 흐름과 관객의 반응을 비교해 어울리는 빛을 판단합니다.','색, 밝기, 확산 각도를 부드럽게 바꿉니다.'],
-  feat:[['글래스 돔','빛을 부드럽게 퍼뜨리는 반투명 돔 구조입니다.'],['반응형 색 온도','분위기에 맞춰 색 온도가 자연스럽게 변합니다.'],['눈부심 보호','관객과의 거리에 따라 밝기를 낮춥니다.'],['무대 연동','음향 콘솔과 연결되어 공연 흐름을 따릅니다.']]},
- {n:3,name:'쉼 포드',place:'휴식 정원',cat:'space',kind:'pod',b:[704,620,20,20,19],
-  one:'주변 소음과 체온을 감지해, 지금 쉬어 가기 좋은 자리를 만들어 줍니다.',
-  problem:'오래 서 있거나 시끄러운 공간에 지친 사람들이 잠시 쉴 곳을 찾기 어렵습니다.',
-  points:['소음을 줄여 주는 공간','체온에 맞춘 온도','빈자리 알림'],
-  steps:[['빈자리 확인','가까운 포드의 빈자리가 빛으로 표시됩니다.'],['조용히 앉기','포드에 앉으면 주변 소음이 부드럽게 줄어듭니다.'],['온도 맞춤','체온에 맞춰 바람과 온기가 조절됩니다.'],['다시 축제로','충분히 쉬면 다음 공연 시간을 알려줍니다.']],
-  sda:['주변 소음, 기온, 앉아 있는 사람의 체온을 감지합니다.','쉬는 사람의 상태와 주변 환경을 비교해 필요한 조절을 판단합니다.','차음, 조명, 공기 흐름을 조절해 편안한 자리를 만듭니다.'],
-  feat:[['돔 셸','소리를 흡수하는 반투명 셸 구조입니다.'],['무드 라이트','휴식에 맞춘 은은한 빛을 냅니다.'],['온도 조절','좌석과 공기의 온도를 함께 조절합니다.'],['점유 표시','빈자리 여부를 바깥에서도 알 수 있습니다.']]},
- {n:4,name:'푸드 큐 사인',place:'푸드 스트리트',cat:'operator',kind:'sign',b:[763,259,20,20,-10],
-  one:'대기 줄을 분석해 지금 가장 빨리 먹을 수 있는 부스를 알려줍니다.',
-  problem:'인기 부스 앞에는 긴 줄이, 다른 부스는 한산한 불균형이 생겨 방문객과 운영자 모두 지칩니다.',
-  points:['실시간 대기 시간','붐비지 않는 부스 추천','운영자 알림'],
-  steps:[['줄 읽기','부스 앞 대기 인원과 속도를 읽습니다.'],['시간 표시','예상 대기 시간이 사인에 표시됩니다.'],['대안 추천','가까운 덜 붐비는 부스를 함께 보여줍니다.'],['운영 조율','운영자에게 인력 배치 제안이 전달됩니다.']],
-  sda:['부스 앞 대기 인원과 줄이 줄어드는 속도를 감지합니다.','주변 부스와 비교해 동선이 고르게 나뉠 방법을 판단합니다.','사인 표시와 운영자 알림으로 흐름을 분산시킵니다.'],
-  feat:[['글래스 패널','멀리서도 읽기 쉬운 반투명 디스플레이입니다.'],['대기 바','대기 시간을 막대의 길이로 직관적으로 보여줍니다.'],['방향 표시','추천 부스 방향을 빛으로 가리킵니다.'],['운영 연동','운영 스테이션과 실시간으로 연결됩니다.']]},
- {n:5,name:'분실물 비컨',place:'라운지',cat:'personal',kind:'beacon',b:[452,448,20,20,-30],
-  one:'소중한 물건에 붙여 두면, 멀어지는 순간 부드럽게 알려줍니다.',
-  problem:'붐비는 축제에서 지갑, 카드, 소지품을 잃어버리면 찾기 어렵고 하루의 경험이 망가집니다.',
-  points:['멀어지면 알림','마지막 위치 기억','분실물 센터 연결'],
-  steps:[['붙이기','작은 비컨을 소지품에 붙입니다.'],['거리 감지','물건과 멀어지면 손목에 진동이 전해집니다.'],['위치 확인','마지막으로 머문 위치를 빛으로 안내받습니다.'],['돌려받기','누군가 발견하면 분실물 센터로 연결됩니다.']],
-  sda:['소유자와 물건 사이의 거리와 움직임을 감지합니다.','일시적으로 내려놓은 것인지, 잃어버린 것인지 판단합니다.','진동과 빛으로 알리고 필요하면 분실물 센터에 연결합니다.'],
-  feat:[['페블 셰이프','손에 쥐기 좋은 조약돌 형태입니다.'],['라이트 링','상태를 빛의 색으로 보여줍니다.'],['저전력 MCU','작은 배터리로 축제 기간 내내 작동합니다.'],['프라이버시','위치 정보는 소유자에게만 공유됩니다.']]},
- {n:6,name:'운영 관제 스테이션',place:'컨트롤 타워',cat:'operator',kind:'station',b:[511,668,20,20,99],
-  one:'축제 전체의 흐름을 살피고, 운영자에게 필요한 대응을 먼저 제안합니다.',
-  problem:'운영자는 넓은 축제장을 한눈에 볼 수 없어, 혼잡이나 안전 문제를 늦게 알아차리기 쉽습니다.',
-  points:['한눈에 보는 축제 흐름','위험 상황 조기 감지','대응 제안'],
-  steps:[['흐름 보기','축제 전체의 혼잡도와 분위기를 한 화면에 모읍니다.'],['조짐 찾기','평소와 다른 패턴을 먼저 발견합니다.'],['대응 제안','인력 배치와 동선 조정을 제안합니다.'],['함께 결정','최종 결정은 운영자가 내리고, 시스템이 실행을 돕습니다.']],
-  sda:['각 구역 센서와 제품에서 들어오는 신호를 모읍니다.','전체 흐름 속에서 위험과 불편의 조짐을 판단합니다.','운영자에게 우선순위가 정리된 대응안을 제안합니다.'],
-  feat:[['타워 폼','축제장 어디서나 보이는 원통형 구조입니다.'],['상태 링','축제 전체 상태를 상단 링의 빛으로 표현합니다.'],['운영 대시보드','운영자 기기와 실시간으로 연결됩니다.'],['사람 중심 결정','AI는 제안하고, 결정은 사람이 합니다.']]},
-];
+ {n:1,name:'제품 1',place:'입구',cat:'personal',kind:'band',at:[771,576,-4]},
+ {n:2,name:'제품 2',place:'장소 입력 필요',cat:'space',kind:'light',at:[539,455,3]},
+ {n:3,name:'제품 3',place:'운동장',cat:'operator',kind:'pod',at:[656,342,0]}
+].map(p=>Object.assign({one:'한 줄 소개 — '+TBD,problem:TBD,points:[TBD,TBD,TBD],
+  steps:[['단계 1',TBD],['단계 2',TBD],['단계 3',TBD],['단계 4',TBD]],sda:[TBD,TBD,TBD],
+  feat:[['기능 1',TBD],['기능 2',TBD],['기능 3',TBD],['기능 4',TBD]],b:[p.at[0]-10,p.at[1]-10,20,20,p.at[2]]},p));
 const DECOR=[[380,180,60,60,34],[440,180,40,60,26],[330,330,70,50,30],[860,400,70,90,40],[880,560,60,60,28],[520,760,90,70,36],[360,820,60,50,26],[620,880,60,40,22],[840,260,50,50,30],[120,380,70,60,30]];
 const TREES=[[110,130],[360,120],[880,120],[930,190],[80,470],[350,470],[560,380],[600,660],[460,900],[300,720],[930,640],[640,960],[860,880],[120,860],[250,940],[960,420]];
 
@@ -392,18 +358,15 @@ vec3 lsp(vec3 p){p-=vec3(500.,500.,0.);return vec3(dot(p,uU)/1150.,dot(p,uV)/115
   const svs=`attribute vec4 a;${LS}varying float vD;void main(){vec3 s=lsp(a.xyz/16.);vD=s.z;gl_Position=vec4(s.xy,s.z*2.-1.,1.);}`;
   const sfs=`precision highp float;varying float vD;void main(){vec4 e=fract(vD*vec4(1.,255.,65025.,16581375.));e-=e.yzww*vec4(1./255.,1./255.,1./255.,0.);gl_FragColor=e;}`;
   // main pass
-  const vs=`attribute vec4 a;uniform vec2 uRes,uC,uT;uniform float uS,uRot,uTilt;varying vec3 vP;varying float vCat;
-void main(){vec3 p=a.xyz/16.;vP=p;vCat=a.w;vec2 q=p.xy-500.+uT;float cr=cos(uRot),sr=sin(uRot),ct=cos(uTilt),st=sin(uTilt);
-float x=q.x*cr-q.y*sr,y=q.x*sr+q.y*cr;float y2=y*ct-p.z*st,z2=y*st+p.z*ct;vec2 sc=uC+uS*vec2(x,y2);
-gl_Position=vec4(sc.x/uRes.x*2.-1.,1.-sc.y/uRes.y*2.,-z2*uS/6000.,1.);}`;
+  const vs=`attribute vec4 a;uniform mat4 uM;varying vec3 vP;varying float vCat;void main(){vec3 p=a.xyz/16.;vP=p;vCat=a.w;gl_Position=uM*vec4(p,1.);}`;
   const fs=`${der?'#extension GL_OES_standard_derivatives : enable\n':''}precision highp float;
-varying vec3 vP;varying float vCat;uniform vec3 uView,uHL;uniform sampler2D uSh;uniform float uTx;${LS}
+varying vec3 vP;varying float vCat;uniform vec3 uView,uHL,uCam;uniform sampler2D uSh;uniform float uTx;${LS}
 float unpack(vec4 c){return dot(c,vec4(1.,1./255.,1./65025.,1./16581375.));}
 float shadowAt(vec3 s,float bias){float lit=0.;
   for(int i=0;i<4;i++){vec2 o=vec2(mod(float(i),2.)-.5,floor(float(i)/2.)-.5)*uTx*1.2;lit+=step(s.z-bias,unpack(texture2D(uSh,s.xy*.5+.5+o)));}
   return lit*.25;}
 void main(){
-${der?'vec3 n=normalize(cross(dFdx(vP),dFdy(vP)));if(dot(n,uView)<0.)n=-n;':'vec3 n=vec3(0.,0.,1.);'}
+${der?'vec3 n=normalize(cross(dFdx(vP),dFdy(vP)));if(dot(n,uCam-vP)<0.)n=-n;':'vec3 n=vec3(0.,0.,1.);'}
   float ndl=dot(n,uL);
   vec3 s=lsp(vP);
   float sh=ndl>0.?shadowAt(s,.00035+.0012*(1.-ndl)):0.;
@@ -425,6 +388,7 @@ ${der?'vec3 n=normalize(cross(dFdx(vP),dFdy(vP)));if(dot(n,uView)<0.)n=-n;':'vec
   col=mix(col,vec3(1.,.93,.86),hi*.35);
   float hl=uHL.z*(1.-smoothstep(36.,100.,length(vP.xy-uHL.xy)));
   col=mix(col,mix(vec3(.74,.84,.97),vec3(.95,.76,.91),clamp(vP.z/80.,0.,1.)),hl*(vCat<.5?.5:.62));
+  col=mix(col,vec3(.975,.935,.955),smoothstep(240.,1100.,length(uCam-vP))*.8);
   float r=length(vP.xy-500.);
   col=mix(col,vec3(.975,.91,.94),smoothstep(380.,700.,r)*.55);
   float al=1.-smoothstep(560.,780.,r);gl_FragColor=vec4(col*al,al);}`;
@@ -445,23 +409,92 @@ ${der?'vec3 n=normalize(cross(dFdx(vP),dFdy(vP)));if(dot(n,uView)<0.)n=-n;':'vec
   g.useProgram(sp);const sl=g.getAttribLocation(sp,'a');g.enableVertexAttribArray(sl);g.vertexAttribPointer(sl,4,g.SHORT,false,0,0);
   g.uniform3fv(g.getUniformLocation(sp,'uL'),L);g.uniform3fv(g.getUniformLocation(sp,'uU'),U);g.uniform3fv(g.getUniformLocation(sp,'uV'),V);
   g.drawElements(g.TRIANGLES,idx.length,g.UNSIGNED_SHORT,0);g.bindFramebuffer(g.FRAMEBUFFER,null);
-  const u={};['uRes','uC','uT','uS','uRot','uTilt','uView','uHL','uSh','uTx','uL','uU','uV'].forEach(k=>u[k]=g.getUniformLocation(pr,k));
+  const u={};['uM','uCam','uView','uHL','uSh','uTx','uL','uU','uV'].forEach(k=>u[k]=g.getUniformLocation(pr,k));
   g.useProgram(pr);g.uniform3fv(u.uL,L);g.uniform3fv(u.uU,U);g.uniform3fv(u.uV,V);g.uniform1i(u.uSh,0);g.uniform1f(u.uTx,1/SZ);
   MGL={g,cv,pr,vb,ib,tex,n:idx.length,u,loc:g.getAttribLocation(pr,'a'),hl:0,hx:500,hy:500,w:1,h:1};
 })();
 function sizeMapGL(w,h){if(!MGL)return;const d=Math.min(devicePixelRatio||1,1.5);MGL.w=w;MGL.h=h;MGL.cv.width=Math.round(w*d);MGL.cv.height=Math.round(h*d)}
+/* ======================= FIRST-PERSON WALK · entrance → 운동장 ======================= */
+// walk path (map px; x east, y south, z up), sampled every 4 units with ground height
+const FP_PATH=[[792.0,500.0,-0.9],[791.9,504.0,-1.0],[791.7,508.0,-1.1],[791.6,512.0,-1.2],[791.5,516.0,-1.3],[791.3,520.0,-1.5],[791.2,524.0,-1.7],[791.1,528.0,-1.8],[790.9,532.0,-2.0],[790.8,536.0,-2.1],[790.7,540.0,-2.3],[790.6,544.0,-2.4],[790.4,548.0,-2.6],[790.3,552.0,-2.7],[790.2,556.0,-2.9],[790.1,560.0,-3.0],[790.0,564.0,-3.2],[789.9,568.0,-3.4],[789.8,572.0,-3.5],[789.7,576.0,-3.7],[789.7,580.0,-3.8],[789.6,584.0,-4.0],[789.5,588.0,-4.1],[789.4,592.0,-4.3],[789.3,596.0,-4.4],[789.1,600.0,-4.6],[788.8,603.9,-4.7],[788.3,607.9,-4.8],[787.8,611.9,-5.0],[786.9,615.8,-5.1],[785.6,619.6,-5.1],[783.3,622.7,-5.1],[780.3,625.4,-5.1],[777.0,627.6,-5.1],[773.1,627.7,-5.1],[769.4,626.3,-5.0],[765.8,624.4,-5.0],[762.4,622.4,-4.9],[758.9,620.4,-4.9],[755.7,618.1,-2.8],[752.5,615.7,-2.8],[749.3,613.2,-2.8],[746.2,610.7,-2.7],[743.1,608.1,-2.6],[740.1,605.5,-2.5],[737.0,602.9,-2.3],[734.0,600.3,-2.0],[731.0,597.7,-1.7],[728.0,595.0,-3.6],[725.1,592.3,-3.2],[722.1,589.7,-2.9],[719.1,587.0,-2.5],[716.2,584.3,-2.2],[713.2,581.6,-1.8],[710.3,578.9,-1.5],[707.3,576.2,-1.1],[704.4,573.4,-0.7],[701.5,570.7,-0.4],[698.5,568.0,0.0],[695.5,565.4,0.4],[692.5,562.8,0.8],[689.4,560.2,1.2],[686.3,557.7,1.6],[683.2,555.2,2.0],[680.0,552.7,2.4],[676.8,550.4,2.8],[673.6,548.0,3.2],[670.3,545.8,3.6],[666.9,543.6,3.9],[663.5,541.6,4.1],[659.9,539.7,4.2],[656.4,537.9,4.1],[652.6,536.4,4.2],[648.8,535.2,4.1],[645.0,534.2,4.0],[641.0,534.0,3.9],[637.0,533.4,3.7],[633.1,532.4,3.6],[629.4,531.1,3.5],[625.7,529.6,3.6],[622.1,527.9,3.6],[618.5,526.1,3.6],[615.0,524.1,3.6],[611.6,522.1,3.6],[608.2,519.9,3.6],[604.9,517.7,3.6],[601.6,515.4,3.6],[598.3,513.1,3.6],[595.1,510.8,3.6],[591.9,508.3,3.6],[588.7,505.9,3.6],[585.6,503.4,3.6],[582.5,500.9,3.6],[579.4,498.3,3.6],[576.3,495.8,3.6],[573.3,493.2,3.6],[570.2,490.6,3.6],[567.2,488.1,3.6],[564.1,485.5,3.6],[561.1,482.9,3.6],[558.0,480.3,3.6],[555.0,477.6,3.6],[552.0,475.0,3.5],[549.0,472.4,3.4],[546.0,469.7,3.3],[543.1,467.0,3.2],[540.1,464.3,3.1],[537.3,461.5,3.0],[534.6,458.5,2.8],[532.5,455.2,2.7],[532.7,451.3,2.6],[533.7,447.4,2.6],[535.1,443.7,2.5],[536.7,440.0,2.5],[538.5,436.4,2.4],[540.3,432.8,2.3],[542.2,429.3,2.2],[544.1,425.8,2.1],[546.1,422.3,2.0],[548.1,418.9,1.9],[550.2,415.5,1.7],[552.3,412.0,1.6],[554.4,408.6,1.4],[556.5,405.3,1.2],[558.7,401.9,1.1],[560.8,398.5,0.9],[563.1,395.2,0.8],[565.3,391.9,0.6],[567.6,388.6,0.5],[569.9,385.3,0.4],[572.2,382.1,0.3],[574.6,378.8,0.2],[576.9,375.6,0.2],[579.3,372.4,0.1],[581.8,369.2,0.1],[584.2,366.1,0.1],[586.7,363.0,0.0],[589.2,359.9,0.0],[591.8,356.8,0.0],[594.4,353.7,0.0],[597.0,350.7,0.0],[599.6,347.7,0.0],[602.3,344.7,0.0],[605.0,341.7,0.0],[607.6,338.7,0.0],[610.3,335.8,0.0],[613.0,332.8,0.0],[615.7,329.8,0.0],[618.3,326.9,0.0],[621.0,323.9,0.0],[623.7,320.9,0.0],[626.4,317.9,0.0],[629.0,315.0,0.0]];
+const FP_STAGE=[626,231,10];                    // stage at the north edge of the playground
+const FP_EYE=9, FP_ITEM_Z=13;
+const FP={yaw:0,pitch:0,yawT:0,pitchT:0,cam:[0,0,0],look:[0,0,0],fov:40,act:0,hover:0,s:0,items:[],ready:false,last:0};
+(function(){let L=0;FP_PATH.forEach((q,i)=>{if(i)L+=Math.hypot(q[0]-FP_PATH[i-1][0],q[1]-FP_PATH[i-1][1]);q[3]=L});FP.L=L})();
+function fpAt(s){s=clamp(s,0,FP.L);let i=1;while(i<FP_PATH.length-1&&FP_PATH[i][3]<s)i++;
+  const a=FP_PATH[i-1],b=FP_PATH[i],k=(s-a[3])/Math.max(1e-6,b[3]-a[3]);return [lerp(a[0],b[0],k),lerp(a[1],b[1],k),lerp(a[2],b[2],k)]}
+// stops: the walk pauses where each product floats ahead, then at the playground
+function fpStops(){return PRODUCTS.map(p=>{const [x,y]=p.at;let bs=0,bd=1e9;
+  for(let s=0;s<=FP.L;s+=4){const q=fpAt(s),d=Math.hypot(q[0]-x,q[1]-y);if(d<bd){bd=d;bs=s}}
+  return clamp(bs-(bd<25?46:28),0,FP.L-30)})}
+/* ---- tiny mat4 helpers (column-major) ---- */
+const M4={
+  persp(f,a,n,fa){const t=1/Math.tan(f/2);return [t/a,0,0,0, 0,t,0,0, 0,0,(fa+n)/(n-fa),-1, 0,0,2*fa*n/(n-fa),0]},
+  look(e,c,u){const z=norm3(sub3(e,c)),x=norm3(cross3(u,z)),y=cross3(z,x);
+    return [x[0],y[0],z[0],0, x[1],y[1],z[1],0, x[2],y[2],z[2],0, -dot3(x,e),-dot3(y,e),-dot3(z,e),1]},
+  mul(a,b){const o=new Array(16);for(let i=0;i<4;i++)for(let j=0;j<4;j++){let s=0;for(let k=0;k<4;k++)s+=a[k*4+j]*b[i*4+k];o[i*4+j]=s}return o},
+  tr(x,y,z){return [1,0,0,0,0,1,0,0,0,0,1,0,x,y,z,1]},
+  rz(a){const c=Math.cos(a),s=Math.sin(a);return [c,s,0,0,-s,c,0,0,0,0,1,0,0,0,0,1]},
+  rx(a){const c=Math.cos(a),s=Math.sin(a);return [1,0,0,0,0,c,s,0,0,-s,c,0,0,0,0,1]},
+  sc(k){return [k,0,0,0,0,k,0,0,0,0,k,0,0,0,0,1]}};
+function sub3(a,b){return [a[0]-b[0],a[1]-b[1],a[2]-b[2]]}function dot3(a,b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]}
+function cross3(a,b){return [a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]]}function norm3(a){const l=Math.hypot(...a)||1;return a.map(v=>v/l)}
+const FLIP=[1,0,0,0, 0,-1,0,0, 0,0,1,0, 0,0,0,1];  // map y points south: mirror so the street view matches the map
+/* ---- floating product items: simple placeholder shapes (swap for real models later) ---- */
+function meshTorus(R,r,a,b){const v=[];const P=(i,j)=>{const u=i/a*Math.PI*2,w=j/b*Math.PI*2;return [[(R+r*Math.cos(w))*Math.cos(u),(R+r*Math.cos(w))*Math.sin(u),r*Math.sin(w)],[Math.cos(w)*Math.cos(u),Math.cos(w)*Math.sin(u),Math.sin(w)]]};
+  for(let i=0;i<a;i++)for(let j=0;j<b;j++){const q=[P(i,j),P(i+1,j),P(i+1,j+1),P(i,j+1)];[q[0],q[1],q[2],q[0],q[2],q[3]].forEach(([p,n])=>v.push(...p,...n))}return v}
+function meshFlat(V,F){const v=[];F.forEach(f=>{const a=V[f[0]],b=V[f[1]],c=V[f[2]],n=norm3(cross3(sub3(b,a),sub3(c,a)));for(let k=1;k<f.length-1;k++)[f[0],f[k],f[k+1]].forEach(i=>v.push(...V[i],...n))});return v}
+const MESH=[
+  ()=>meshTorus(1,.36,40,16),
+  ()=>meshFlat([[0,0,1.45],[1,0,0],[0,1,0],[-1,0,0],[0,-1,0],[0,0,-1.45]],[[0,1,2],[0,2,3],[0,3,4],[0,4,1],[5,2,1],[5,3,2],[5,4,3],[5,1,4]]),
+  ()=>{const s=.85,V=[];for(const z of[-s,s])for(const y of[-s,s])for(const x of[-s,s])V.push([x,y,z]);
+    return meshFlat(V,[[0,2,3,1],[4,5,7,6],[0,1,5,4],[2,6,7,3],[0,4,6,2],[1,3,7,5]])}];
+const ITEM_COL=[[[.61,.78,.89],[.86,.71,.88]],[[.72,.71,.93],[.98,.76,.86]],[[.98,.82,.70],[.76,.74,.95]]];
+(function initFP(){
+  if(!MGL)return; const g=MGL.g;
+  const ivs=`attribute vec3 aP,aN;uniform mat4 uM,uW;varying vec3 vN,vW;void main(){vec4 w=uW*vec4(aP,1.);vW=w.xyz;vN=mat3(uW)*aN;gl_Position=uM*w;}`;
+  const ifs=`precision mediump float;varying vec3 vN,vW;uniform vec3 uCam,uL,uA,uB;uniform float uGlow;
+void main(){vec3 n=normalize(vN),v=normalize(uCam-vW);float d=dot(n,uL);float lit=smoothstep(-.05,.1,d);
+vec3 c=mix(uA,uB,n.z*.5+.5);c=mix(c*.8,c,lit);float rim=pow(1.-abs(dot(n,v)),2.2);c+=rim*vec3(1.,.97,1.)*(.55+.45*uGlow);c+=uGlow*.12;
+gl_FragColor=vec4(min(c,1.),1.);}`;
+  const mk=(t,s)=>{const o=g.createShader(t);g.shaderSource(o,s);g.compileShader(o);return g.getShaderParameter(o,g.COMPILE_STATUS)?o:(console.warn(g.getShaderInfoLog(o)),null)};
+  const p=g.createProgram();g.attachShader(p,mk(g.VERTEX_SHADER,ivs));g.attachShader(p,mk(g.FRAGMENT_SHADER,ifs));g.linkProgram(p);
+  if(!g.getProgramParameter(p,g.LINK_STATUS))return;
+  FP.ip=p;FP.iu={};['uM','uW','uCam','uL','uA','uB','uGlow'].forEach(k=>FP.iu[k]=g.getUniformLocation(p,k));FP.ia=[g.getAttribLocation(p,'aP'),g.getAttribLocation(p,'aN')];
+  FP.items=PRODUCTS.map((pr,i)=>{const d=new Float32Array(MESH[i%3]());const b=g.createBuffer();g.bindBuffer(g.ARRAY_BUFFER,b);g.bufferData(g.ARRAY_BUFFER,d,g.STATIC_DRAW);
+    return {b,n:d.length/6,glow:0,scr:[-999,-999,0],z:pr.at[2]??0}});
+  FP.ready=true;
+})();
 function drawMapGL(){
-  if(!MGL)return;const {g,u}=MGL,c=map.cur,s=map.base*c.zoom,r=c.rot*Math.PI/180,t=c.tilt*Math.PI/180;
-  const n=map.sel||map.hover||0; if(n){const b=PRODUCTS[n-1].b;MGL.hx=b[0]+b[2]/2;MGL.hy=b[1]+b[3]/2}
-  const tg=n?1:0; MGL.hl+=(tg-MGL.hl)*.14; if(Math.abs(tg-MGL.hl)>.01)map.dirty=true; else MGL.hl=tg;
+  if(!MGL)return;const {g,u}=MGL;
+  const a=MGL.w/Math.max(1,MGL.h), P=M4.persp(FP.fov*Math.PI/180,a,1.5,3200);
+  const e=FP.cam, c=FP.look, V=M4.look([e[0],-e[1],e[2]],[c[0],-c[1],c[2]],[0,0,1]);
+  const M=M4.mul(M4.mul(P,V),FLIP); FP.M=M;
+  const tg=FP.act?1:0; MGL.hl+=(tg-MGL.hl)*.1; if(FP.act){const q=PRODUCTS[FP.act-1].at;MGL.hx=q[0];MGL.hy=q[1]}
   g.viewport(0,0,MGL.cv.width,MGL.cv.height);g.clearColor(0,0,0,0);g.clear(g.COLOR_BUFFER_BIT|g.DEPTH_BUFFER_BIT);g.enable(g.DEPTH_TEST);g.disable(g.CULL_FACE);
   g.useProgram(MGL.pr);g.activeTexture(g.TEXTURE0);g.bindTexture(g.TEXTURE_2D,MGL.tex);
   g.bindBuffer(g.ARRAY_BUFFER,MGL.vb);g.bindBuffer(g.ELEMENT_ARRAY_BUFFER,MGL.ib);g.enableVertexAttribArray(MGL.loc);g.vertexAttribPointer(MGL.loc,4,g.SHORT,false,0,0);
-  g.uniform2f(u.uRes,MGL.w,MGL.h);g.uniform2f(u.uC,world.offsetLeft+500,world.offsetTop+500);g.uniform2f(u.uT,c.tx,c.ty);
-  g.uniform1f(u.uS,s);g.uniform1f(u.uRot,r);g.uniform1f(u.uTilt,t);
-  g.uniform3f(u.uView,Math.sin(t)*Math.sin(r),Math.sin(t)*Math.cos(r),Math.cos(t));g.uniform3f(u.uHL,MGL.hx,MGL.hy,MGL.hl);
+  g.uniformMatrix4fv(u.uM,false,new Float32Array(M));g.uniform3f(u.uCam,e[0],e[1],e[2]);g.uniform3f(u.uHL,MGL.hx,MGL.hy,MGL.hl);
   g.drawElements(g.TRIANGLES,MGL.n,g.UNSIGNED_SHORT,0);
+  g.disableVertexAttribArray(MGL.loc);
+  if(!FP.ready)return;
+  const t=performance.now()/1000;
+  g.useProgram(FP.ip);g.uniformMatrix4fv(FP.iu.uM,false,new Float32Array(M));g.uniform3f(FP.iu.uCam,e[0],e[1],e[2]);g.uniform3fv(FP.iu.uL,TOON_SUN);
+  FP.items.forEach((it,i)=>{const q=PRODUCTS[i].at, z=q[2]+FP_ITEM_Z+Math.sin(t*1.6+i*2)*1.2, sc=3.8*(1+it.glow*.12);
+    const W=M4.mul(M4.tr(q[0],q[1],z),M4.mul(M4.rz(t*.9+i*2.1),M4.mul(M4.rx(.5+Math.sin(t*.7+i)*.15),M4.sc(sc))));
+    g.uniformMatrix4fv(FP.iu.uW,false,new Float32Array(W));g.uniform3fv(FP.iu.uA,ITEM_COL[i%3][0]);g.uniform3fv(FP.iu.uB,ITEM_COL[i%3][1]);g.uniform1f(FP.iu.uGlow,it.glow);
+    g.bindBuffer(g.ARRAY_BUFFER,it.b);g.enableVertexAttribArray(FP.ia[0]);g.enableVertexAttribArray(FP.ia[1]);
+    g.vertexAttribPointer(FP.ia[0],3,g.FLOAT,false,24,0);g.vertexAttribPointer(FP.ia[1],3,g.FLOAT,false,24,12);
+    g.drawArrays(g.TRIANGLES,0,it.n);
+    // where it lands on screen (labels, clicks)
+    const cl=fpProject([q[0],q[1],z]); it.scr=cl?[cl[0],cl[1],sc*cl[2]]:[-999,-999,0];
+    g.disableVertexAttribArray(FP.ia[0]);g.disableVertexAttribArray(FP.ia[1]);
+  });
 }
+function fpProject(p){const M=FP.M;if(!M)return null;const x=p[0],y=p[1],z=p[2];
+  const cx=M[0]*x+M[4]*y+M[8]*z+M[12],cy=M[1]*x+M[5]*y+M[9]*z+M[13],cw=M[3]*x+M[7]*y+M[11]*z+M[15];
+  if(cw<=1)return null;return [(cx/cw*.5+.5)*MGL.w,(1-(cy/cw*.5+.5))*MGL.h,MGL.h/2/Math.tan(FP.fov*Math.PI/360)/cw]}
+
 const pins=$$('.pin'), trees=$$('.tree');
 function fitMap(){const w=mstage.clientWidth,h=mstage.clientHeight;map.base=Math.min(w/1350,h/950)*(w<700?1.3:1);sizeMapGL(w,h);map.dirty=true}
 function applyMap(){
@@ -548,10 +581,10 @@ function buildDetail(p){
   </div></div></section>
 <section class="d-sec" id="d-ga" style="padding-top:40px"><span class="label reveal">GALLERY</span><h2 class="h-main reveal">3D 모델, 제품 이미지 및 사용자 시나리오</h2>
   <div class="gallery reveal">${['3D 모델','제품 이미지','사용 장면','사용자 시나리오'].map((g,k)=>`<button data-g="${k}" aria-label="${g} 크게 보기">${k<2?prodTile(p.kind,TILE_BG[k]):scene({pal:['lav','peach'][k-2],seed:80+k+i,crowd:50,orbs:2,motif:['person','network'][k-2],fade:.2})}<span>${g}</span></button>`).join('')}</div></section>
-<div class="d-foot"><button class="btn back" data-back><span class="arr">←</span> 3D 지도로 돌아가기</button><button class="btn dark" data-next>다음 제품 · ${PRODUCTS[p.n%6].name} <span class="arr">→</span></button></div>`;
+<div class="d-foot"><button class="btn back" data-back><span class="arr">←</span> 3D 지도로 돌아가기</button><button class="btn dark" data-next>다음 제품 · ${PRODUCTS[p.n%PRODUCTS.length].name} <span class="arr">→</span></button></div>`;
   dState={p,tabs:$$('#dTabs a'),secs:['d-hero','d-ov','d-ex','d-ai','d-ds','d-ga'].map(id=>$('#'+id)),prod:$('#dProd'),prod2:$('#dProd2'),design:$('#dDesign'),feats:$$('#dFeat li'),fi:-1,story:$('#dStory'),slides:$$('#dStory .story-slide')};
   dState.tabs.forEach(a=>a.onclick=e=>{e.preventDefault();const t=$('#'+a.dataset.t);detail.scrollTo({top:a.dataset.t==='d-hero'?0:t.offsetTop-64,behavior:reduce?'auto':'smooth'})});
-  $$('[data-next]',dBody).forEach(b=>b.onclick=()=>switchProduct(PRODUCTS[p.n%6].n));
+  $$('[data-next]',dBody).forEach(b=>b.onclick=()=>switchProduct(PRODUCTS[p.n%PRODUCTS.length].n));
   $$('[data-back]',dBody).forEach(b=>b.onclick=closeDetail);
   $$('[data-sx]',dBody).forEach(b=>b.onclick=()=>$('#dSteps').scrollBy({left:+b.dataset.sx*360,behavior:'smooth'}));
   $$('.gallery button',dBody).forEach(b=>b.onclick=()=>openLB(b.querySelector('svg').parentNode.innerHTML.replace(/<span>.*<\/span>/,'')));
@@ -585,14 +618,14 @@ function tween(dur,fn,done){const t0=performance.now();(function f(t){const k=cl
 let savedY=0;
 function openDetail(n){
   const p=PRODUCTS[n-1]; buildDetail(p); savedY=scrollY;
-  const r=pcard.getBoundingClientRect(); const from=[r.top,VW-r.right,VH-r.bottom,r.left];
+  const r=pcard.getBoundingClientRect(); const from=FP.from||[r.top,VW-r.right,VH-r.bottom,r.left]; FP.from=null;
   detail.classList.add('open'); document.body.style.overflow='hidden'; warp(60,1000);
   if(reduce){detail.style.clipPath='none';detail.classList.add('ready');return}
   tween(1000,k=>{const e=eIO(k);detail.style.clipPath=`inset(${from.map(v=>(v*(1-e)).toFixed(1)+'px').join(' ')} round ${(28*(1-e)).toFixed(1)}px)`;dBody.style.transform=`scale(${(1.08-.08*eOut(k)).toFixed(4)})`;dBody.style.filter=`blur(${(10*(1-eOut(k))).toFixed(2)}px)`},()=>{dBody.style.transform='';dBody.style.filter='';detail.style.clipPath='none';detail.classList.add('ready');$('#dBack').focus({preventScroll:true})});
 }
 function closeDetail(){
   if(!dState)return; const n=dState.p.n; detail.classList.remove('ready');
-  const finish=()=>{detail.classList.remove('open');detail.style.clipPath='';document.body.style.overflow='';dState=null;openCard(n);$$('.pin')[n-1].focus({preventScroll:true})};
+  const finish=()=>{detail.classList.remove('open');detail.style.clipPath='';document.body.style.overflow='';dState=null;};
   if(reduce)return finish();
   const r=pcard.getBoundingClientRect(); const to=[r.top||VH*.3,(VW-r.right)||40,(VH-r.bottom)||VH*.3,r.left||VW*.6];
   tween(700,k=>{const e=eIO(k);detail.style.clipPath=`inset(${to.map(v=>(v*e).toFixed(1)+'px').join(' ')} round ${(28*e).toFixed(1)}px)`;detail.style.opacity=(1-range(k,.6,1)).toFixed(3)},()=>{detail.style.opacity='';finish()});
@@ -812,47 +845,71 @@ function tickSystem2(now){
   const ph=(t*1.2)%1; s2Pulse.setAttribute('r',(16+ph*22).toFixed(1)); s2Pulse.setAttribute('opacity',(A>0?(1-ph)*Math.min(1,A*3):0).toFixed(3));
 }
 
-/* ======================= PROJECTS v4 · orbs land → guided tour → free ======================= */
+/* ======================= PROJECTS · first-person walk (scroll) ======================= */
 const pj={el:$('#projects'),p:0,t:0,stop:-2};
-const pjSticky=$('.pj-sticky'), pjHead=$('.pj-head'), pjOrbs=$$('.pj-orb'), pjTour=$('#pjTour'), ptK=$('#ptK'), ptN=$('#ptN'), ptO=$('#ptO'), ptGo=$('#ptGo');
-const PJ_CATS=['personal','space','operator'];
-const TOUR=PJ_CATS.flatMap(c=>PRODUCTS.filter(q=>q.cat===c).map(q=>q.n));
-const PJ_T0=.17, PJ_T1=.91, PJ_TW=(PJ_T1-PJ_T0)/TOUR.length;
-let pjTourActive=false;
-function zoneCenter(cat){let x=0,y=0,n=0;pins.forEach(pn=>{if(PRODUCTS[pn.dataset.n-1].cat===cat){const r=pn.querySelector('.head').getBoundingClientRect();if(r.width){x+=r.left+r.width/2;y+=r.top+r.height/2;n++}}});return n?[x/n,y/n]:[VW*.57,VH*.57]}
+const pjSticky=$('.pj-sticky'), pjHead=$('.pj-head'), pjTour=$('#pjTour'), ptK=$('#ptK'), ptN=$('#ptN'), ptO=$('#ptO'), ptGo=$('#ptGo'), fpHint=$('.map-hint');
+const PJ_KN=[.2,.36,.57,.77,.94]; let pjTourActive=false;                      // scroll progress: start of walk, each product, playground
+let FP_SK=null; const fpSK=()=>FP_SK||(FP_SK=[0,...fpStops(),FP.L]);
+function fpS(p){const S=fpSK();if(p<=PJ_KN[0])return 0;for(let i=1;i<PJ_KN.length;i++)if(p<=PJ_KN[i])return lerp(S[i-1],S[i],eIO((p-PJ_KN[i-1])/(PJ_KN[i]-PJ_KN[i-1])));return FP.L}
+mstage.insertAdjacentHTML('beforeend',PRODUCTS.map(p=>`<button class="fp-tag" data-n="${p.n}" aria-label="${p.n}번 ${p.name} 소개 열기"><b>0${p.n}</b><span>${p.name}</span></button>`).join(''));
+const fpTags=$$('.fp-tag',mstage);
+fpTags.forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();fpOpen(+b.dataset.n)}));
+function fpOpen(n){const it=FP.items[n-1];if(it){const r=it.scr[2]*2.2;FP.from=[it.scr[1]-r,VW-(it.scr[0]+r),VH-(it.scr[1]+r),it.scr[0]-r].map(v=>Math.max(0,v))}openDetail(n)}
 function renderProjects(p){
-  // three orbs (from the question) land on their zones
-  const land=eIO(range(p,.05,.14)), gone=range(p,.13,.16);
-  if(p<.17){const box=pjSticky.getBoundingClientRect();
-    pjOrbs.forEach((o,i)=>{const gap=Math.min(VW*.26,260), sx=VW/2+(i-1)*gap, sy=VH*.34;
-      const z=land>0?zoneCenter(PJ_CATS[i]):[sx,sy], x=lerp(sx,z[0],land), y=lerp(sy,z[1]-box.top,land)-Math.sin(land*Math.PI)*60;
-      o.style.transform=`translate(${x.toFixed(1)}px,${y.toFixed(1)}px) translate(-50%,-50%) scale(${(1-.78*land).toFixed(4)})`;
-      o.style.opacity=(1-gone).toFixed(3);
-      o.querySelector('span').style.opacity=(1-range(p,.05,.08)).toFixed(3);
-      const rp=o.querySelector('.ripple'), rk=range(p,.12,.16);
-      rp.style.transform=`translate(-50%,-50%) scale(${(rk*4).toFixed(3)})`; rp.style.opacity=(rk>0?(1-rk):0).toFixed(3)});
-  } else pjOrbs.forEach(o=>o.style.opacity='0');
-  // tour stops
-  let st=p<PJ_T0?-1:p<PJ_T1?Math.min(TOUR.length-1,Math.floor((p-PJ_T0)/PJ_TW)):99;
+  pj.p=p;
+  const S=fpSK(); FP.s=fpS(p);
+  let act=0; PJ_KN.slice(1,4).forEach((k,i)=>{if(Math.abs(p-k)<.05)act=i+1}); FP.act=act;
+  const fin=p>PJ_KN[4]-.04;
+  const st=act?act:fin?9:-1;
   if(st!==pj.stop){pj.stop=st;
-    if(st>=0&&st<99){const n=TOUR[st],pr=PRODUCTS[n-1],[x,y,w,d]=pr.b;
-      if(map.sel)closeCard();
-      map.tx=-(x+w/2-500);map.ty=-(y+d/2-500);map.zoom=VW<700?1.45:1.7;map.rot=MAP_ROT+(st-2.5)*12;map.tilt=52;setHL(n);
-      ptK.textContent=`0${n} · ${CAT[pr.cat]} · ${pr.place}`;ptN.textContent=pr.name;ptO.textContent=pr.one;ptGo.dataset.n=n;
-    } else {if(!map.sel){map.tx=0;map.ty=0;map.zoom=1;map.rot=MAP_ROT;map.tilt=56;setHL(0)}}
-  }
-  if(st>=0&&st<99){const local=(p-PJ_T0)/PJ_TW-st, ti=eOut(clamp(local/.28)), to=eIn(clamp((local-.84)/.16)), w=(1-ti)+to;
-    pjTour.style.opacity=(ti*(1-to)).toFixed(3);
-    pjTour.style.transform=`translateY(${VW<700?0:-50}%) translateY(${((1-ti)*36-to*30).toFixed(1)}px)`;
-    pjTour.style.filter=w>.004?`blur(${(w*10).toFixed(2)}px)`:'none';
-    pjTour.classList.toggle('live',ti*(1-to)>.6);
-  } else {pjTour.style.opacity='0';pjTour.classList.remove('live')}
-  pjTourActive=p>=PJ_T0-.01&&p<PJ_T1;
-  const free=p>=PJ_T1+.01; pjSticky.classList.toggle('free',free);
-  pjHead.style.opacity=free?eOut(range(p,PJ_T1,PJ_T1+.05)).toFixed(3):'0';
-  pjHead.style.pointerEvents=free?'':'none';
+    if(act){const pr=PRODUCTS[act-1];ptK.textContent=`0${act} · ${pr.place}`;ptN.textContent=pr.name;ptO.textContent=pr.one;ptGo.dataset.n=act;ptGo.style.display=''}
+    else if(fin){ptK.textContent='도착';ptN.textContent='공연이 열리는 운동장';ptO.textContent='';ptGo.style.display='none'}}
+  let vis=0; if(act)vis=1-clamp((Math.abs(p-PJ_KN[act])-.02)/.03); else if(fin)vis=eOut(range(p,PJ_KN[4]-.04,PJ_KN[4]));
+  pjTour.style.opacity=vis.toFixed(3); pjTour.style.transform=`translateY(${VW<700?0:-50}%) translateY(${((1-vis)*30).toFixed(1)}px)`;
+  pjTour.style.filter='none'; pjTour.classList.toggle('live',vis>.6); pjTourActive=vis>.3;
+  pjHead.style.opacity=(1-eIO(range(p,.05,.12))).toFixed(3); pjHead.style.pointerEvents='none';
+  fpHint.style.opacity=(eOut(range(p,.18,.24))*(1-range(p,.95,.99))).toFixed(3);
 }
-ptGo.addEventListener('click',()=>openDetail(+ptGo.dataset.n));
+ptGo.addEventListener('click',()=>fpOpen(+ptGo.dataset.n));
+// look around: drag sideways (touch keeps vertical scrolling)
+let fpDrag=null;
+mstage.addEventListener('pointerdown',e=>{if(e.target.closest('.fp-tag'))return;fpDrag={x:e.clientX,y:e.clientY,yw:FP.yawT,pt:FP.pitchT,moved:false}});
+mstage.addEventListener('pointermove',e=>{
+  if(fpDrag){const dx=e.clientX-fpDrag.x,dy=e.clientY-fpDrag.y;if(Math.abs(dx)+Math.abs(dy)>5)fpDrag.moved=true;
+    FP.yawT=fpDrag.yw-dx*.22;if(e.pointerType!=='touch')FP.pitchT=clamp(fpDrag.pt+dy*.14,-28,30);FP.lastDrag=performance.now();return}
+  FP.hover=fpHit(e.clientX,e.clientY); mstage.style.cursor=FP.hover?'pointer':'';
+});
+const fpEnd=e=>{if(!fpDrag)return;const mv=fpDrag.moved;fpDrag=null;if(!mv&&e.type==='pointerup'){const n=fpHit(e.clientX,e.clientY);if(n)fpOpen(n)}};
+mstage.addEventListener('pointerup',fpEnd);mstage.addEventListener('pointercancel',fpEnd);
+function fpHit(cx,cy){const r=mstage.getBoundingClientRect();let best=0,bd=1e9;
+  FP.items.forEach((it,i)=>{const d=Math.hypot(cx-r.left-it.scr[0],cy-r.top-it.scr[1]);if(it.scr[2]>2&&d<Math.max(it.scr[2]*1.7,26)&&d<bd){bd=d;best=i+1}});return best}
+// camera
+const FP_AER=(()=>{const c=[650,470,0],d=[Math.sin(70*Math.PI/180),Math.cos(70*Math.PI/180)];return {c,e:[c[0]+d[0]*760,c[1]+d[1]*760,560]}})();
+function tickFP(now){
+  const r=pjSticky.getBoundingClientRect(); if(r.bottom<0||r.top>VH||!MGL)return;
+  const p=pj.p, mob=VW<700, k=eIO(range(p,.07,PJ_KN[0]));
+  const s=FP.s, here=fpAt(s), eye=[here[0],here[1],here[2]+FP_EYE];
+  let tgt=fpAt(s+46); tgt=[tgt[0],tgt[1],here[2]+FP_EYE-1.5];
+  // turn toward the product at each stop, and toward the stage at the end
+  PJ_KN.slice(1,4).forEach((kn,i)=>{const w=eIO(clamp(1-Math.abs(p-kn)/.075));if(w>0){const q=PRODUCTS[i].at;tgt=[lerp(tgt[0],q[0],w),lerp(tgt[1],q[1],w),lerp(tgt[2],q[2]+FP_ITEM_Z-1,w)]}});
+  const we=eIO(range(p,PJ_KN[3]+.05,PJ_KN[4])); tgt=[lerp(tgt[0],FP_STAGE[0],we),lerp(tgt[1],FP_STAGE[1],we),lerp(tgt[2],FP_STAGE[2]+6,we)];
+  // drag offsets ease back when the walk moves on
+  if(Math.abs(s-(FP.ls??s))>.5&&now-(FP.lastDrag||0)>900){FP.yawT*=.9;FP.pitchT*=.9} FP.ls=s;
+  FP.yaw=lerp(FP.yaw,FP.yawT,.12);FP.pitch=lerp(FP.pitch,FP.pitchT,.12);
+  let dv=sub3(tgt,eye);const yr=FP.yaw*Math.PI/180,cy=Math.cos(yr),sy=Math.sin(yr);dv=[dv[0]*cy-dv[1]*sy,dv[0]*sy+dv[1]*cy,dv[2]];
+  const hl=Math.hypot(dv[0],dv[1]);dv[2]+=Math.tan(-FP.pitch*Math.PI/180)*hl; tgt=[eye[0]+dv[0],eye[1]+dv[1],eye[2]+dv[2]];
+  // fly in from above, then walk
+  const kx=eOut(Math.min(1,k*1.15)), kz=eIn(k);
+  FP.cam=[lerp(FP_AER.e[0],eye[0],kx),lerp(FP_AER.e[1],eye[1],kx),lerp(FP_AER.e[2],eye[2],kz)];
+  FP.look=[lerp(FP_AER.c[0],tgt[0],kx),lerp(FP_AER.c[1],tgt[1],kx),lerp(FP_AER.c[2],tgt[2],kz)];
+  FP.fov=lerp(34,mob?74:62,k);
+  FP.items.forEach((it,i)=>{const tg=FP.act===i+1||FP.hover===i+1?1:0;it.glow=lerp(it.glow,tg,.08)});
+  drawMapGL();
+  fpTags.forEach((b,i)=>{const it=FP.items[i],[x,y,rr]=it.scr,o=k>.85&&rr>2.5?clamp((rr-2.5)/4):0;
+    b.style.opacity=o.toFixed(3);b.style.pointerEvents=o>.4?'auto':'none';
+    b.style.transform=`translate(${x.toFixed(1)}px,${(y-rr*1.9-14).toFixed(1)}px) translate(-50%,-100%) scale(${(.85+.15*it.glow).toFixed(3)})`;
+    b.classList.toggle('on',it.glow>.5)});
+}
 
 /* ======================= shared pointer tilt + epilogue card ======================= */
 const tilt={x:0,y:0}, wcImgBox=$('#world-c .wc-img');
@@ -873,8 +930,8 @@ function tickPjSky(){
 }
 /* ======================= SCROLL PAUSES + SNAP ======================= */
 // mapped progress values where the scene should rest (content fully shown)
-const HOLDS={'intro':[0,.44,1],'world-a':[.04,.24,.4467,.6533,.86],'world-c':[.11,.22,.35,.45,.55,.65,.78,.92],'system':[.05,.31,.53,.8],'turn':[.42,.8],'projects':[.02,...Array.from({length:6},(_,i)=>.17+(.74/6)*(i+.5)),.975]};
-const HOLD_W={'intro':.07,'world-a':.05,'world-c':.05,'system':.05,'turn':.07,'projects':.035};   // raw share of the section each pause takes
+const HOLDS={'intro':[0,.44,1],'world-a':[.04,.24,.4467,.6533,.86],'world-c':[.11,.22,.35,.45,.55,.65,.78,.92],'system':[.05,.31,.53,.8],'turn':[.42,.8],'projects':[.03,.36,.57,.77,.955]};
+const HOLD_W={'intro':.07,'world-a':.05,'world-c':.05,'system':.05,'turn':.07,'projects':.045};   // raw share of the section each pause takes
 const KNOTS={};
 for(const id in HOLDS){const H=HOLDS[id],w=HOLD_W[id],mv=1-H.length*w,k=[[0,0]];let pr=0,pm=0;
   H.forEach(h=>{const r0=pr+(h-pm)*mv;k.push([r0,h],[r0+w,h]);pr=r0+w;pm=h});k.push([1,1]);KNOTS[id]=k}
@@ -983,7 +1040,7 @@ function loop(){
     cmx=lerp(cmx,mx,.05);cmy=lerp(cmy,my,.05);
     if(!reduce)iorbs.forEach((o,i)=>o.style.transform=`translate(${(cmx*(30+i*14)).toFixed(1)}px,${(cmy*(30+i*14)).toFixed(1)}px)`);
     if(intro.p<.95||particles.list.length)tickParticles();
-    tickMap(); updateChrome(); tickHoldbar(); tickTilt(); tickWorld(performance.now()); tickWorldC(); tickTurn(performance.now()); tickSystem2(performance.now()); tickPjSky();
+    tickMap(); updateChrome(); tickHoldbar(); tickTilt(); tickWorld(performance.now()); tickWorldC(); tickTurn(performance.now()); tickSystem2(performance.now()); tickPjSky(); tickFP(performance.now());
   }
   requestAnimationFrame(loop);
 }
