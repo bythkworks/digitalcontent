@@ -360,7 +360,7 @@ vec3 lsp(vec3 p){p-=vec3(500.,500.,0.);return vec3(dot(p,uU)/1150.,dot(p,uV)/115
   // main pass
   const vs=`attribute vec4 a;uniform mat4 uM;varying vec3 vP;varying float vCat;void main(){vec3 p=a.xyz/16.;vP=p;vCat=a.w;gl_Position=uM*vec4(p,1.);}`;
   const fs=`${der?'#extension GL_OES_standard_derivatives : enable\n':''}precision highp float;
-varying vec3 vP;varying float vCat;uniform vec3 uView,uHL,uCam;uniform sampler2D uSh;uniform float uTx;${LS}
+varying vec3 vP;varying float vCat;uniform vec3 uView,uHL,uCam;uniform float uFog;uniform sampler2D uSh;uniform float uTx;${LS}
 float unpack(vec4 c){return dot(c,vec4(1.,1./255.,1./65025.,1./16581375.));}
 float shadowAt(vec3 s,float bias){float lit=0.;
   for(int i=0;i<4;i++){vec2 o=vec2(mod(float(i),2.)-.5,floor(float(i)/2.)-.5)*uTx*1.2;lit+=step(s.z-bias,unpack(texture2D(uSh,s.xy*.5+.5+o)));}
@@ -388,7 +388,7 @@ ${der?'vec3 n=normalize(cross(dFdx(vP),dFdy(vP)));if(dot(n,uCam-vP)<0.)n=-n;':'v
   col=mix(col,vec3(1.,.93,.86),hi*.35);
   float hl=uHL.z*(1.-smoothstep(36.,100.,length(vP.xy-uHL.xy)));
   col=mix(col,mix(vec3(.74,.84,.97),vec3(.95,.76,.91),clamp(vP.z/80.,0.,1.)),hl*(vCat<.5?.5:.62));
-  col=mix(col,vec3(.975,.935,.955),smoothstep(240.,1100.,length(uCam-vP))*.8);
+  col=mix(col,vec3(.975,.935,.955),smoothstep(240.,1100.,length(uCam-vP))*.8*uFog);
   float r=length(vP.xy-500.);
   col=mix(col,vec3(.975,.91,.94),smoothstep(380.,700.,r)*.55);
   float al=1.-smoothstep(560.,780.,r);gl_FragColor=vec4(col*al,al);}`;
@@ -409,7 +409,7 @@ ${der?'vec3 n=normalize(cross(dFdx(vP),dFdy(vP)));if(dot(n,uCam-vP)<0.)n=-n;':'v
   g.useProgram(sp);const sl=g.getAttribLocation(sp,'a');g.enableVertexAttribArray(sl);g.vertexAttribPointer(sl,4,g.SHORT,false,0,0);
   g.uniform3fv(g.getUniformLocation(sp,'uL'),L);g.uniform3fv(g.getUniformLocation(sp,'uU'),U);g.uniform3fv(g.getUniformLocation(sp,'uV'),V);
   g.drawElements(g.TRIANGLES,idx.length,g.UNSIGNED_SHORT,0);g.bindFramebuffer(g.FRAMEBUFFER,null);
-  const u={};['uM','uCam','uView','uHL','uSh','uTx','uL','uU','uV'].forEach(k=>u[k]=g.getUniformLocation(pr,k));
+  const u={};['uM','uCam','uFog','uView','uHL','uSh','uTx','uL','uU','uV'].forEach(k=>u[k]=g.getUniformLocation(pr,k));
   g.useProgram(pr);g.uniform3fv(u.uL,L);g.uniform3fv(u.uU,U);g.uniform3fv(u.uV,V);g.uniform1i(u.uSh,0);g.uniform1f(u.uTx,1/SZ);
   MGL={g,cv,pr,vb,ib,tex,n:idx.length,u,loc:g.getAttribLocation(pr,'a'),hl:0,hx:500,hy:500,w:1,h:1};
 })();
@@ -467,14 +467,14 @@ gl_FragColor=vec4(min(c,1.),1.);}`;
 })();
 function drawMapGL(){
   if(!MGL)return;const {g,u}=MGL;
-  const a=MGL.w/Math.max(1,MGL.h), P=M4.persp(FP.fov*Math.PI/180,a,1.5,3200);
+  const a=MGL.w/Math.max(1,MGL.h), P=M4.persp(FP.fov*Math.PI/180,a,FP.near||1.5,FP.far||3200);
   const e=FP.cam, c=FP.look, V=M4.look([e[0],-e[1],e[2]],[c[0],-c[1],c[2]],[0,0,1]);
   const M=M4.mul(M4.mul(P,V),FLIP); FP.M=M;
   const tg=FP.act?1:0; MGL.hl+=(tg-MGL.hl)*.1; if(FP.act){const q=PRODUCTS[FP.act-1].at;MGL.hx=q[0];MGL.hy=q[1]}
   g.viewport(0,0,MGL.cv.width,MGL.cv.height);g.clearColor(0,0,0,0);g.clear(g.COLOR_BUFFER_BIT|g.DEPTH_BUFFER_BIT);g.enable(g.DEPTH_TEST);g.disable(g.CULL_FACE);
   g.useProgram(MGL.pr);g.activeTexture(g.TEXTURE0);g.bindTexture(g.TEXTURE_2D,MGL.tex);
   g.bindBuffer(g.ARRAY_BUFFER,MGL.vb);g.bindBuffer(g.ELEMENT_ARRAY_BUFFER,MGL.ib);g.enableVertexAttribArray(MGL.loc);g.vertexAttribPointer(MGL.loc,4,g.SHORT,false,0,0);
-  g.uniformMatrix4fv(u.uM,false,new Float32Array(M));g.uniform3f(u.uCam,e[0],e[1],e[2]);g.uniform3f(u.uHL,MGL.hx,MGL.hy,MGL.hl);
+  g.uniformMatrix4fv(u.uM,false,new Float32Array(M));g.uniform3f(u.uCam,e[0],e[1],e[2]);g.uniform1f(u.uFog,FP.fog??1);g.uniform3f(u.uHL,MGL.hx,MGL.hy,MGL.hl);
   g.drawElements(g.TRIANGLES,MGL.n,g.UNSIGNED_SHORT,0);
   g.disableVertexAttribArray(MGL.loc);
   if(!FP.ready)return;
@@ -851,6 +851,8 @@ const pjSticky=$('.pj-sticky'), pjHead=$('.pj-head'), pjTour=$('#pjTour'), ptK=$
 const PJ_KN=[.2,.36,.57,.77,.94]; let pjTourActive=false;                      // scroll progress: start of walk, each product, playground
 let FP_SK=null; const fpSK=()=>FP_SK||(FP_SK=[0,...fpStops(),FP.L]);
 function fpS(p){const S=fpSK();if(p<=PJ_KN[0])return 0;for(let i=1;i<PJ_KN.length;i++)if(p<=PJ_KN[i])return lerp(S[i-1],S[i],eIO((p-PJ_KN[i-1])/(PJ_KN[i]-PJ_KN[i-1])));return FP.L}
+mstage.insertAdjacentHTML('beforeend','<svg class="fp-route" aria-hidden="true"><path/></svg>');
+const fpRouteSvg=$('.fp-route',mstage), fpRoute=$('.fp-route path',mstage);
 mstage.insertAdjacentHTML('beforeend',PRODUCTS.map(p=>`<button class="fp-tag" data-n="${p.n}" aria-label="${p.n}번 ${p.name} 소개 열기"><b>0${p.n}</b><span>${p.name}</span></button>`).join(''));
 const fpTags=$$('.fp-tag',mstage);
 fpTags.forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();fpOpen(+b.dataset.n)}));
@@ -884,7 +886,9 @@ mstage.addEventListener('pointerup',fpEnd);mstage.addEventListener('pointercance
 function fpHit(cx,cy){const r=mstage.getBoundingClientRect();let best=0,bd=1e9;
   FP.items.forEach((it,i)=>{const d=Math.hypot(cx-r.left-it.scr[0],cy-r.top-it.scr[1]);if(it.scr[2]>2&&d<Math.max(it.scr[2]*1.7,26)&&d<bd){bd=d;best=i+1}});return best}
 // camera
-const FP_AER=(()=>{const c=[650,470,0],d=[Math.sin(70*Math.PI/180),Math.cos(70*Math.PI/180)];return {c,e:[c[0]+d[0]*760,c[1]+d[1]*760,560]}})();
+function fpOverview(){const a=MGL.w/Math.max(1,MGL.h), mob=a<.9, fv=mob?30:16, th=Math.tan(fv*Math.PI/360), tw=th*a;
+  const D=Math.max((mob?720:1250)/(2*tw),(mob?900:820)/(2*th)), r=MAP_ROT*Math.PI/180, el=34*Math.PI/180, sh=mob?-300:0, c=[540+Math.sin(r)*sh,470+Math.cos(r)*sh,0];
+  return {c,fv,e:[c[0]+Math.sin(r)*Math.cos(el)*D,c[1]+Math.cos(r)*Math.cos(el)*D,Math.sin(el)*D]}}
 function tickFP(now){
   const r=pjSticky.getBoundingClientRect(); if(r.bottom<0||r.top>VH||!MGL)return;
   const p=pj.p, mob=VW<700, k=eIO(range(p,.07,PJ_KN[0]));
@@ -899,13 +903,15 @@ function tickFP(now){
   let dv=sub3(tgt,eye);const yr=FP.yaw*Math.PI/180,cy=Math.cos(yr),sy=Math.sin(yr);dv=[dv[0]*cy-dv[1]*sy,dv[0]*sy+dv[1]*cy,dv[2]];
   const hl=Math.hypot(dv[0],dv[1]);dv[2]+=Math.tan(-FP.pitch*Math.PI/180)*hl; tgt=[eye[0]+dv[0],eye[1]+dv[1],eye[2]+dv[2]];
   // fly in from above, then walk
-  const kx=eOut(Math.min(1,k*1.15)), kz=eIn(k);
-  FP.cam=[lerp(FP_AER.e[0],eye[0],kx),lerp(FP_AER.e[1],eye[1],kx),lerp(FP_AER.e[2],eye[2],kz)];
-  FP.look=[lerp(FP_AER.c[0],tgt[0],kx),lerp(FP_AER.c[1],tgt[1],kx),lerp(FP_AER.c[2],tgt[2],kz)];
-  FP.fov=lerp(34,mob?74:62,k);
+  const O=fpOverview(), kd=eIO(k), kx=eOut(Math.min(1,k*1.1)), kz=eIn(k);
+  FP.cam=[lerp(O.e[0],eye[0],kx),lerp(O.e[1],eye[1],kx),lerp(O.e[2],eye[2],kz)];
+  FP.look=[lerp(O.c[0],tgt[0],kx),lerp(O.c[1],tgt[1],kx),lerp(O.c[2],tgt[2],kz)];
+  FP.fov=lerp(O.fv,mob?74:62,kd); FP.near=lerp(40,1.5,kd); FP.far=lerp(Math.hypot(...sub3(O.e,O.c))*2.2,3200,kd); FP.fog=eIn(range(k,.55,1));
   FP.items.forEach((it,i)=>{const tg=FP.act===i+1||FP.hover===i+1?1:0;it.glow=lerp(it.glow,tg,.08)});
   drawMapGL();
-  fpTags.forEach((b,i)=>{const it=FP.items[i],[x,y,rr]=it.scr,o=k>.85&&rr>2.5?clamp((rr-2.5)/4):0;
+  if(k<1){let d='';for(let i=0;i<FP_PATH.length;i+=2){const q=fpProject([FP_PATH[i][0],FP_PATH[i][1],FP_PATH[i][2]+1]);if(q)d+=(d?'L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1)}
+    fpRoute.setAttribute('d',d);} fpRouteSvg.style.opacity=(1-eIO(range(k,0,.35))).toFixed(3);
+  fpTags.forEach((b,i)=>{const it=FP.items[i],[x,y,rr]=it.scr,ov=1-eIO(range(k,0,.3)),o=Math.max(ov,k>.85&&rr>2.5?clamp((rr-2.5)/4):0);
     b.style.opacity=o.toFixed(3);b.style.pointerEvents=o>.4?'auto':'none';
     b.style.transform=`translate(${x.toFixed(1)}px,${(y-rr*1.9-14).toFixed(1)}px) translate(-50%,-100%) scale(${(.85+.15*it.glow).toFixed(3)})`;
     b.classList.toggle('on',it.glow>.5)});

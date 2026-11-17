@@ -963,3 +963,6 @@ body.dark-zone #sprog{box-shadow:0 0 14px rgba(232,176,221,.9)}
 .fp-tag::after{content:"";position:absolute;left:50%;top:100%;width:1px;height:14px;background:linear-gradient(#fff,rgba(255,255,255,0))}
 .map-hint{opacity:0}
 @media (max-width:700px){.fp-tag{padding:4px 11px 4px 4px}.fp-tag b{width:24px;height:24px;font-size:11px}.fp-tag span{font-size:12px}}
+.fp-route{position:absolute;inset:0;width:100%;height:100%;z-index:5;pointer-events:none;overflow:visible}
+.fp-route path{fill:none;stroke:#8E8AD8;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:2 9;filter:drop-shadow(0 0 6px rgba(201,198,255,.9));animation:fpDash 1.2s linear infinite}
+@keyframes fpDash{to{stroke-dashoffset:-22}}
