@@ -951,3 +951,24 @@ body.dark-zone #sprog{box-shadow:0 0 14px rgba(232,176,221,.9)}
   -webkit-text-stroke:0;color:transparent;background:linear-gradient(135deg,#9CC8E2 0%,#B8B6E5 48%,#E8B0DD 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
   filter:drop-shadow(0 10px 24px rgba(142,138,216,.18));transform-origin:0 100%;will-change:transform}
 @media (max-width:900px){.wa-num{font-size:15vw}}
+
+/* ---- reversal: the person asks, the chat steps back ---- */
+#world-c{height:680vh}
+.ec-input{display:flex;align-items:center;gap:10px;margin:0 16px 16px;padding:8px 8px 8px 18px;border-radius:999px;background:#fff;border:1px solid rgba(124,120,201,.18);box-shadow:0 6px 18px rgba(110,100,180,.08);min-height:48px}
+.ec-in-wrap{flex:1;min-width:0;font-size:clamp(14px,1.1vw,16px);color:#2B2A36;white-space:nowrap;overflow:hidden;text-overflow:clip;direction:rtl;text-align:left}
+.ec-in-wrap span{direction:ltr;unicode-bidi:plaintext}
+.ec-ph{color:#A9A7C4}
+.ec-caret{display:inline-block;width:1.5px;height:1.1em;margin-left:2px;vertical-align:-.15em;background:#8E8AD8;animation:ecCaret 1s steps(1) infinite}
+@keyframes ecCaret{50%{opacity:0}}
+.ec-send{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#E9E6F8;color:#fff;transition:background .3s var(--ease),transform .3s var(--ease)}
+.ec-send svg{width:16px;height:16px}
+.ec-send.on{background:linear-gradient(135deg,#8E8AD8,#B98BD6)}
+.ec-send.hit{transform:scale(.86)}
+.ec-final{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(28px,4vh,48px);padding:80px clamp(20px,6vw,80px) 40px;pointer-events:none;text-align:center}
+.ec-qb{max-width:min(1000px,100%);padding:clamp(22px,2.6vw,36px) clamp(26px,3.4vw,48px);border-radius:40px 40px 12px 40px;color:#fff;background:linear-gradient(135deg,#8E8AD8,#B98BD6);
+  box-shadow:0 30px 80px rgba(142,138,216,.35);font-size:clamp(28px,3.6vw,54px);font-weight:800;letter-spacing:-.04em;line-height:1.25;word-break:keep-all;opacity:0;will-change:transform,opacity}
+.ec-ans{font-size:clamp(20px,2vw,30px);font-weight:700;letter-spacing:-.03em;line-height:1.45;color:#2B2A36;word-break:keep-all;opacity:0}
+.ec-ans em{font-style:normal;background:linear-gradient(120deg,#7FAFD0,#8E8AD8 45%,#C98BC9);-webkit-background-clip:text;background-clip:text;color:transparent}
+#world-c .to-system{display:none!important}
+#turn{display:none!important}
+@media (max-width:900px){.ec-input{margin:0 10px 10px;min-height:44px}.ec-qb{font-size:7.4vw;border-radius:30px 30px 10px 30px}.ec-ans{font-size:5vw}}

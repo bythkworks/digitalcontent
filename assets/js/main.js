@@ -292,6 +292,7 @@ chBtns.forEach(b=>b.addEventListener('click',()=>{const i=+b.dataset.ch;const el
 /* ======================= WORLD C ======================= */
 /* ======================= WORLD EPILOGUE · 대화 ======================= */
 // [초안] 표시된 줄은 팀 문구로 바꿔 주세요. 나머지는 기존 에필로그 문구입니다.
+const EC_Q='하지만 과연 AI가 사용자의 모든 생각을 이해할 수 있을까요?';
 const EC_CHOICES=['조용한 쉼터','공연 무대 앞','푸드 트럭 거리'];                     // [초안]
 const EC_ROLES=[
   {k:'개인',t:'자신의 경험을 이어가고',ic:'<svg width="22" height="22" viewBox="0 0 26 26" fill="none" stroke="#8E8AD8" stroke-width="1.8"><circle cx="13" cy="9" r="4"/><path d="M5 22c1.2-4.2 4.2-6 8-6s6.8 1.8 8 6" stroke-linecap="round"/></svg>'},
@@ -299,17 +300,19 @@ const EC_ROLES=[
   {k:'운영자',t:'더 넓은 상황을 살필 수 있습니다',ic:'<svg width="22" height="22" viewBox="0 0 26 26" fill="none" stroke="#D08FC6" stroke-width="1.8"><circle cx="13" cy="13" r="8"/><circle cx="13" cy="13" r="3"/><path d="M13 2v4M13 20v4M2 13h4M20 13h4" stroke-linecap="round"/></svg>'}];
 const josa=w=>{const c=w.charCodeAt(w.length-1)-0xAC00;return c>=0&&c%28&&c%28!==8?'으로':'로'};
 const EC_MSG=[ // at: scroll progress where the message lands
-  {at:.06,who:'ai',html:'오후 7시예요. 지금 축제 공간이 가장 붐비고 있어요.'},                 // [초안]
-  {at:.15,who:'ai',kind:'choice',html:'지금 상황에 맞는 곳을 골라 봤어요.'},                    // [초안]
-  {at:.31,who:'me',reply:true},                                                                 // [초안] "○○(으)로 갈게요."
-  {at:.40,who:'me',html:'그런데 AI가 다 정해 주는 건가요?'},                                     // [초안]
-  {at:.50,who:'ai',kind:'big',html:'AI는 모든 것을<br>대신 결정하지 않습니다.'},
-  {at:.60,who:'ai',kind:'lead',html:'사람과 공간의 상황을 이해하고, 더 나은 선택을 돕습니다.'},
-  {at:.70,who:'ai',kind:'roles'}];
-const EC_PICK=.26, EC_TYPE=.045;
+  {at:.045,who:'ai',html:'오후 7시예요. 지금 축제 공간이 가장 붐비고 있어요.'},                 // [초안]
+  {at:.11,who:'ai',kind:'choice',html:'지금 상황에 맞는 곳을 골라 봤어요.'},                    // [초안]
+  {at:.22,who:'me',reply:true},                                                                 // [초안] "○○(으)로 갈게요."
+  {at:.29,who:'me',html:'그런데 AI가 다 정해 주는 건가요?'},                                     // [초안]
+  {at:.36,who:'ai',kind:'big',html:'AI는 모든 것을<br>대신 결정하지 않습니다.'},
+  {at:.43,who:'ai',kind:'lead',html:'사람과 공간의 상황을 이해하고, 더 나은 선택을 돕습니다.'},
+  {at:.5,who:'ai',kind:'roles'},
+  {at:.7,who:'me',html:EC_Q}];
+const EC_PICK=.19, EC_TYPE=.032;
 const worldC={el:$('#world-c'),p:0,t:0};
 const ecList=$('#ecList'), ecState=$('#ecState'), ecLabel=$('#ecLabel'), ecPhone=$('#ecPhone'), wcScene=$('#wcScene'), wcbar=$('#wcbar'), wcNext=$('#wc6');
-const EC={pick:-1,user:-1,n:-1,typing:false};
+const ecIn=$('#ecIn'),ecPh=$('#ecPh'),ecSend=$('#ecSend'),ecQb=$('#ecQb'),ecAns=$('#ecAns');
+const EC={nc:-1,pick:-1,user:-1,n:-1,typing:false};
 ecList.innerHTML=EC_MSG.map((m,i)=>{
   let body=m.html||'';
   if(m.kind==='choice')body+=`<div class="ec-opts">${EC_CHOICES.map((c,k)=>`<button type="button" data-k="${k}"><span>${c}</span><i aria-hidden="true"></i></button>`).join('')}</div>`;
@@ -333,8 +336,16 @@ function renderWorldC(p){
   ecPhone.classList.toggle('done',p>=EC_MSG[6].at+.04);
   const ent=eOut(range(p,0,.06)); ecPhone.style.opacity=ent.toFixed(3); ecPhone.style.transform=`translateY(${(40*(1-ent)).toFixed(1)}px)`;
   ecLabel.style.opacity=ent.toFixed(3);
-  const nxt=eOut(range(p,.8,.88)); wcNext.style.opacity=nxt.toFixed(3); wcNext.style.transform=`translateY(${(16*(1-nxt)).toFixed(1)}px)`;
-  wcbar.style.width=(range(p,.84,.98)*100).toFixed(2)+'%';
+  // the person types the question and sends it
+  const ty=range(p,.57,.67), nc=p>=.7?0:Math.round(ty*EC_Q.length);
+  if(nc!==EC.nc){EC.nc=nc;ecIn.textContent=EC_Q.slice(0,nc);ecPh.style.display=nc?'none':'';}
+  ecSend.classList.toggle('on',nc>=EC_Q.length); ecSend.classList.toggle('hit',p>=.685&&p<.7);
+  // the chat steps back; the question stays, then the answer
+  const f=eIO(range(p,.73,.8)), a2=eOut(range(p,.83,.89));
+  ecPhone.style.opacity=(ent*(1-f)).toFixed(3); ecPhone.style.transform=`translateY(${(40*(1-ent)-30*f).toFixed(1)}px) scale(${(1-.06*f).toFixed(4)})`;
+  ecLabel.style.opacity=(ent*(1-f)).toFixed(3);
+  ecQb.style.opacity=f.toFixed(3); ecQb.style.transform=`translateY(${((1-f)*60-a2*10).toFixed(1)}px) scale(${(.8+.2*f).toFixed(4)})`;
+  ecAns.style.opacity=a2.toFixed(3); ecAns.style.transform=`translateY(${((1-a2)*24).toFixed(1)}px)`;
   
 }
 function tickWorldC(){}
@@ -873,8 +884,8 @@ function tickPjSky(){
 }
 /* ======================= SCROLL PAUSES + SNAP ======================= */
 // mapped progress values where the scene should rest (content fully shown)
-const HOLDS={'intro':[0,.44,1],'world-a':[.04,.24,.4467,.6533,.86],'world-c':[.11,.22,.35,.45,.55,.65,.78,.92],'system':[.05,.31,.53,.8],'turn':[.42,.8],'projects':[.02,...Array.from({length:6},(_,i)=>.17+(.74/6)*(i+.5)),.975]};
-const HOLD_W={'intro':.07,'world-a':.05,'world-c':.05,'system':.05,'turn':.07,'projects':.035};   // raw share of the section each pause takes
+const HOLDS={'intro':[0,.44,1],'world-a':[.04,.24,.4467,.6533,.86],'world-c':[.08,.16,.25,.32,.39,.46,.545,.68,.8,.92],'system':[.05,.31,.53,.8],'projects':[.02,...Array.from({length:6},(_,i)=>.17+(.74/6)*(i+.5)),.975]};
+const HOLD_W={'intro':.07,'world-a':.05,'world-c':.04,'system':.05,'turn':.07,'projects':.035};   // raw share of the section each pause takes
 const KNOTS={};
 for(const id in HOLDS){const H=HOLDS[id],w=HOLD_W[id],mv=1-H.length*w,k=[[0,0]];let pr=0,pm=0;
   H.forEach(h=>{const r0=pr+(h-pm)*mv;k.push([r0,h],[r0+w,h]);pr=r0+w;pm=h});k.push([1,1]);KNOTS[id]=k}
