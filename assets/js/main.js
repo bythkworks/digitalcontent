@@ -387,9 +387,12 @@ ${der?'vec3 n=normalize(cross(dFdx(vP),dFdy(vP)));if(dot(n,uCam-vP)<0.)n=-n;':'v
     // grass / turf (striped inside the playground)
     float gr=smoothstep(.35,.65,mk.g);
     float field=step(550.,vP.x)*step(vP.x,702.)*step(186.,vP.y)*step(vP.y,438.);
-    float stripe=step(.5,fract(vP.y/16.));
-    vec3 gL=mix(vec3(.83,.95,.83),mix(vec3(.80,.94,.82),vec3(.86,.97,.86),stripe),field);
-    vec3 gS=mix(vec3(.62,.80,.80),mix(vec3(.60,.78,.80),vec3(.66,.83,.83),stripe),field);
+    float stripe=step(.5,fract(vP.x/12.));
+    float court=step(580.,vP.x)*step(vP.x,676.)*step(269.,vP.y)*step(vP.y,339.);
+    float grain=fract(sin(dot(floor(vP.xy*1.3),vec2(12.9898,78.233)))*43758.5453);
+    vec3 sandL=vec3(.995,.915,.82)*(1.-.03*grain), sandS=vec3(.87,.78,.84)*(1.-.025*grain);
+    vec3 tfL=mix(vec3(.78,.93,.82),vec3(.84,.96,.86),stripe), tfS=mix(vec3(.58,.77,.79),vec3(.64,.81,.82),stripe);
+    vec3 gL=mix(vec3(.83,.95,.83),sandL,field), gS=mix(vec3(.62,.80,.80),sandS,field);
     cL=mix(cL,gL,gr);cS=mix(cS,gS,gr);
     // walkway + white paint
     float paint=smoothstep(.78,.95,mk.b), walk=smoothstep(.3,.45,mk.b)*(1.-paint);
@@ -397,22 +400,38 @@ ${der?'vec3 n=normalize(cross(dFdx(vP),dFdy(vP)));if(dot(n,uCam-vP)<0.)n=-n;':'v
     cL=mix(cL,vec3(1.),paint*.9);cS=mix(cS,vec3(.92,.91,1.),paint*.85);
     // ambient occlusion near buildings
     float ao=mix(.80,1.,mk.a);cL*=ao;cS*=mix(.86,1.,mk.a);
-  }else if(vCat<1.5){
-    float h=clamp(vP.z/140.,0.,1.);
-    cL=mix(vec3(1.,.968,.955),vec3(1.,.94,.95),h);cS=mix(vec3(.79,.775,.94),vec3(.84,.78,.94),h);
-    if(n.z>.7){cL=vec3(1.,.985,.975);cS=vec3(.86,.84,.965);
+  }else if(vCat<1.5||vCat>14.5){
+    float mat=vCat<1.5?0.:vCat<15.5?1.:2.;
+    float hb=fract(sin(dot(floor(vP.xy/22.),vec2(27.17,91.3)))*4375.85);
+    vec3 wL=vec3(1.,.97,.945),wS=vec3(.80,.78,.93);
+    if(mat>.5&&mat<1.5){wL=vec3(1.,.80,.71);wS=vec3(.80,.62,.74);}
+    if(mat>1.5){wL=hb<.3?vec3(1.,.95,.90):hb<.5?vec3(1.,.86,.78):hb<.7?vec3(.94,.90,1.):hb<.85?vec3(.92,.97,.93):vec3(1.,.82,.76);
+      wS=hb<.3?vec3(.80,.77,.92):hb<.5?vec3(.84,.68,.80):hb<.7?vec3(.74,.70,.92):hb<.85?vec3(.70,.78,.86):vec3(.82,.64,.76);}
+    if(mat>1.5){wL=mix(wL,vec3(1.,.96,.95),.4);wS=mix(wS,vec3(.80,.78,.93),.35);}
+    cL=wL;cS=wS;
+    if(n.z>.97){                                    // flat roofs
+      float rr=fract(hb*7.3);
+      vec3 rL=mat<.5?vec3(.80,.93,.92):mat<1.5?(rr<.45?vec3(.82,.94,.86):vec3(.97,.95,.95)):(rr<.4?vec3(.78,.93,.84):rr<.6?vec3(1.,.82,.76):vec3(.96,.95,.97));
+      vec3 rS=mat<.5?vec3(.62,.77,.86):mat<1.5?(rr<.45?vec3(.62,.78,.80):vec3(.84,.82,.95)):(rr<.4?vec3(.60,.77,.80):rr<.6?vec3(.84,.66,.78):vec3(.82,.81,.95));
+      cL=rL;cS=rS;
       vec2 rf=fract(vP.xy/9.),re=min(rf,1.-rf);float rl=1.-smoothstep(0.,.04,min(re.x,re.y));cL*=1.-.03*rl;cS*=1.-.03*rl;}
+    else if(n.z>.15){                               // curved / pitched roofs: brushed metal
+      float rib=step(.82,fract(dot(vP.xy,normalize(vec2(-n.y,n.x)))/2.4));
+      cL=mix(vec3(.95,.955,1.),vec3(.86,.87,.96),rib);cS=mix(vec3(.74,.74,.88),vec3(.66,.66,.82),rib);}
     else if(abs(n.z)<.35){
       vec2 tg=normalize(vec2(-n.y,n.x)); float u=dot(vP.xy,tg), v=vP.z+40.;
-      vec2 c=vec2(u/6.5,v/9.),f=fract(c),id=floor(c);
+      vec2 cs=mat>1.5?vec2(5.,8.):vec2(6.5,9.);
+      vec2 c=vec2(u/cs.x,v/cs.y),f=fract(c),id=floor(c);
       float win=step(.2,f.x)*step(f.x,.8)*step(.32,f.y)*step(f.y,.84);
-      float fw=length(fwidth(c));win*=1.-smoothstep(.22,.45,fw);
-      float slab=(1.-step(.07,f.y))*(1.-smoothstep(.22,.45,fw));
+      float frame=(step(.14,f.x)*step(f.x,.86)*step(.26,f.y)*step(f.y,.9))-win;
+      float fw=length(fwidth(c));float far=1.-smoothstep(.07,.17,fw);win*=far;frame*=far;
+      float slab=(1.-step(.07,f.y))*far;
       float rnd=fract(sin(dot(id,vec2(41.3,289.1)))*15731.7);
-      vec3 gl=mix(vec3(.80,.83,.98),vec3(.92,.88,1.),f.y);
-      vec3 wL=mix(gl,vec3(1.,.90,.78),step(.86,rnd)), wS=mix(vec3(.62,.64,.88),vec3(.74,.66,.86),step(.86,rnd));
-      cL=mix(cL,wL,win*.9);cS=mix(cS,wS,win*.9);
-      cL=mix(cL,cL*.94,slab);cS=mix(cS,cS*.95,slab);
+      vec3 gl=mix(vec3(.78,.82,.98),vec3(.92,.88,1.),f.y);
+      vec3 gL=mix(gl,vec3(1.,.90,.78),step(.86,rnd)), gS=mix(vec3(.60,.62,.88),vec3(.74,.66,.86),step(.86,rnd));
+      if(mat>.5&&mat<1.5){cL=mix(cL,vec3(1.,.97,.95),frame);cS=mix(cS,vec3(.86,.82,.94),frame);}   // white frames on brick
+      cL=mix(cL,gL,win*.9);cS=mix(cS,gS,win*.9);
+      cL=mix(cL,cL*.93,slab);cS=mix(cS,cS*.95,slab);
     }
   }else if(vCat<2.5){cL=vec3(1.,1.,1.);cS=vec3(.90,.90,.99);}
   else if(vCat<3.5){
