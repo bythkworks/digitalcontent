@@ -77,8 +77,8 @@ python3 -m http.server 8000
 | 폴더 | 제품 | 상태 |
 |---|---|---|
 | `PRODUCT01/` | KNOBLE | 완성 — 지도에서 1번 제품을 누르면 이동 |
-| `PRODUCT02/` | PATH GUARD | 페이지 준비 중 (지금은 사이트 안 임시 소개) |
-| `PRODUCT03/` | FLOWAY | 페이지 준비 중 (지금은 사이트 안 임시 소개) |
+| `PRODUCT02/` | PATH GUARD | 완성 — 지도에서 2번 제품을 누르면 이동 |
+| `PRODUCT03/` | FLOWAY (페이지 표기: FLOW DIAL) | 완성 — 지도에서 3번 제품을 누르면 이동 |
 
 각 제품 페이지는 `index.html` + `assets/(images|videos|models|js|css|fonts)` 구조이고, 상대 경로만 사용합니다.
 제품 페이지 상단: `전체 프로젝트`(../../index.html) · `COLLEGE FESTIVAL 2031`(조 페이지, ../index.html).
