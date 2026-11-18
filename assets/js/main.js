@@ -994,7 +994,7 @@ const fpRouteSvg=$('.fp-route',mstage), fpRoute=$('.fp-route path',mstage);
 mstage.insertAdjacentHTML('beforeend',PRODUCTS.map(p=>`<button class="fp-tag" data-n="${p.n}" aria-label="${p.n}번 ${p.name} 소개 열기"><b>0${p.n}</b><span>${p.name}</span></button>`).join(''));
 const fpTags=$$('.fp-tag',mstage);
 fpTags.forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();fpOpen(+b.dataset.n)}));
-function fpOpen(n){const pu=PRODUCTS[n-1]&&PRODUCTS[n-1].url;if(pu){if(!/^https?:/.test(pu)){location.href=pu;return}const a=document.createElement('a');a.href=pu;a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();return}const it=FP.items[n-1];if(it){const r=it.scr[2]*2.2;FP.from=[it.scr[1]-r,VW-(it.scr[0]+r),VH-(it.scr[1]+r),it.scr[0]-r].map(v=>Math.max(0,v))}openDetail(n)}
+function fpOpen(n){const pu=PRODUCTS[n-1]&&PRODUCTS[n-1].url;if(pu){if(!/^https?:/.test(pu)){location.href=pu;return}let w=null;try{w=window.open(pu,'_blank')}catch(e){}if(w)return;const a=document.createElement('a');a.href=pu;a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();return}const it=FP.items[n-1];if(it){const r=it.scr[2]*2.2;FP.from=[it.scr[1]-r,VW-(it.scr[0]+r),VH-(it.scr[1]+r),it.scr[0]-r].map(v=>Math.max(0,v))}openDetail(n)}
 function renderProjects(p){
   pj.p=p;
   const S=fpSK(); FP.s=fpS(p);
@@ -1089,7 +1089,8 @@ function holdY(id,i){const el=$('#'+id);return Math.round(el.offsetTop+holdRaw(i
 addEventListener('load',()=>{const h=location.hash,m=h.match(/^#product-(\d)$/);
   if(!m&&h!=='#products'&&h!=='#projects')return;
   const y=m?holdY('projects',+m[1]):holdY('projects',0);
-  setTimeout(()=>{scrollTo(0,y);if(typeof SS!=='undefined'){SS.tgt=y;SS.cur=y}},60)});
+  const go=()=>{scrollTo(0,y);if(typeof SS!=='undefined'){SS.tgt=y;SS.cur=y}scenes.forEach(([s,fn])=>{s.t=s.p=progressOf(s.el);fn(s.p)})};
+  go();setTimeout(go,60);setTimeout(go,400)});
 function snapPoints(){const pts=[];for(const id in HOLDS){const hw=HOLD_W[id]*($('#'+id).offsetHeight-VH)/2;HOLDS[id].forEach((_,i)=>pts.push({y:holdY(id,i),id,i,hw}))}return pts.sort((a,b)=>a.y-b.y)}
 /* ---- smooth scrolling: wheel inertia + gentle magnet (no hard stops) ---- */
 let snapT=0,touching=false,lastSY=scrollY,dir=1;
