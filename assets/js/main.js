@@ -1121,7 +1121,7 @@ function tickPjSky(){
 }
 /* ======================= SCROLL PAUSES + SNAP ======================= */
 // mapped progress values where the scene should rest (content fully shown)
-const HOLDS={'intro':[0,.44,1],'world-a':[.04,.24,.4467,.6533,.86],'world-c':[.11,.22,.35,.45,.55,.65,.78,.92],'system':[.05,.31,.53,.8],'turn':[.42,.8],'projects':[.03,.36,.57,.77,.955]};
+const HOLDS={'intro':[0,.44,1],'world-a':[.04,.24,.4467,.6533,.86],'world-c':[.11,.22,.35,.45,.55,.65,.78,.92],'system':[.05,.31,.53,.8],'turn':[.07,.42,.8],'projects':[.03,.36,.57,.77,.955]};
 const HOLD_W={'intro':.07,'world-a':.05,'world-c':.05,'system':.05,'turn':.07,'projects':.045};   // raw share of the section each pause takes
 const KNOTS={};
 for(const id in HOLDS){const H=HOLDS[id],w=HOLD_W[id],mv=1-H.length*w,k=[[0,0]];let pr=0,pm=0;
@@ -1174,10 +1174,23 @@ addEventListener('wheel',e=>{
   e.preventDefault();
   const d=e.deltaY*(e.deltaMode===1?32:e.deltaMode===2?VH:1);
   if(!SS.on){SS.cur=scrollY;SS.tgt=scrollY}
+  if(gateWheel(d))return;
   SS.tgt=clamp(SS.tgt+d,0,maxY());SS.k=.085;SS.on=true;if(d)dir=d>0?1:-1;queueMagnet();
 },{passive:false});
 addEventListener('touchstart',()=>{touching=true;SS.on=false},{passive:true});
-addEventListener('touchend',()=>{touching=false;queueMagnet()},{passive:true});
+addEventListener('touchend',()=>{touching=false;GATE.te=performance.now();queueMagnet()},{passive:true});
+/* ---- one hard stop on "하지만," before the question: the scroll rests there for a beat ---- */
+const GATE={until:0,passed:false,lockT:0};
+function gateY(){return holdY('turn',0)}
+function gateWheel(d){const gy=gateY(),now=performance.now(),base=SS.on?SS.tgt:scrollY;
+  if(base<gy-VH*.3)GATE.passed=false;
+  if(d<=0)return false;
+  if(now<GATE.until&&Math.abs(base-gy)<VH*.6)return true;                 // resting: swallow the wheel
+  if(!GATE.passed&&base<gy-2&&base+d>=gy-2){GATE.passed=true;GATE.until=now+1500;smoothTo(gy,.08);return true}
+  return false}
+function gateTouch(){if(!touching&&performance.now()-(GATE.te||0)>1600)return;const gy=gateY();if(scrollY<gy-VH*.3){GATE.passed=false;return}
+  if(!GATE.passed&&lastSY<gy-2&&scrollY>gy+2&&dir>0){GATE.passed=true;const de=document.documentElement;de.style.overflow='hidden';window.scrollTo(0,gy);SS.cur=SS.tgt=gy;
+    clearTimeout(GATE.lockT);GATE.lockT=setTimeout(()=>{de.style.overflow=''},1200)}}
 function queueMagnet(){clearTimeout(snapT);snapT=setTimeout(magnet,300)}
 function magnet(){
   if(touching||detail.classList.contains('open'))return;
@@ -1189,7 +1202,7 @@ function magnet(){
   const reach=ahead?best.hw+VH*.18:best.hw*.9;
   if(bd<reach)smoothTo(best.y,.055);
 }
-addEventListener('scroll',()=>{const d=scrollY-lastSY;if(Math.abs(d)>.5)dir=d>0?1:-1;lastSY=scrollY;
+addEventListener('scroll',()=>{if(!SS.on&&!reduce)gateTouch();const d=scrollY-lastSY;if(Math.abs(d)>.5)dir=d>0?1:-1;lastSY=scrollY;
   if(SS.on&&Math.abs(scrollY-SS.set)>3){SS.on=false}      // scrollbar / external scroll takes over
   if(!SS.on){SS.cur=SS.tgt=scrollY;queueMagnet()}},{passive:true});
 addEventListener('keydown',e=>{
