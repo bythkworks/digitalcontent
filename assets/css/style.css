@@ -984,6 +984,35 @@ body.dark-zone #sprog{box-shadow:0 0 14px rgba(232,176,221,.9)}
 body:has(#detail.open) .snd-btn,body:has(#detail.open) .day-clock{opacity:0;pointer-events:none}
 body:has(#detail.open) .snd-btn{opacity:0;pointer-events:none}
 @media (max-width:700px){.snd-btn span{display:none}.snd-btn{padding:9px}}
+
+/* ---- WORLD · cinematic full-bleed chapters ---- */
+.wa-bg{position:absolute;inset:0;z-index:2;overflow:hidden;pointer-events:none;opacity:0;background:#1a1730;will-change:clip-path,opacity}
+.wa-bi{position:absolute;inset:0;overflow:hidden;visibility:hidden;will-change:clip-path,filter}
+.wa-bi .world-art{position:absolute;inset:-6%;width:112%;height:112%;object-fit:cover;will-change:transform}
+.wa-bg::after{content:"";position:absolute;inset:0;z-index:40;pointer-events:none;
+  background:linear-gradient(90deg,rgba(18,14,40,.78) 0%,rgba(18,14,40,.5) 32%,rgba(18,14,40,.08) 62%,rgba(18,14,40,0) 80%),linear-gradient(0deg,rgba(18,14,40,.55),rgba(18,14,40,0) 38%),linear-gradient(180deg,rgba(18,14,40,.35),rgba(18,14,40,0) 22%)}
+.wa-bg::before{content:"";position:absolute;inset:0;z-index:41;pointer-events:none;opacity:.5;mix-blend-mode:overlay;
+  background:radial-gradient(60% 50% at 80% 30%,rgba(232,176,221,.55),transparent 70%),radial-gradient(50% 50% at 20% 85%,rgba(156,200,226,.5),transparent 70%)}
+.wa-full{z-index:3}
+.wa-sys{display:none}
+#world-a .wa-copy{width:min(720px,56%)}
+#world-a .wa-num{font-size:clamp(150px,17vw,280px);-webkit-text-stroke:1.5px rgba(255,255,255,.55);background:linear-gradient(120deg,rgba(255,255,255,.22),rgba(255,255,255,.04) 60%);-webkit-background-clip:text;background-clip:text;margin-bottom:-.12em}
+#world-a .wa-c small{color:#E3DEFF;letter-spacing:.32em}
+#world-a .wa-c h3{color:#fff;font-size:clamp(46px,5.6vw,92px);line-height:1.04;text-shadow:0 10px 40px rgba(10,8,30,.35)}
+#world-a .wa-c p{color:rgba(255,255,255,.82);font-size:clamp(17px,1.4vw,21px);text-shadow:0 2px 16px rgba(10,8,30,.4)}
+#world-a .wa-prog{left:auto;right:clamp(20px,4vw,56px);bottom:34px;gap:8px}
+#world-a .wa-prog button{width:clamp(56px,6vw,96px);height:22px;border-radius:0;overflow:visible;opacity:1;background:none;box-shadow:none;transform:none}
+#world-a .wa-prog button::before{content:"";position:absolute;left:0;right:0;top:10px;height:2px;border-radius:2px;background:rgba(255,255,255,.28);transition:background .5s var(--ease)}
+#world-a .wa-prog button.on::before{background:#fff;box-shadow:0 0 12px rgba(255,255,255,.7)}
+#world-a .wa-prog button span{left:0;right:auto;bottom:auto;top:-10px;padding:0;background:none;font-size:10px;letter-spacing:.2em;color:rgba(255,255,255,.45);text-align:left}
+#world-a .wa-prog button.on span{color:#fff}
+@media (max-width:900px){
+  #world-a .wa-copy{left:20px;right:20px;width:auto;top:auto;bottom:86px;height:60vh}
+  #world-a .wa-c{top:auto;bottom:0}
+  #world-a .wa-num{font-size:30vw}#world-a .wa-c h3{font-size:10.5vw}#world-a .wa-c p{font-size:15px}
+  .wa-bg::after{background:linear-gradient(0deg,rgba(18,14,40,.85) 0%,rgba(18,14,40,.55) 38%,rgba(18,14,40,0) 70%)}
+  #world-a .wa-prog{left:auto;right:20px;transform:none;bottom:30px;gap:6px}#world-a .wa-prog button{width:13vw}
+}
 /* ---- "하지만," glitch ---- */
 #turn.t-glitch .t-pre .t-h{animation:gMain 1.3s steps(1,end)}
 #turn.t-glitch .t-pre .t-h::before{animation:gA 1.3s steps(1,end)}

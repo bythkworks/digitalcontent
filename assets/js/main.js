@@ -199,25 +199,26 @@ CHAPTERS.forEach((c,i)=>{
 });
 const wcards=$$('.wcard'), chBtns=$$('#chapters button'), counter=$('#counter'), wvbar=$('#wvbar');
 const worldA={el:$('#world-a'),p:0,t:0,act:-1};
-const waHead=$('#waHead'), waCopy=$('#waCopy'), waDeck=$('#waDeck'), waProg=$('#waProg');
+const waHead=$('#waHead'), waCopy=$('#waCopy'), waDeck=$('#waDeck'), waProg=$('#waProg'); const waBg=$('#waBg');
 
 const SYS_LEAD='MCUAI는 상황을 감지하고 맥락을 판단해 필요한 안내와 대응을 제공합니다.';
 function waSys(i){const a=i-1, st=SYS.map((s,k)=>`<span class="${a<0||k===a?'on':''}">${s.k} ${s.t}</span>`).join('<em></em>');
   return `<div class="wa-sys"><div class="wa-steps">${st}</div>${a<0?`<h4>${SYS_LEAD}</h4>`:`<h4>${SYS[a].h}</h4><div class="wa-chips">${SYS[a].c.map(x=>`<span>${x}</span>`).join('')}</div>`}</div>`}
 CHAPTERS.forEach((c,i)=>{
-  waCopy.insertAdjacentHTML('beforeend',`<div class="wa-c" aria-hidden="${i?'true':'false'}"><b class="wa-num" aria-hidden="true">0${i+1}</b><small>${c.k}</small><h3>${c.t}</h3><p>${c.d}</p>${waSys(i)}</div>`);
+  waCopy.insertAdjacentHTML('beforeend',`<div class="wa-c" aria-hidden="${i?'true':'false'}"><b class="wa-num" aria-hidden="true">0${i+1}</b><small>${c.k}</small><h3>${c.t}</h3><p>${c.d}</p></div>`);
   waDeck.insertAdjacentHTML('beforeend',`<div class="wa-card">${WORLD_ART[i+1]}<span class="wa-chip">${c.k}</span></div>`);
+  waBg.insertAdjacentHTML('beforeend',`<div class="wa-bi">${WORLD_ART[i+1]}</div>`);
   waProg.insertAdjacentHTML('beforeend',`<button data-wch="${i}" aria-label="${c.k} ${c.t}">${WORLD_ART[i+1]}<span>${c.k}</span></button>`);
 });
-$$('#waProg .world-art').forEach(im=>{im.alt='';im.loading='lazy'});
-const waCs=$$('.wa-c'), waCards=$$('.wa-card'), waBtns=$$('#waProg button');
+$$('#waProg .world-art').forEach(im=>im.remove());$$('#waBg .world-art').forEach(im=>{im.alt=''});
+const waCs=$$('.wa-c'), waCards=$$('.wa-card'), waBtns=$$('#waProg button'); const waBis=$$('.wa-bi'), waBimg=waBis.map(b=>b.firstElementChild);
 // scattered (intro) poses: [x%, y%, zpx, rotY, rotZ, scale]
 const WA_SC=[[-34,-40,-300,22,-8,.6],[40,-50,-560,-12,7,.5],[-52,44,-420,16,9,.52],[44,42,-180,-18,-6,.62]];
 const WA_SCM=[[-26,-20,-260,16,-6,.6],[30,-26,-420,-10,6,.52],[-30,30,-360,12,7,.52],[28,26,-160,-12,-5,.62]];
 function renderWorldA(p){
   const s=clamp((p-.24)/.62)*3, act=Math.min(3,Math.round(s));
   if(act!==worldA.act){worldA.act=act;waBtns.forEach((b,i)=>b.classList.toggle('on',i===act));waCs.forEach((c,i)=>c.setAttribute('aria-hidden',i===act?'false':'true'));chBtns.forEach((b,i)=>b.classList.toggle('on',i===act))}
-  waProg.classList.toggle('show',p>.2&&p<.99);
+  waProg.classList.toggle('show',p>.2&&p<.93);
 }
 function tickWorld(now){
   const el=worldA.el,top=el.offsetTop; if(scrollY+VH<top-10||scrollY>top+el.offsetHeight)return;
@@ -229,10 +230,23 @@ function tickWorld(now){
   // heading: big statement → small header (desktop) / fades (mobile)
   const SC=mob?WA_SCM:WA_SC, tx=tilt.x, ty=tilt.y;
   const H=waHead.offsetHeight;
-  if(mob){waHead.style.opacity=(1-g).toFixed(3);waHead.style.transform=`translateY(${(-H/2-g*40).toFixed(1)}px)`;}
-  else{waHead.style.opacity=(1-.15*g).toFixed(3);waHead.style.transform=`translateY(${lerp(-H/2,92-VH/2,g).toFixed(1)}px) scale(${lerp(1,.42,g).toFixed(4)})`;}
+  const ex=range(p,.93,.995), hg=eIO(range(p,.1,.17));
+  waHead.style.opacity=(1-hg).toFixed(3);waHead.style.transform=`translateY(${(-H/2-hg*60).toFixed(1)}px) scale(${(1-hg*.06).toFixed(4)})`;waHead.style.filter=hg>.01?`blur(${(hg*8).toFixed(2)}px)`:'none';
+  // full-bleed cinematic background: grows out of the front card, then wipes chapter to chapter
+  {const r=waDeck.getBoundingClientRect(), gi=1-g, rad=30*gi;
+   const ins=`inset(${(r.top*gi).toFixed(1)}px ${((VW-r.right)*gi).toFixed(1)}px ${((VH-r.bottom)*gi).toFixed(1)}px ${(r.left*gi).toFixed(1)}px round ${rad.toFixed(1)}px)`;
+   waBg.style.clipPath=g>=1?'none':ins; waBg.style.opacity=(g>0?1:0)*(1-ex);
+   worldA.el.classList.toggle('wa-cine',g>.35);
+   waBis.forEach((b,k)=>{const d=s-k;
+     if(d<=-1||d>=1.6){b.style.visibility='hidden';return} b.style.visibility='visible';
+     let clip='none', sc, ty=0, br=1;
+     if(d<0){const r2=eIO(1+d); clip=`inset(${((1-r2)*100).toFixed(2)}% 0 0 0)`; sc=1.18-.1*r2; ty=(1-r2)*8}
+     else {const q=Math.min(1,d); sc=1.08+.12*q; ty=-q*6; br=1-.55*q}
+     b.style.clipPath=clip; b.style.zIndex=10+k;
+     waBimg[k].style.transform=`translate(${(-tx*14).toFixed(1)}px,calc(${ty.toFixed(2)}% + ${(-tilt.y*10).toFixed(1)}px)) scale(${(sc+Math.sin(t*.25+k)*.01).toFixed(4)})`;
+     b.style.filter=br<.995?`brightness(${br.toFixed(3)})`:'none'});}
   // copy per chapter
-  waCs.forEach((c,k)=>{const d=s-k,ad=Math.abs(d),o=clamp(1-ad*2.4)*g;
+  waCs.forEach((c,k)=>{const d=s-k,ad=Math.abs(d),o=clamp(1-ad*2.4)*eIO(range(p,.17,.25))*(1-ex);
     c.style.opacity=o.toFixed(3);
     c.style.transform=`translateY(calc(${mob?'0%':'-50%'} + ${(-d*50).toFixed(1)}px)) skewY(${(-jel*2.2).toFixed(2)}deg)`;
     const nm=c.firstElementChild; if(nm)nm.style.transform=`translateY(${(-d*36).toFixed(1)}px) scale(${(1+Math.abs(jel)*.06).toFixed(3)},${(1-Math.abs(jel)*.08).toFixed(3)})`;
@@ -249,7 +263,7 @@ function tickWorld(now){
     c.style.transform=`translate(${x.toFixed(2)}%,${y.toFixed(2)}%) translateZ(${z.toFixed(1)}px) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg) rotateZ(${rz.toFixed(2)}deg) scale(${sc.toFixed(4)})`;
     if(g>=1&&Math.abs(d)<1){const q=1-Math.abs(d);rz+=jel*4*q;sc*=1+Math.abs(jel)*.03*q;y+=jel*3*q}
     c.style.transform=`translate(${x.toFixed(2)}%,${y.toFixed(2)}%) translateZ(${z.toFixed(1)}px) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg) rotateZ(${rz.toFixed(2)}deg) scale(${sc.toFixed(4)})`;
-    c.style.opacity=o.toFixed(3); c.style.filter=br<.995?`brightness(${br.toFixed(3)})`:'none';
+    c.style.opacity=(o*(1-g)).toFixed(3); c.style.visibility=g>=1?'hidden':'visible'; c.style.filter=br<.995?`brightness(${br.toFixed(3)})`:'none';
     c.style.zIndex=d<0&&g>=1?(d>-1?40:20):Math.round(30+z/40);
   });
 }
