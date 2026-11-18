@@ -1024,6 +1024,17 @@ body:has(#detail.open) .snd-btn{opacity:0;pointer-events:none}
 .t-vig::after{content:"";position:absolute;left:50%;top:54%;width:min(1180px,96vw);aspect-ratio:1.6;transform:translate(-50%,-50%);border-radius:50%;
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.045),inset 0 0 140px rgba(201,198,255,.09)}
 @media (max-width:700px){#tQ .t-h{font-size:11.4vw}}
+
+/* ---- key line: soft gradient ripples spread across the screen from the bubble ---- */
+.ec-wave{position:absolute;inset:0;z-index:3;pointer-events:none;overflow:hidden;--wx:50%;--wy:50%;opacity:0;transition:opacity 1.2s var(--ease)}
+.ec-wave::before{content:"";position:absolute;inset:0;background:radial-gradient(60vmax 60vmax at var(--wx) var(--wy),rgba(201,198,255,.32),rgba(232,176,221,.14) 40%,rgba(156,200,226,0) 70%);mix-blend-mode:multiply}
+.ec-wave i{position:absolute;left:var(--wx);top:var(--wy);width:240vmax;height:240vmax;margin:-120vmax 0 0 -120vmax;border-radius:50%;opacity:0;transform:scale(.02);mix-blend-mode:multiply;
+  background:radial-gradient(circle,rgba(156,200,226,0) 0 34%,rgba(156,200,226,.16) 41%,rgba(184,182,229,.28) 47%,rgba(232,176,221,.2) 52%,rgba(232,176,221,0) 60%);filter:blur(6px)}
+.ec-wave.on{opacity:1}
+.ec-wave.on i{animation:ecWave 4.8s cubic-bezier(.22,.6,.3,1) infinite}
+.ec-wave.on i:nth-child(2){animation-delay:1.2s}.ec-wave.on i:nth-child(3){animation-delay:2.4s}.ec-wave.on i:nth-child(4){animation-delay:3.6s}
+@keyframes ecWave{0%{transform:scale(.02);opacity:0}12%{opacity:1}70%{opacity:.55}100%{transform:scale(1);opacity:0}}
+@media (prefers-reduced-motion:reduce){.ec-wave.on i{animation:none}}
 /* ---- "하지만," glitch ---- */
 #turn.t-glitch .t-pre .t-h{animation:gMain 1.3s steps(1,end)}
 #turn.t-glitch .t-pre .t-h::before{animation:gA 1.3s steps(1,end)}
