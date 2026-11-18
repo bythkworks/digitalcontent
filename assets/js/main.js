@@ -835,6 +835,7 @@ function tickTurn(now){
   document.body.classList.toggle('dark-zone',R>VH*.55);
   // ---- "하지만," on white, pulled into the dark
   const a=eOut(range(p,0,.075)), up=eIO(range(p,.11,.3)), c=range(p,.09,.2), out=range(p,.45,.55);
+  if(p>=.03&&!turn.hit){turn.hit=true;el.classList.remove('t-punch');void el.offsetWidth;el.classList.add('t-punch')} if(p<.01)turn.hit=false;
   const col=Math.round(29+226*c);
   tPreH.style.color=`rgb(${col},${col},${Math.min(255,col+4)})`;
   tPreH.style.opacity=(a*(1-out)).toFixed(3);
@@ -1282,7 +1283,7 @@ function drawGL(now){
 $('#intro .stage').addEventListener('pointerdown',e=>{
   if(intro.p>.25||reduce)return;
   const now=performance.now()/1000;
-  if(GL)GL.click=[(e.clientX-VW/2)/VH,(VH/2-e.clientY)/VH,now];
+  if(GL)GL.click=[(e.clientX-VW/2)/VH,(VH/2-e.clientY)/VH,now]; typeof Sound!=='undefined'&&Sound.play('bloom',e.clientX/VW);
   for(let i=0;i<46;i++){const a=Math.random()*Math.PI*2,sp=1.2+Math.random()*3.4;
     particles.list.push({x:e.clientX,y:e.clientY,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,s:1.4+Math.random()*3.6,life:1,d:.012+Math.random()*.014,c:PCOL[(Math.random()*4)|0],rect:Math.random()<.4,rot:Math.random()*6})}
 });
@@ -1303,7 +1304,8 @@ function tickTitle(now){
   if(reduce||!chPos.length)return;
   const on=1-range(intro.p,0,.06); if(on<=0&&!chCur.some(c=>Math.abs(c.x)+Math.abs(c.y)>.1))return;
   heroChs.forEach((c,i)=>{const q=chPos[i];let tx=0,ty=Math.sin(now/650+i*.45)*2.2*on;
-    if(pIn&&FINE){const dx=q.x-PX,dy=q.y-PY,d=Math.hypot(dx,dy)||1,f=Math.exp(-(d*d)/(2*110*110))*on;tx+=dx/d*26*f;ty+=dy/d*26*f-10*f}
+    if(pIn&&FINE){const dx=q.x-PX,dy=q.y-PY,d=Math.hypot(dx,dy)||1,f=Math.exp(-(d*d)/(2*110*110))*on;tx+=dx/d*26*f;ty+=dy/d*26*f-10*f;
+      const hot=f>.55;if(hot&&!c._hot&&now-(c._ts||0)>220){c._ts=now;typeof Sound!=='undefined'&&Sound.play('letter',i)}c._hot=hot}
     const k=chCur[i];k.x=lerp(k.x,tx,.14);k.y=lerp(k.y,ty,.14);c.style.translate=`${k.x.toFixed(2)}px ${k.y.toFixed(2)}px`});
   h1.style.transform=`perspective(1000px) rotateX(${(-fxm.y*9*on).toFixed(2)}deg) rotateY(${(fxm.x*12*on).toFixed(2)}deg)`;
 }
@@ -1512,8 +1514,33 @@ const Sound=(()=>{
     stop(i){const t=T();const B=[[659.25,987.77],[783.99,1174.66],[880,1318.5]][i]||[659.25,987.77];bell(B[0],t,.1,2.4);bell(B[1],t+.12,.07,2.2)},
     hover(){const t=T();tone(1760,t,.06,.03,'sine',.2)},
     open(){const t=T();swoosh(t,.9,500,4200,.28,1.3,.6);bell(1046.5,t+.4,.06,1.6)},
+    // intro: magnetic letters → each letter rings a note of a pentatonic scale
+    letter(i){const t=T(),P=[523.25,587.33,659.25,783.99,880,1046.5,1174.66,1318.5,1567.98,1760];const f=P[i%P.length];tone(f,t,.5,.05,'triangle',.7);tone(f*2,t,.25,.018,'sine',.7)},
+    // intro: click the aurora → colour bloom
+    bloom(x){const t=T(),R=[[261.63,329.63,392],[293.66,369.99,440],[329.63,415.3,493.88],[349.23,440,523.25]][Math.min(3,Math.floor(x*4))];
+      R.forEach((f,i)=>{tone(f,t+i*.03,2.6,.05,'sine',1);tone(f*2,t+.08+i*.03,1.6,.02,'triangle',1)});swoosh(t,1.2,600,5200,.12,.7,1);
+      for(let k=0;k<7;k++)tone(1800+Math.random()*2600,t+.1+k*.05,.18,.015,'sine',1)},
+    // "하지만," — the turn
+    preHit(){const t=T();tone(48,t,2.2,.7,'sine',.5,.6);tone(96,t,.5,.35,'triangle',.3,.5);swoosh(t,.35,6000,700,.5,.6,.6);
+      const s=ctx.createBufferSource();s.buffer=noise();const hp=ctx.createBiquadFilter();hp.type='highpass';hp.frequency.value=2500;const g=ctx.createGain();s.connect(hp);hp.connect(g);g.connect(bus(1,1));
+      g.gain.setValueAtTime(.5,t);g.gain.exponentialRampToValueAtTime(.0001,t+.5);s.start(t);s.stop(t+.6)},
+    lens(){const t=T();swoosh(t,2.4,3200,90,.32,.7,.9);tone(41.2,t+.2,3,.4,'sine',.7,.9)},
+    question(){const t=T();[0,.32].forEach(d=>tone(62,t+d,.5,.45,'sine',.3,.55));[622.25,739.99,932.33].forEach((f,i)=>tone(f,t+.1+i*.05,2.6,.025,'triangle',1))},
+    shatter(){const t=T();for(let k=0;k<26;k++)tone(2200+Math.random()*5200,t+Math.random()*.7,.08+Math.random()*.15,.025+Math.random()*.03,'sine',.9);swoosh(t,1.1,1500,7000,.2,.6,.9)},
+    core(i){const t=T();bell([523.25,659.25,783.99][i],t,.13,3.2);tone([130.81,164.81,196][i],t,1.6,.12,'sine',.6)},
+    answer(){const t=T();pad([261.63,329.63,392,523.25,659.25],t,4.5,.05);bell(1046.5,t+.25,.06,3);swoosh(t,1.8,400,3600,.12,.6,1)},
+    release(){const t=T();swoosh(t,1.6,300,4200,.2,.8,1);bell(1567.98,t+.3,.04,2)},
   };
   function play(k,...a){if(!on||!ctx)return;try{C[k](...a)}catch(e){}}
+  let sh=null,lx=0,ly=0,spd=0,lt=0;
+  addEventListener('pointermove',e=>{const now=performance.now(),dt=Math.max(8,now-lt);spd=Math.min(1,spd*.6+Math.hypot(e.clientX-lx,e.clientY-ly)/dt*.12);lx=e.clientX;ly=e.clientY;lt=now},{passive:true});
+  function shimmer(active){if(!on||!ctx)return;
+    if(!sh){const s=ctx.createBufferSource();s.buffer=noise();s.loop=true;const f=ctx.createBiquadFilter();f.type='bandpass';f.Q.value=6;const g=ctx.createGain();g.gain.value=0;
+      const o=ctx.createOscillator();o.type='sine';const og=ctx.createGain();og.gain.value=0;o.connect(og);og.connect(bus(.6,1));
+      s.connect(f);f.connect(g);g.connect(bus(.7,1));s.start();o.start();sh={f,g,o,og}}
+    const t=T(),x=lx/VW,y=ly/VH,v=active?spd:0;spd*=.9;
+    sh.f.frequency.setTargetAtTime(900+x*3800,t,.08);sh.g.gain.setTargetAtTime(v*.16,t,.12);
+    const P=[392,440,523.25,587.33,659.25,783.99];sh.o.frequency.setTargetAtTime(P[Math.min(5,Math.floor((1-y)*6))]*(x<.5?1:1.5),t,.15);sh.og.gain.setTargetAtTime(v*.03,t,.2)}
   function set(v){on=v;btn.setAttribute('aria-pressed',String(on));btn.classList.toggle('on',on);btn.querySelector('span').textContent=on?'소리 끄기':'소리 켜기';
     try{sessionStorage.setItem('cf-sound',on?'1':'0')}catch(e){}
     if(on){if(!ctx)init();ctx.resume();play('on')}}
@@ -1522,10 +1549,16 @@ const Sound=(()=>{
   // watch the page and fire cues on moments
   const W={sec:null,ia:-1,wa:-1,ec:-1,ty:false,act:0,k:-1,hov:0,first:true};
   const SECS=['intro','world-a','world-c','turn','projects'];
-  return {play,
+  return {play,shimmer,
     tick(){if(!on)return;
       let cur=null;for(const id of SECS){const r=$('#'+id).getBoundingClientRect();if(r.top<=VH*.5&&r.bottom>VH*.5)cur=id}
-      if(cur!==W.sec){const prev=W.sec;W.sec=cur;if(!W.first&&cur&&prev!==null){cur==='turn'?Sound.play('dark'):Sound.play('section')}W.first=false}
+      if(cur!==W.sec){const prev=W.sec;W.sec=cur;if(!W.first&&cur&&prev!==null&&cur!=='turn')Sound.play('section');W.first=false}
+      // the turn ("하지만,") — one cue per beat, fired going forward
+      const tp=turn.p, TB=[[.02,'preHit'],[.1,'lens'],[.24,'question'],[.47,'shatter'],[.56,'core',0],[.59,'core',1],[.62,'core',2],[.66,'answer'],[.88,'release']];
+      let tb=-1;TB.forEach((b,i)=>{if(tp>=b[0])tb=i});
+      if(tb!==W.tb){if(W.tb!==undefined&&tb>W.tb&&tb-W.tb<=2){for(let i=W.tb+1;i<=tb;i++)Sound.play(TB[i][1],TB[i][2])}W.tb=tb}
+      // intro: colour-mix shimmer follows the pointer over the aurora
+      Sound.shimmer(intro.p<.15);
       // intro flight: start and landing
       const ip=intro.p,ia=ip<.04?0:ip<.85?1:2; if(ia!==W.ia){if(W.ia===0&&ia===1)Sound.play('introFly');if(W.ia===1&&ia===2)Sound.play('introLand');W.ia=ia}
       // world chapter cards
