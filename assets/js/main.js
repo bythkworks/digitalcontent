@@ -143,6 +143,10 @@ h1.innerHTML=[...title].map(c=>c===' '?' ':`<span class="ch" style="animation-de
 h1.querySelectorAll('.ch').forEach(s=>s.setAttribute('aria-hidden','true'));
 $('#portalScene').innerHTML=WORLD_ART[0];
 $('#wcScene').innerHTML=WORLD_ART[5];
+// epilogue backdrop: continues from WORLD CH.04 → evening festival → the place the person picks
+const EC_BG=[[4,'50% 50%',1.04],[5,'50% 45%',1.06],[2,'38% 66%',1.32],[0,'50% 58%',1.42],[4,'62% 46%',1.26]];
+$('#ecBg').innerHTML=EC_BG.map(([a,o,z])=>`<div class="eb" style="--o:${o};--z:${z}">${WORLD_ART[a]}</div>`).join('');
+$$('#ecBg .world-art').forEach(im=>{im.alt=''});
 
 const intro={el:$('#intro'),p:0,t:0};
 const iTitle=$('#introTitle'),veil=$('#veil'),hint=$('#scrollHint'),introStage=$('#intro .stage');
@@ -235,7 +239,7 @@ function tickWorld(now){
   // full-bleed cinematic background: grows out of the front card, then wipes chapter to chapter
   {const r=waDeck.getBoundingClientRect(), gi=1-g, rad=30*gi;
    const ins=`inset(${(r.top*gi).toFixed(1)}px ${((VW-r.right)*gi).toFixed(1)}px ${((VH-r.bottom)*gi).toFixed(1)}px ${(r.left*gi).toFixed(1)}px round ${rad.toFixed(1)}px)`;
-   waBg.style.clipPath=g>=1?'none':ins; waBg.style.opacity=(g>0?1:0)*(1-ex);
+   waBg.style.clipPath=g>=1?'none':ins; waBg.style.opacity=(g>0?1:0);
    worldA.el.classList.toggle('wa-cine',g>.35);
    waBis.forEach((b,k)=>{const d=s-k;
      if(d<=-1||d>=1.6){b.style.visibility='hidden';return} b.style.visibility='visible';
@@ -313,6 +317,8 @@ function renderWorldC(p){
   {const sp=n===5&&!typing, w=$('#ecWave'); if(sp&&!w.classList.contains('on')){const b=$('.ec-m.big .ec-b'),st=w.getBoundingClientRect();if(b){const r=b.getBoundingClientRect();w.style.setProperty('--wx',(r.left+r.width/2-st.left).toFixed(0)+'px');w.style.setProperty('--wy',(r.top+r.height/2-st.top).toFixed(0)+'px')}}
    w.classList.toggle('on',sp)}
   ecPhone.classList.toggle('spot',n===5&&!typing);
+  {const pk=EC.pick, L=pk>=0&&p>=EC_PICK-.02?2+pk:n>=1||p>=.03?1:0; if(L!==EC.bgL){EC.bgL=L;$$('#ecBg .eb').forEach((e,i)=>e.classList.toggle('on',i===L))}
+   $('#ecBg').style.opacity=(1-range(p,.9,.99)).toFixed(3)}
   ecPhone.classList.toggle('done',p>=EC_MSG[6].at+.04);
   const ent=eOut(range(p,0,.06)); ecPhone.style.opacity=ent.toFixed(3); ecPhone.style.transform=`translateY(${(40*(1-ent)).toFixed(1)}px)`;
   ecLabel.style.opacity=ent.toFixed(3);
