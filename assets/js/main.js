@@ -1547,7 +1547,7 @@ const Sound=(()=>{
   function arp(t,idx,step=.08,vol=.07){idx.forEach((i,k)=>box(pick(i),t+k*step,vol))}
   const C={
     on(){const t=T();arp(t,[0,2,3,5],.07,.07)},
-    introFly(){const t=T();air(t,1.4,600,3000,.1);arp(t+.1,[5,6,7,8,10],.09,.05)},
+    introFly(){const t=T();air(t,2.4,600,6000,.14);pad([293.66,369.99,440,659.25],t,3.6,.03);arp(t+.2,[0,1,2,3,4,5,6,7],.16,.05)},
     introLand(){const t=T();[8,7,5,3].forEach((i,k)=>glass(pick(i),t+k*.08,.05,2.6));box(pick(5),t+.4,.08)},
     section(){const t=T();air(t,.7,900,5200,.12);box(pick(3),t+.12,.07);box(pick(5),t+.24,.07)},
     card(dir){const t=T();air(t,.25,dir>0?1500:4000,dir>0?4000:1500,.12,1.6,.4);const a=dir>0?[4,6]:[6,4];box(pick(a[0]),t+.04,.06,.5);box(pick(a[1]),t+.12,.06,.7)},
@@ -1622,7 +1622,6 @@ const Sound=(()=>{
       Sound.shimmer(intro.p<.15);
       // intro flight: start and landing
       const ip=intro.p,ia=ip<.04?0:ip<.85?1:2; if(ia!==W.ia){if(W.ia===0&&ia===1)Sound.play('introFly');if(W.ia===1&&ia===2)Sound.play('introLand');W.ia=ia}
-      Sound.fly(ia===1,(ip-.04)/.81);
       // world chapter cards
       const wa=worldA.act??-1; if(wa!==W.wa){if(W.wa>=0&&wa>=0)Sound.play('card',wa>W.wa?1:-1);W.wa=wa}
       // epilogue chat
