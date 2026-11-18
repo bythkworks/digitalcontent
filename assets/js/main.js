@@ -144,9 +144,10 @@ h1.querySelectorAll('.ch').forEach(s=>s.setAttribute('aria-hidden','true'));
 $('#portalScene').innerHTML=WORLD_ART[0];
 $('#wcScene').innerHTML=WORLD_ART[5];
 // epilogue backdrop: continues from WORLD CH.04 → evening festival → the place the person picks
-const EC_BG=[[4,'50% 50%',1.04],[5,'50% 45%',1.06],[2,'38% 66%',1.32],[0,'50% 58%',1.42],[4,'62% 46%',1.26]];
-$('#ecBg').innerHTML=EC_BG.map(([a,o,z])=>`<div class="eb" style="--o:${o};--z:${z}">${WORLD_ART[a]}</div>`).join('');
-$$('#ecBg .world-art').forEach(im=>{im.alt=''});
+const EC_BG=[ // [base, blob1, blob2, blob3] — start → evening → the picked place (쉼터 · 무대 · 푸드 트럭)
+  ['#C9C3F2','#A9C9F0','#E9B8E0','#D9D4FF'],['#9C8FDB','#7E8BE0','#E59AC8','#F6BFA6'],
+  ['#BFD9E6','#A6DCCB','#C9C2FA','#EFE0FF'],['#8A78D8','#6F7FE6','#E688C7','#B8A0F5'],['#E9C2D6','#F5BE9E','#EC9FC4','#C8B6F4']];
+$('#ecBg').innerHTML=EC_BG.map(c=>`<div class="eb" style="--bg:${c[0]};--c1:${c[1]};--c2:${c[2]};--c3:${c[3]}"><i></i><i></i><i></i></div>`).join('');
 
 const intro={el:$('#intro'),p:0,t:0};
 const iTitle=$('#introTitle'),veil=$('#veil'),hint=$('#scrollHint'),introStage=$('#intro .stage');
@@ -239,7 +240,7 @@ function tickWorld(now){
   // full-bleed cinematic background: grows out of the front card, then wipes chapter to chapter
   {const r=waDeck.getBoundingClientRect(), gi=1-g, rad=30*gi;
    const ins=`inset(${(r.top*gi).toFixed(1)}px ${((VW-r.right)*gi).toFixed(1)}px ${((VH-r.bottom)*gi).toFixed(1)}px ${(r.left*gi).toFixed(1)}px round ${rad.toFixed(1)}px)`;
-   waBg.style.clipPath=g>=1?'none':ins; waBg.style.opacity=(g>0?1:0);
+   waBg.style.clipPath=g>=1?'none':ins; waBg.style.opacity=(g>0?1:0)*(1-ex);
    worldA.el.classList.toggle('wa-cine',g>.35);
    waBis.forEach((b,k)=>{const d=s-k;
      if(d<=-1||d>=1.6){b.style.visibility='hidden';return} b.style.visibility='visible';
