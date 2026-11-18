@@ -984,12 +984,39 @@ body.dark-zone #sprog{box-shadow:0 0 14px rgba(232,176,221,.9)}
 body:has(#detail.open) .snd-btn,body:has(#detail.open) .day-clock{opacity:0;pointer-events:none}
 body:has(#detail.open) .snd-btn{opacity:0;pointer-events:none}
 @media (max-width:700px){.snd-btn span{display:none}.snd-btn{padding:9px}}
-/* ---- "하지만," punch ---- */
-#turn.t-punch .t-pre .t-h{animation:tPunch .9s cubic-bezier(.2,1.4,.3,1) both}
-#turn.t-punch .stage{animation:tShake .5s cubic-bezier(.3,0,.3,1) both}
-#turn.t-punch .t-pre::after{content:"";position:absolute;left:50%;top:50%;width:60vmax;height:60vmax;margin:-30vmax 0 0 -30vmax;border-radius:50%;pointer-events:none;
-  background:radial-gradient(circle,rgba(201,198,255,.55),rgba(242,182,227,.25) 35%,rgba(255,255,255,0) 62%);animation:tFlash 1.1s ease-out both}
-@keyframes tPunch{0%{scale:1.35;letter-spacing:.12em;filter:blur(6px)}35%{scale:.96;letter-spacing:-.02em;filter:blur(0)}100%{scale:1;letter-spacing:normal}}
-@keyframes tShake{0%,100%{translate:0 0}15%{translate:-7px 3px}30%{translate:6px -4px}45%{translate:-4px 2px}60%{translate:3px -1px}80%{translate:-1px 1px}}
-@keyframes tFlash{0%{opacity:0;scale:.2}18%{opacity:1}100%{opacity:0;scale:1.3}}
-@media (prefers-reduced-motion:reduce){#turn.t-punch .stage,#turn.t-punch .t-pre .t-h,#turn.t-punch .t-pre::after{animation:none}}
+/* ---- "하지만," glitch ---- */
+#turn.t-glitch .t-pre .t-h{animation:gMain 1.3s steps(1,end) both}
+#turn.t-glitch .t-pre .t-h::before{animation:gA 1.3s steps(1,end) both}
+#turn.t-glitch .t-pre .t-h::after{animation:gB 1.3s steps(1,end) both}
+#turn.t-glitch .t-pre::after{content:"";position:absolute;inset:0;pointer-events:none;mix-blend-mode:multiply;
+  background:repeating-linear-gradient(0deg,rgba(29,29,31,.07) 0 1px,transparent 1px 3px);animation:gScan 1.3s steps(1,end) both}
+@keyframes gMain{
+  0%{transform:translate(-14px,0) skewX(-12deg);clip-path:inset(0 0 58% 0);opacity:.9}
+  5%{transform:translate(18px,2px);clip-path:inset(42% 0 0 0)}
+  10%{transform:translate(-6px,-3px) skewX(8deg);clip-path:inset(18% 0 30% 0)}
+  15%{transform:translate(9px,0);clip-path:none}
+  20%{transform:translate(-3px,1px);clip-path:inset(62% 0 8% 0)}
+  25%{transform:none;clip-path:none;opacity:1}
+  56%{transform:translate(7px,0) skewX(-6deg);clip-path:inset(30% 0 46% 0)}
+  60%{transform:translate(-5px,0);clip-path:none}
+  64%,100%{transform:none;clip-path:none}}
+@keyframes gA{
+  0%{opacity:1;transform:translate(-22px,-2px);clip-path:inset(8% 0 70% 0)}
+  6%{opacity:1;transform:translate(16px,3px);clip-path:inset(55% 0 20% 0)}
+  12%{opacity:1;transform:translate(-30px,0);clip-path:inset(30% 0 52% 0)}
+  18%{opacity:1;transform:translate(10px,-1px);clip-path:inset(72% 0 4% 0)}
+  24%{opacity:.85;transform:translate(-6px,0);clip-path:none}
+  30%{opacity:0}
+  56%{opacity:1;transform:translate(-18px,0);clip-path:inset(40% 0 38% 0)}
+  62%,100%{opacity:0;transform:none;clip-path:none}}
+@keyframes gB{
+  0%{opacity:1;transform:translate(24px,2px);clip-path:inset(60% 0 12% 0)}
+  6%{opacity:1;transform:translate(-14px,-2px);clip-path:inset(12% 0 64% 0)}
+  12%{opacity:1;transform:translate(28px,0);clip-path:inset(44% 0 36% 0)}
+  18%{opacity:1;transform:translate(-8px,1px);clip-path:inset(0 0 80% 0)}
+  24%{opacity:.85;transform:translate(6px,0);clip-path:none}
+  30%{opacity:0}
+  58%{opacity:1;transform:translate(16px,0);clip-path:inset(20% 0 58% 0)}
+  64%,100%{opacity:0;transform:none;clip-path:none}}
+@keyframes gScan{0%{opacity:1;transform:translateY(0)}10%{transform:translateY(2px)}20%{transform:translateY(-1px)}28%{opacity:0}55%{opacity:.8}64%,100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){#turn.t-glitch .t-pre .t-h,#turn.t-glitch .t-pre .t-h::before,#turn.t-glitch .t-pre .t-h::after,#turn.t-glitch .t-pre::after{animation:none}}

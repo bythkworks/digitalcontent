@@ -835,7 +835,7 @@ function tickTurn(now){
   document.body.classList.toggle('dark-zone',R>VH*.55);
   // ---- "하지만," on white, pulled into the dark
   const a=eOut(range(p,0,.075)), up=eIO(range(p,.11,.3)), c=range(p,.09,.2), out=range(p,.45,.55);
-  if(p>=.03&&!turn.hit){turn.hit=true;el.classList.remove('t-punch');void el.offsetWidth;el.classList.add('t-punch')} if(p<.01)turn.hit=false;
+  if(p>=.03&&!turn.hit){turn.hit=true;el.classList.remove('t-glitch');void el.offsetWidth;el.classList.add('t-glitch')} if(p<.01)turn.hit=false;
   const col=Math.round(29+226*c);
   tPreH.style.color=`rgb(${col},${col},${Math.min(255,col+4)})`;
   tPreH.style.opacity=(a*(1-out)).toFixed(3);
@@ -1521,9 +1521,14 @@ const Sound=(()=>{
       R.forEach((f,i)=>{tone(f,t+i*.03,2.6,.05,'sine',1);tone(f*2,t+.08+i*.03,1.6,.02,'triangle',1)});swoosh(t,1.2,600,5200,.12,.7,1);
       for(let k=0;k<7;k++)tone(1800+Math.random()*2600,t+.1+k*.05,.18,.015,'sine',1)},
     // "하지만," — the turn
-    preHit(){const t=T();tone(48,t,2.2,.7,'sine',.5,.6);tone(96,t,.5,.35,'triangle',.3,.5);swoosh(t,.35,6000,700,.5,.6,.6);
-      const s=ctx.createBufferSource();s.buffer=noise();const hp=ctx.createBiquadFilter();hp.type='highpass';hp.frequency.value=2500;const g=ctx.createGain();s.connect(hp);hp.connect(g);g.connect(bus(1,1));
-      g.gain.setValueAtTime(.5,t);g.gain.exponentialRampToValueAtTime(.0001,t+.5);s.start(t);s.stop(t+.6)},
+    preHit(){const t=T();
+      // digital stutter: chopped square bursts + crushed noise blips, then a low thud
+      const seq=[0,.05,.09,.16,.2,.27,.74,.79];
+      seq.forEach((d,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type='square';o.frequency.setValueAtTime([110,880,220,1760,140,660,180,1320][i],t+d);
+        o.connect(g);g.connect(bus(1,.25));g.gain.setValueAtTime(.12,t+d);g.gain.setValueAtTime(0,t+d+.035);o.start(t+d);o.stop(t+d+.04);
+        const s=ctx.createBufferSource();s.buffer=noise();const hp=ctx.createBiquadFilter();hp.type='bandpass';hp.frequency.value=1200+i*700;hp.Q.value=3;const ng=ctx.createGain();
+        s.connect(hp);hp.connect(ng);ng.connect(bus(1,.3));ng.gain.setValueAtTime(.35,t+d);ng.gain.setValueAtTime(0,t+d+.03);s.start(t+d,Math.random()*2);s.stop(t+d+.035)});
+      tone(46,t+.02,1.4,.5,'sine',.5,.7);tone(3520,t,.06,.05,'square',.2,.25)},
     lens(){const t=T();swoosh(t,2.4,3200,90,.32,.7,.9);tone(41.2,t+.2,3,.4,'sine',.7,.9)},
     question(){const t=T();[0,.32].forEach(d=>tone(62,t+d,.5,.45,'sine',.3,.55));[622.25,739.99,932.33].forEach((f,i)=>tone(f,t+.1+i*.05,2.6,.025,'triangle',1))},
     shatter(){const t=T();for(let k=0;k<26;k++)tone(2200+Math.random()*5200,t+Math.random()*.7,.08+Math.random()*.15,.025+Math.random()*.03,'sine',.9);swoosh(t,1.1,1500,7000,.2,.6,.9)},
