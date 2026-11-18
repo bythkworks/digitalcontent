@@ -123,9 +123,9 @@ const CAT={personal:'개인',space:'공간',operator:'운영'};
 //   at: 지도 좌표 [x, y, 지면 높이] — 제품 아이템이 떠 있을 위치 (입구 → 운동장 동선 위)
 const TBD='내용 입력 필요';
 const PRODUCTS=[
- {n:1,name:'제품 1',place:'입구',cat:'personal',kind:'band',at:[766,572,-4]},
- {n:2,name:'제품 2',place:'장소 입력 필요',cat:'space',kind:'light',at:[520,471,4]},
- {n:3,name:'제품 3',place:'운동장',cat:'operator',kind:'pod',at:[646,338,0]}
+ {n:1,name:'KNOBLE',model:'KNOBLE',place:'입구',cat:'personal',kind:'band',at:[766,572,-4]},
+ {n:2,name:'PATH GUARD',model:'PATHGUARD',place:'장소 입력 필요',cat:'space',kind:'light',at:[520,471,4]},
+ {n:3,name:'FLOWAY',model:'FLOWAY',place:'운동장',cat:'operator',kind:'pod',at:[646,338,0]}
 ].map(p=>Object.assign({one:'한 줄 소개 — '+TBD,problem:TBD,points:[TBD,TBD,TBD],
   steps:[['단계 1',TBD],['단계 2',TBD],['단계 3',TBD],['단계 4',TBD]],sda:[TBD,TBD,TBD],
   feat:[['기능 1',TBD],['기능 2',TBD],['기능 3',TBD],['기능 4',TBD]],b:[p.at[0]-10,p.at[1]-10,20,20,p.at[2]]},p));
@@ -469,7 +469,7 @@ function sizeMapGL(w,h){if(!MGL)return;const d=Math.min(devicePixelRatio||1,1.5)
 // walk path (map px; x east, y south, z up), sampled every 4 units with ground height
 const FP_PATH=[[787.0,501.0,-1.1],[786.4,505.0,-1.2],[785.8,508.9,-1.4],[785.1,512.9,-1.5],[784.5,516.8,-1.6],[783.9,520.8,-1.8],[783.3,524.7,-1.9],[782.7,528.7,-2.1],[782.1,532.6,-2.3],[781.4,536.6,-2.4],[780.2,540.4,-2.6],[778.8,544.1,-2.8],[776.8,547.6,-2.9],[774.7,551.0,-3.0],[772.0,553.9,-3.1],[769.3,556.9,-3.2],[766.2,559.4,-3.3],[763.0,561.8,-3.4],[759.6,563.8,-3.4],[756.1,565.8,-3.4],[752.5,567.5,-3.4],[748.8,569.0,-3.4],[745.1,570.5,-3.3],[741.2,571.7,-3.2],[737.4,572.8,-3.0],[733.6,573.9,-2.9],[729.6,574.7,-2.7],[725.7,575.5,-2.5],[721.8,576.3,-2.2],[717.9,576.9,-1.9],[713.9,577.6,-1.6],[710.0,578.3,-1.3],[706.0,578.8,-0.9],[702.0,579.4,-0.5],[698.1,579.9,-0.1],[694.1,580.4,0.3],[690.1,580.8,0.7],[686.1,581.2,1.1],[682.2,581.5,1.6],[678.2,581.8,2.0],[674.2,582.1,2.5],[670.2,582.3,3.0],[666.2,582.4,3.4],[662.2,582.6,3.9],[658.2,582.7,4.4],[654.2,582.7,4.8],[650.2,582.7,5.3],[646.2,582.7,5.7],[642.2,582.6,6.2],[638.2,582.5,6.6],[634.2,582.3,7.0],[630.2,582.1,7.4],[626.2,581.8,7.8],[622.2,581.6,8.2],[618.2,581.3,8.6],[614.2,581.1,8.9],[610.2,580.8,9.2],[606.3,580.5,9.5],[602.3,580.3,9.8],[598.3,580.0,10.0],[594.3,579.7,10.2],[590.3,579.4,10.4],[586.3,579.1,10.5],[582.3,578.8,10.7],[578.3,578.5,10.8],[574.3,578.1,10.9],[570.4,577.8,10.9],[566.4,577.4,11.0],[562.4,577.1,11.0],[558.4,576.7,11.0],[554.4,576.4,11.0],[550.4,576.0,11.1],[546.5,575.6,11.1],[542.5,575.2,11.1],[538.5,574.7,11.1],[534.6,574.0,11.1],[530.7,572.9,11.1],[527.0,571.6,11.1],[523.4,569.7,11.1],[520.0,567.7,11.1],[517.0,565.1,11.1],[514.0,562.5,11.1],[511.6,559.3,11.1],[509.2,556.1,11.1],[507.4,552.5,11.2],[505.6,548.9,11.2],[504.3,545.1,11.1],[503.1,541.3,11.1],[502.1,537.5,11.0],[501.4,533.5,10.9],[500.8,529.6,10.7],[500.3,525.6,10.5],[500.0,521.6,10.2],[499.8,517.6,10.0],[499.7,513.6,9.7],[499.9,509.6,9.3],[500.1,505.6,8.9],[500.4,501.7,8.5],[501.1,497.7,8.1],[501.7,493.8,7.6],[502.5,489.8,7.2],[503.6,486.0,6.7],[504.7,482.2,6.2],[505.9,478.4,5.8],[507.5,474.7,5.4],[509.1,471.0,5.0],[510.7,467.3,4.6],[512.6,463.8,4.3],[514.6,460.4,4.0],[516.5,456.9,3.8],[518.9,453.6,3.5],[521.2,450.3,3.3],[523.5,447.1,3.1],[526.0,444.0,3.0],[528.6,440.9,2.8],[531.2,437.9,2.8],[533.9,435.0,2.7],[536.8,432.2,2.5],[539.7,429.4,2.4],[542.5,426.6,2.2],[545.4,423.8,2.1],[548.2,420.9,1.9],[551.0,418.1,1.7],[553.8,415.3,1.6],[556.6,412.4,1.4],[559.4,409.5,1.2],[562.2,406.6,1.0],[564.9,403.7,0.9],[567.6,400.8,0.7],[570.3,397.8,0.6],[573.0,394.9,0.5],[575.6,391.8,0.4],[578.2,388.8,0.3],[580.8,385.7,0.2],[583.2,382.6,0.2],[585.7,379.4,0.1],[588.0,376.1,0.1],[590.1,372.8,0.1],[592.2,369.4,0.0],[594.3,365.9,0.0],[596.4,362.5,0.0],[598.5,359.1,0.0],[600.6,355.7,0.0],[601.0,355.0,0.0]];
 const FP_STAGE=[626,226,20];                    // stage at the north edge of the playground
-const FP_EYE=7, FP_ITEM_Z=12;
+const FP_EYE=7, FP_ITEM_Z=14;
 const FP={yaw:0,pitch:0,yawT:0,pitchT:0,cam:[0,0,0],look:[0,0,0],fov:40,act:0,hover:0,s:0,items:[],ready:false,last:0};
 (function(){let L=0;FP_PATH.forEach((q,i)=>{if(i)L+=Math.hypot(q[0]-FP_PATH[i-1][0],q[1]-FP_PATH[i-1][1]);q[3]=L});FP.L=L})();
 function fpAt(s){s=clamp(s,0,FP.L);let i=1;while(i<FP_PATH.length-1&&FP_PATH[i][3]<s)i++;
@@ -500,20 +500,26 @@ const MESH=[
   ()=>meshFlat([[0,0,1.45],[1,0,0],[0,1,0],[-1,0,0],[0,-1,0],[0,0,-1.45]],[[0,1,2],[0,2,3],[0,3,4],[0,4,1],[5,2,1],[5,3,2],[5,4,3],[5,1,4]]),
   ()=>{const s=.85,V=[];for(const z of[-s,s])for(const y of[-s,s])for(const x of[-s,s])V.push([x,y,z]);
     return meshFlat(V,[[0,2,3,1],[4,5,7,6],[0,1,5,4],[2,6,7,3],[0,4,6,2],[1,3,7,5]])}];
+const ITEM_CFG={KNOBLE:{s:4.6,tilt:1.0},PATHGUARD:{s:6.2,tilt:.12},FLOWAY:{s:6.2,tilt:.25}};
 const ITEM_COL=[[[.61,.78,.89],[.86,.71,.88]],[[.72,.71,.93],[.98,.76,.86]],[[.98,.82,.70],[.76,.74,.95]]];
 (function initFP(){
   if(!MGL)return; const g=MGL.g;
-  const ivs=`attribute vec3 aP,aN;uniform mat4 uM,uW;varying vec3 vN,vW;void main(){vec4 w=uW*vec4(aP,1.);vW=w.xyz;vN=mat3(uW)*aN;gl_Position=uM*w;}`;
-  const ifs=`precision mediump float;varying vec3 vN,vW;uniform vec3 uCam,uL,uA,uB;uniform float uGlow;
-void main(){vec3 n=normalize(vN),v=normalize(uCam-vW);float d=dot(n,uL);float lit=smoothstep(-.05,.1,d);
-vec3 c=mix(uA,uB,n.z*.5+.5);c=mix(c*.8,c,lit);float rim=pow(1.-abs(dot(n,v)),2.2);c+=rim*vec3(1.,.97,1.)*(.55+.45*uGlow);c+=uGlow*.12;
+  const ivs=`attribute vec3 aP,aN;attribute vec4 aC;uniform mat4 uM,uW;varying vec3 vN,vW;varying vec4 vC;void main(){vec4 w=uW*vec4(aP,1.);vW=w.xyz;vN=mat3(uW)*aN;vC=aC;gl_Position=uM*w;}`;
+  const ifs=`precision mediump float;varying vec3 vN,vW;varying vec4 vC;uniform vec3 uCam,uL;uniform float uGlow;
+void main(){vec3 n=normalize(vN),v=normalize(uCam-vW);if(dot(n,v)<0.)n=-n;float d=dot(n,uL);float lit=smoothstep(-.05,.12,d);
+vec3 base=vC.rgb;vec3 c=mix(base*vec3(.80,.78,.92),base,lit);float rim=pow(1.-abs(dot(n,v)),2.4);c+=rim*vec3(1.,.97,1.)*(.25+.35*uGlow);
+c=mix(c,min(base*1.25+.12,vec3(1.)),vC.a);c+=uGlow*.06;
 gl_FragColor=vec4(min(c,1.),1.);}`;
   const mk=(t,s)=>{const o=g.createShader(t);g.shaderSource(o,s);g.compileShader(o);return g.getShaderParameter(o,g.COMPILE_STATUS)?o:(console.warn(g.getShaderInfoLog(o)),null)};
   const p=g.createProgram();g.attachShader(p,mk(g.VERTEX_SHADER,ivs));g.attachShader(p,mk(g.FRAGMENT_SHADER,ifs));g.linkProgram(p);
   if(!g.getProgramParameter(p,g.LINK_STATUS))return;
-  FP.ip=p;FP.iu={};['uM','uW','uCam','uL','uA','uB','uGlow'].forEach(k=>FP.iu[k]=g.getUniformLocation(p,k));FP.ia=[g.getAttribLocation(p,'aP'),g.getAttribLocation(p,'aN')];
-  FP.items=PRODUCTS.map((pr,i)=>{const d=new Float32Array(MESH[i%3]());const b=g.createBuffer();g.bindBuffer(g.ARRAY_BUFFER,b);g.bufferData(g.ARRAY_BUFFER,d,g.STATIC_DRAW);
-    return {b,n:d.length/6,glow:0,scr:[-999,-999,0],z:pr.at[2]??0}});
+  FP.ip=p;FP.iu={};['uM','uW','uCam','uL','uGlow'].forEach(k=>FP.iu[k]=g.getUniformLocation(p,k));FP.ia=[g.getAttribLocation(p,'aP'),g.getAttribLocation(p,'aN'),g.getAttribLocation(p,'aC')];
+  const b64=t=>{const s=atob(t),u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u};
+  FP.items=PRODUCTS.map((pr,i)=>{const m=PROD_MESH[pr.model];const vb=g.createBuffer(),ib=g.createBuffer();
+    g.bindBuffer(g.ARRAY_BUFFER,vb);g.bufferData(g.ARRAY_BUFFER,b64(m.v),g.STATIC_DRAW);const ix=b64(m.i);
+    g.bindBuffer(g.ELEMENT_ARRAY_BUFFER,ib);g.bufferData(g.ELEMENT_ARRAY_BUFFER,ix,g.STATIC_DRAW);
+    return {vb,ib,n:ix.length/2,glow:0,scr:[-999,-999,0],z:pr.at[2]??0}});
+  g.bindBuffer(g.ELEMENT_ARRAY_BUFFER,MGL.ib);
   FP.ready=true;
 })();
 function drawMapGL(){
@@ -532,16 +538,17 @@ function drawMapGL(){
   drawBeams(M,e,t);
   if(!FP.ready)return;
   g.useProgram(FP.ip);g.uniformMatrix4fv(FP.iu.uM,false,new Float32Array(M));g.uniform3f(FP.iu.uCam,e[0],e[1],e[2]);g.uniform3fv(FP.iu.uL,TOON_SUN);
-  FP.items.forEach((it,i)=>{const q=PRODUCTS[i].at, z=q[2]+FP_ITEM_Z+Math.sin(t*1.6+i*2)*1.2, sc=3.8*(1+it.glow*.12);
-    const W=M4.mul(M4.tr(q[0],q[1],z),M4.mul(M4.rz(t*.9+i*2.1),M4.mul(M4.rx(.5+Math.sin(t*.7+i)*.15),M4.sc(sc))));
-    g.uniformMatrix4fv(FP.iu.uW,false,new Float32Array(W));g.uniform3fv(FP.iu.uA,ITEM_COL[i%3][0]);g.uniform3fv(FP.iu.uB,ITEM_COL[i%3][1]);g.uniform1f(FP.iu.uGlow,it.glow);
-    g.bindBuffer(g.ARRAY_BUFFER,it.b);g.enableVertexAttribArray(FP.ia[0]);g.enableVertexAttribArray(FP.ia[1]);
-    g.vertexAttribPointer(FP.ia[0],3,g.FLOAT,false,24,0);g.vertexAttribPointer(FP.ia[1],3,g.FLOAT,false,24,12);
-    g.drawArrays(g.TRIANGLES,0,it.n);
+  FP.items.forEach((it,i)=>{const pr=PRODUCTS[i],q=pr.at,cf=ITEM_CFG[pr.model]||{s:4,tilt:.4}, z=q[2]+FP_ITEM_Z+Math.sin(t*1.6+i*2)*1.2, sc=cf.s*(1+it.glow*.1);
+    const W=M4.mul(M4.tr(q[0],q[1],z),M4.mul(M4.rz(t*.8+i*2.1),M4.mul(M4.rx(cf.tilt+Math.sin(t*.7+i)*.08),M4.mul(M4.sc(sc),[1,0,0,0,0,-1,0,0,0,0,1,0,0,0,0,1]))));
+    g.uniformMatrix4fv(FP.iu.uW,false,new Float32Array(W));g.uniform1f(FP.iu.uGlow,it.glow);
+    g.bindBuffer(g.ARRAY_BUFFER,it.vb);g.bindBuffer(g.ELEMENT_ARRAY_BUFFER,it.ib);FP.ia.forEach(a=>g.enableVertexAttribArray(a));
+    g.vertexAttribPointer(FP.ia[0],3,g.SHORT,true,14,0);g.vertexAttribPointer(FP.ia[1],3,g.BYTE,true,14,6);g.vertexAttribPointer(FP.ia[2],4,g.UNSIGNED_BYTE,true,14,9);
+    g.drawElements(g.TRIANGLES,it.n,g.UNSIGNED_SHORT,0);
     // where it lands on screen (labels, clicks)
     const cl=fpProject([q[0],q[1],z]); it.scr=cl?[cl[0],cl[1],sc*cl[2]]:[-999,-999,0];
-    g.disableVertexAttribArray(FP.ia[0]);g.disableVertexAttribArray(FP.ia[1]);
+    FP.ia.forEach(a=>g.disableVertexAttribArray(a));
   });
+  g.bindBuffer(g.ELEMENT_ARRAY_BUFFER,MGL.ib);
 }
 function drawBeams(M,e,t){
   const g=MGL.g;
