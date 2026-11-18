@@ -319,7 +319,7 @@ function renderWorldC(p){
    w.classList.toggle('on',sp)}
   ecPhone.classList.toggle('spot',n===5&&!typing);
   {const pk=EC.pick, L=pk>=0&&p>=EC_PICK-.02?2+pk:n>=1||p>=.03?1:0; if(L!==EC.bgL){EC.bgL=L;$$('#ecBg .eb').forEach((e,i)=>e.classList.toggle('on',i===L))}
-   $('#ecBg').style.opacity=(1-range(p,.9,.99)).toFixed(3)}
+   worldC.bgOut=1-range(p,.9,.99)}
   ecPhone.classList.toggle('done',p>=EC_MSG[6].at+.04);
   const ent=eOut(range(p,0,.06)); ecPhone.style.opacity=ent.toFixed(3); ecPhone.style.transform=`translateY(${(40*(1-ent)).toFixed(1)}px)`;
   ecLabel.style.opacity=ent.toFixed(3);
@@ -327,7 +327,11 @@ function renderWorldC(p){
   wcbar.style.width=(range(p,.84,.98)*100).toFixed(2)+'%';
   
 }
-function tickWorldC(){}
+const ecBgEl=$('#ecBg'), ecWaveEl=$('#ecWave');
+function tickWorldC(){ // gradient eases in from white while the section scrolls up, so there is no hard edge with WORLD
+  const r=worldC.el.getBoundingClientRect(); if(r.top>VH||r.bottom<0)return;
+  const inn=eIO(clamp(1-r.top/VH)); const o=(inn*(worldC.bgOut??1)).toFixed(3);
+  if(o!==worldC.bgO){worldC.bgO=o;ecBgEl.style.opacity=o;const fh=(Math.sqrt(1-clamp(1-r.top/VH))*90).toFixed(1);ecBgEl.style.webkitMaskImage=ecBgEl.style.maskImage=+fh>.1?`linear-gradient(180deg,transparent 0,#000 ${fh}vh)`:'none'}}
 
 /* ======================= SYSTEM ======================= */
 const nodesEl=$('#nodes'), sysDesc=$('#sysDesc');
