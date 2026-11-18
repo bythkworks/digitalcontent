@@ -1547,7 +1547,7 @@ const Sound=(()=>{
   function arp(t,idx,step=.08,vol=.07){idx.forEach((i,k)=>box(pick(i),t+k*step,vol))}
   const C={
     on(){const t=T();arp(t,[0,2,3,5],.07,.07)},
-    introFly(){const t=T();air(t,1.4,600,3000,.1);arp(t+.1,[0,2,3,5],.12,.05)},
+    introFly(){const t=T();air(t,1.4,600,3000,.1);arp(t+.1,[5,6,7,8,10],.09,.05)},
     introLand(){const t=T();[8,7,5,3].forEach((i,k)=>glass(pick(i),t+k*.08,.05,2.6));box(pick(5),t+.4,.08)},
     section(){const t=T();air(t,.7,900,5200,.12);box(pick(3),t+.12,.07);box(pick(5),t+.24,.07)},
     card(dir){const t=T();air(t,.25,dir>0?1500:4000,dir>0?4000:1500,.12,1.6,.4);const a=dir>0?[4,6]:[6,4];box(pick(a[0]),t+.04,.06,.5);box(pick(a[1]),t+.12,.06,.7)},
@@ -1589,19 +1589,19 @@ const Sound=(()=>{
   // intro flight: a sustained wind + pad layer that lasts the whole flight and opens up as it progresses
   let fl=null,flStep=-1;
   function fly(active,p){if(!ctx)return;
-    if(!fl){const s=ctx.createBufferSource();s.buffer=noise();s.loop=true;const hp=ctx.createBiquadFilter();hp.type='highpass';hp.frequency.value=400;
+    if(!fl){const s=ctx.createBufferSource();s.buffer=noise();s.loop=true;const hp=ctx.createBiquadFilter();hp.type='highpass';hp.frequency.value=900;
       const bp=ctx.createBiquadFilter();bp.type='bandpass';bp.Q.value=.7;const ng=ctx.createGain();ng.gain.value=0;s.connect(hp);hp.connect(bp);bp.connect(ng);ng.connect(bus(.8,.9,.15));
-      const lp=ctx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=600;lp.Q.value=.6;const pg=ctx.createGain();pg.gain.value=0;lp.connect(pg);pg.connect(bus(.6,1,.25));
-      const os=[146.83,220,293.66,369.99,440].map((f,i)=>{const o=ctx.createOscillator();o.type=i<2?'sine':'triangle';o.frequency.value=f;o.detune.value=(i%2?6:-6);o.connect(lp);o.start();return o});
+      const lp=ctx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=1600;lp.Q.value=.6;const pg=ctx.createGain();pg.gain.value=0;lp.connect(pg);pg.connect(bus(.6,1,.25));
+      const os=[293.66,440,587.33,739.99,880].map((f,i)=>{const o=ctx.createOscillator();o.type=i<2?'sine':'triangle';o.frequency.value=f;o.detune.value=(i%2?6:-6);o.connect(lp);o.start();return o});
       s.start();fl={bp,ng,lp,pg,os}}
     const t=T(),v=active&&on?1:0,q=Math.max(0,Math.min(1,p));
-    fl.bp.frequency.setTargetAtTime(500+q*4200,t,.15);
+    fl.bp.frequency.setTargetAtTime(1400+q*5200,t,.15);
     fl.ng.gain.setTargetAtTime(v*(.05+.09*Math.sin(q*Math.PI)),t,v?.25:.6);
-    fl.lp.frequency.setTargetAtTime(500+q*2600,t,.2);
-    fl.pg.gain.setTargetAtTime(v*.028,t,v?.4:.9);
-    fl.os.forEach((o,i)=>o.frequency.setTargetAtTime([146.83,220,293.66,369.99,440][i]*(1+q*.122),t,.3));
+    fl.lp.frequency.setTargetAtTime(1600+q*4200,t,.2);
+    fl.pg.gain.setTargetAtTime(v*.022,t,v?.4:.9);
+    fl.os.forEach((o,i)=>o.frequency.setTargetAtTime([293.66,440,587.33,739.99,880][i]*(1+q*.26),t,.3));
     // a rising music-box note every tenth of the flight
-    const st=active?Math.floor(q*10):-1; if(active&&on&&st>flStep&&flStep>=0)box(pick(st%8),t,.045,.9,.5); flStep=active?st:-1}
+    const st=active?Math.floor(q*10):-1; if(active&&on&&st>flStep&&flStep>=0)box(pick(4+st),t,.045,.9,.5);if(st%2)box(pick(6+st),t+.09,.03,.7,.5); flStep=active?st:-1}
   function set(v){on=v;if(!v&&fl){fly(false,0)}btn.setAttribute('aria-pressed',String(on));btn.classList.toggle('on',on);btn.querySelector('span').textContent=on?'소리 끄기':'소리 켜기';
     try{sessionStorage.setItem('cf-sound',on?'1':'0')}catch(e){}
     if(on){if(!ctx)init();ctx.resume();play('on')}}
