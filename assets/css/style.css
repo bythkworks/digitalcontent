@@ -985,9 +985,9 @@ body:has(#detail.open) .snd-btn,body:has(#detail.open) .day-clock{opacity:0;poin
 body:has(#detail.open) .snd-btn{opacity:0;pointer-events:none}
 @media (max-width:700px){.snd-btn span{display:none}.snd-btn{padding:9px}}
 /* ---- "하지만," glitch ---- */
-#turn.t-glitch .t-pre .t-h{animation:gMain 1.3s steps(1,end) both}
-#turn.t-glitch .t-pre .t-h::before{animation:gA 1.3s steps(1,end) both}
-#turn.t-glitch .t-pre .t-h::after{animation:gB 1.3s steps(1,end) both}
+#turn.t-glitch .t-pre .t-h{animation:gMain 1.3s steps(1,end)}
+#turn.t-glitch .t-pre .t-h::before{animation:gA 1.3s steps(1,end)}
+#turn.t-glitch .t-pre .t-h::after{animation:gB 1.3s steps(1,end)}
 #turn.t-glitch .t-pre::after{content:"";position:absolute;inset:0;pointer-events:none;mix-blend-mode:multiply;
   background:repeating-linear-gradient(0deg,rgba(29,29,31,.07) 0 1px,transparent 1px 3px);animation:gScan 1.3s steps(1,end) both}
 @keyframes gMain{

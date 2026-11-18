@@ -834,7 +834,7 @@ function tickTurn(now){
   tRing.style.width=tRing.style.height=(R*2).toFixed(1)+'px'; tRing.style.opacity=ringO.toFixed(3);
   document.body.classList.toggle('dark-zone',R>VH*.55);
   // ---- "하지만," on white, pulled into the dark
-  const a=eOut(range(p,0,.075)), up=eIO(range(p,.11,.3)), c=range(p,.09,.2), out=range(p,.45,.55);
+  const a=eOut(range(p,0,.075)), up=eIO(range(p,.11,.3)), c=range(p,.09,.2), out=range(p,.13,.21);
   if(p>=.03&&!turn.hit){turn.hit=true;el.classList.remove('t-glitch');void el.offsetWidth;el.classList.add('t-glitch')} if(p<.01)turn.hit=false;
   const col=Math.round(29+226*c);
   tPreH.style.color=`rgb(${col},${col},${Math.min(255,col+4)})`;
