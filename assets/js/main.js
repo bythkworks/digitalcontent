@@ -1085,6 +1085,11 @@ for(const id in HOLDS){const H=HOLDS[id],w=HOLD_W[id],mv=1-H.length*w,k=[[0,0]];
 function remap(id,t){const k=KNOTS[id];if(!k)return t;for(let i=1;i<k.length;i++){const [r0,m0]=k[i-1],[r1,m1]=k[i];if(t<=r1)return r1>r0?m0+(m1-m0)*(.5-.5*Math.cos(Math.PI*(t-r0)/(r1-r0))):m1}return 1}
 function holdRaw(id,i){const k=KNOTS[id];return (k[1+i*2][0]+k[2+i*2][0])/2}
 function holdY(id,i){const el=$('#'+id);return Math.round(el.offsetTop+holdRaw(id,i)*(el.offsetHeight-VH))}
+// returning from a product page: index.html#product-2 → stand at that product on the walk; #products → start of the map
+addEventListener('load',()=>{const h=location.hash,m=h.match(/^#product-(\d)$/);
+  if(!m&&h!=='#products'&&h!=='#projects')return;
+  const y=m?holdY('projects',+m[1]):holdY('projects',0);
+  setTimeout(()=>{scrollTo(0,y);if(typeof SS!=='undefined'){SS.tgt=y;SS.cur=y}},60)});
 function snapPoints(){const pts=[];for(const id in HOLDS){const hw=HOLD_W[id]*($('#'+id).offsetHeight-VH)/2;HOLDS[id].forEach((_,i)=>pts.push({y:holdY(id,i),id,i,hw}))}return pts.sort((a,b)=>a.y-b.y)}
 /* ---- smooth scrolling: wheel inertia + gentle magnet (no hard stops) ---- */
 let snapT=0,touching=false,lastSY=scrollY,dir=1;
