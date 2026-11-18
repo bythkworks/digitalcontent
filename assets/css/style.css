@@ -1013,6 +1013,17 @@ body:has(#detail.open) .snd-btn{opacity:0;pointer-events:none}
   .wa-bg::after{background:linear-gradient(0deg,rgba(18,14,40,.85) 0%,rgba(18,14,40,.55) 38%,rgba(18,14,40,0) 70%)}
   #world-a .wa-prog{left:auto;right:20px;transform:none;bottom:30px;gap:6px}#world-a .wa-prog button{width:13vw}
 }
+
+/* ---- question: bigger type, concave lens + vignette pulling the eye to the centre ---- */
+#tQ .t-h{font-size:clamp(46px,8.4vw,140px);line-height:1.1}
+#tQ .lw{display:inline-block;white-space:nowrap}#tQ .lc{display:inline-block;transform-origin:50% 50%;will-change:transform}
+.t-vig{position:absolute;inset:0;z-index:3;pointer-events:none;opacity:0;
+  background:radial-gradient(ellipse 58% 52% at 50% 54%,rgba(5,5,14,0) 0%,rgba(5,5,14,0) 42%,rgba(5,5,14,.55) 78%,rgba(5,5,14,.9) 100%);
+  -webkit-backdrop-filter:blur(7px) saturate(.8);backdrop-filter:blur(7px) saturate(.8);
+  -webkit-mask:radial-gradient(ellipse 60% 55% at 50% 54%,transparent 38%,#000 85%);mask:radial-gradient(ellipse 60% 55% at 50% 54%,transparent 38%,#000 85%)}
+.t-vig::after{content:"";position:absolute;left:50%;top:54%;width:min(1180px,96vw);aspect-ratio:1.6;transform:translate(-50%,-50%);border-radius:50%;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.045),inset 0 0 140px rgba(201,198,255,.09)}
+@media (max-width:700px){#tQ .t-h{font-size:11.4vw}}
 /* ---- "하지만," glitch ---- */
 #turn.t-glitch .t-pre .t-h{animation:gMain 1.3s steps(1,end)}
 #turn.t-glitch .t-pre .t-h::before{animation:gA 1.3s steps(1,end)}

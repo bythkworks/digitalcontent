@@ -808,6 +808,20 @@ $$('main .reveal').forEach(el=>io.observe(el));
 
 /* ======================= 03.5 INTERLUDE (dark turn) ======================= */
 const turn={el:$('#turn'),p:0,t:0};
+const tVig=$('#tVig');
+// concave lens on the question: each glyph is pulled toward the centre and shrinks with distance (p' = p·(1−a·r²))
+const qLC=[];let qLv=-1;
+(()=>{const h=document.querySelector('#tQ .t-h');h.innerHTML=h.innerHTML.split(/<br\s*\/?>/i).map(line=>line.split(' ').map(w=>`<span class="lw">${[...w].map(ch=>`<span class="lc">${ch}</span>`).join('')}</span>`).join(' ')).join('<br>');
+  h.querySelectorAll('.lc').forEach(e=>qLC.push({e,nx:0,ny:0}))})();
+function qMeasure(){const h=document.querySelector('#tQ .t-h');qLC.forEach(c=>c.e.style.transform='');const R=h.getBoundingClientRect();if(!R.width)return;
+  const cx=R.left+R.width/2,cy=R.top+R.height/2,hw=R.width/2,hh=R.height/2;
+  qLC.forEach(c=>{const r=c.e.getBoundingClientRect();c.nx=(r.left+r.width/2-cx)/hw;c.ny=(r.top+r.height/2-cy)/hw;c.w=hw});qLv=-1}
+function qLens(lv){if(reduce)lv=0;lv=Math.round(lv*100)/100;if(lv===qLv)return;qLv=lv;const a=.16*lv;
+  qLC.forEach(c=>{const r2=c.nx*c.nx+c.ny*c.ny*1.6,k=a*r2;
+    c.e.style.transform=k>.0005?`translate(${(-c.nx*c.w*k*.55).toFixed(1)}px,${(-c.ny*c.w*k*.55).toFixed(1)}px) scale(${(1-k*1.1).toFixed(4)})`:''})}
+addEventListener('resize',()=>requestAnimationFrame(qMeasure));(document.fonts?document.fonts.ready:Promise.resolve()).then(()=>setTimeout(qMeasure,60));setTimeout(qMeasure,400);
+
+
 const tDark=$('#tDark'),tRing=$('#tRing'),tPreH=$('#tPre .t-h'),tQ=$('#tQ'),tQH=$('#tQ .t-h'),tCores=$$('#tCores .t-core'),tLenses=$$('#tCores .lens'),tDisp3=$('#tDisp3'),tTurb3=$('#tTurb3'),
       tSpace=$('#tSpace'),tDust=$('#tDust'),tDisp=$('#tDisp'),tDisp2=$('#tDisp2'),tTurb=$('#tTurb'),tTurb2=$('#tTurb2');
 const tA=$('#ta1');
@@ -867,6 +881,7 @@ function tickTurn(now){
   tQH.style.setProperty('--ca',(12*(1-q)+28*d).toFixed(2)+'px'); tQH.style.setProperty('--ca-o',Math.min(.9,qw*3).toFixed(3));
   if(qw>.004){tDisp.setAttribute('scale',(70*(1-q)+140*d).toFixed(1));tTurb.setAttribute('baseFrequency',`${(.012+.003*Math.sin(t*.6)).toFixed(4)} ${(.03+.008*Math.cos(t*.8)).toFixed(4)}`);
     tQH.style.filter=`url(#tWarp) blur(${(d*9+(1-q)*4).toFixed(2)}px)`} else tQH.style.filter='none';
+  {const lv=q*(1-d);tVig.style.opacity=(lv*.95).toFixed(3);qLens(lv)}
   // ---- camera through the glass thoughts
   const f=T_MOB?560:880;
   const camZ=-1500+3700*eIO(range(p,.06,.42))+2700*eIn(range(p,.44,.64));
@@ -1532,7 +1547,7 @@ const Sound=(()=>{
   function arp(t,idx,step=.08,vol=.07){idx.forEach((i,k)=>box(pick(i),t+k*step,vol))}
   const C={
     on(){const t=T();arp(t,[0,2,3,5],.07,.07)},
-    introFly(){const t=T();air(t,2.4,600,6000,.14);pad([293.66,369.99,440,659.25],t,3.6,.03);arp(t+.2,[0,1,2,3,4,5,6,7],.16,.05)},
+    introFly(){const t=T();air(t,1.4,600,3000,.1);arp(t+.1,[0,2,3,5],.12,.05)},
     introLand(){const t=T();[8,7,5,3].forEach((i,k)=>glass(pick(i),t+k*.08,.05,2.6));box(pick(5),t+.4,.08)},
     section(){const t=T();air(t,.7,900,5200,.12);box(pick(3),t+.12,.07);box(pick(5),t+.24,.07)},
     card(dir){const t=T();air(t,.25,dir>0?1500:4000,dir>0?4000:1500,.12,1.6,.4);const a=dir>0?[4,6]:[6,4];box(pick(a[0]),t+.04,.06,.5);box(pick(a[1]),t+.12,.06,.7)},
@@ -1571,7 +1586,23 @@ const Sound=(()=>{
     const t=T(),x=lx/VW,y=ly/VH,v=active?spd:0;spd*=.9;
     sh.f.frequency.setTargetAtTime(900+x*3800,t,.08);sh.g.gain.setTargetAtTime(v*.08,t,.12);
     sh.o.frequency.setTargetAtTime(PN[Math.min(PN.length-1,Math.floor((1-y)*8))],t,.12);sh.og.gain.setTargetAtTime(v*.035,t,.2)}
-  function set(v){on=v;btn.setAttribute('aria-pressed',String(on));btn.classList.toggle('on',on);btn.querySelector('span').textContent=on?'소리 끄기':'소리 켜기';
+  // intro flight: a sustained wind + pad layer that lasts the whole flight and opens up as it progresses
+  let fl=null,flStep=-1;
+  function fly(active,p){if(!ctx)return;
+    if(!fl){const s=ctx.createBufferSource();s.buffer=noise();s.loop=true;const hp=ctx.createBiquadFilter();hp.type='highpass';hp.frequency.value=400;
+      const bp=ctx.createBiquadFilter();bp.type='bandpass';bp.Q.value=.7;const ng=ctx.createGain();ng.gain.value=0;s.connect(hp);hp.connect(bp);bp.connect(ng);ng.connect(bus(.8,.9,.15));
+      const lp=ctx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=600;lp.Q.value=.6;const pg=ctx.createGain();pg.gain.value=0;lp.connect(pg);pg.connect(bus(.6,1,.25));
+      const os=[146.83,220,293.66,369.99,440].map((f,i)=>{const o=ctx.createOscillator();o.type=i<2?'sine':'triangle';o.frequency.value=f;o.detune.value=(i%2?6:-6);o.connect(lp);o.start();return o});
+      s.start();fl={bp,ng,lp,pg,os}}
+    const t=T(),v=active&&on?1:0,q=Math.max(0,Math.min(1,p));
+    fl.bp.frequency.setTargetAtTime(500+q*4200,t,.15);
+    fl.ng.gain.setTargetAtTime(v*(.05+.09*Math.sin(q*Math.PI)),t,v?.25:.6);
+    fl.lp.frequency.setTargetAtTime(500+q*2600,t,.2);
+    fl.pg.gain.setTargetAtTime(v*.028,t,v?.4:.9);
+    fl.os.forEach((o,i)=>o.frequency.setTargetAtTime([146.83,220,293.66,369.99,440][i]*(1+q*.122),t,.3));
+    // a rising music-box note every tenth of the flight
+    const st=active?Math.floor(q*10):-1; if(active&&on&&st>flStep&&flStep>=0)box(pick(st%8),t,.045,.9,.5); flStep=active?st:-1}
+  function set(v){on=v;if(!v&&fl){fly(false,0)}btn.setAttribute('aria-pressed',String(on));btn.classList.toggle('on',on);btn.querySelector('span').textContent=on?'소리 끄기':'소리 켜기';
     try{sessionStorage.setItem('cf-sound',on?'1':'0')}catch(e){}
     if(on){if(!ctx)init();ctx.resume();play('on')}}
   btn.addEventListener('click',()=>set(!on));
@@ -1579,7 +1610,7 @@ const Sound=(()=>{
   // watch the page and fire cues on moments
   const W={sec:null,ia:-1,wa:-1,ec:-1,ty:false,act:0,k:-1,hov:0,first:true};
   const SECS=['intro','world-a','world-c','turn','projects'];
-  return {play,shimmer,
+  return {play,shimmer,fly,
     tick(){if(!on)return;
       let cur=null;for(const id of SECS){const r=$('#'+id).getBoundingClientRect();if(r.top<=VH*.5&&r.bottom>VH*.5)cur=id}
       if(cur!==W.sec){const prev=W.sec;W.sec=cur;if(!W.first&&cur&&prev!==null&&cur!=='turn')Sound.play('section');W.first=false}
@@ -1591,6 +1622,7 @@ const Sound=(()=>{
       Sound.shimmer(intro.p<.15);
       // intro flight: start and landing
       const ip=intro.p,ia=ip<.04?0:ip<.85?1:2; if(ia!==W.ia){if(W.ia===0&&ia===1)Sound.play('introFly');if(W.ia===1&&ia===2)Sound.play('introLand');W.ia=ia}
+      Sound.fly(ia===1,(ip-.04)/.81);
       // world chapter cards
       const wa=worldA.act??-1; if(wa!==W.wa){if(W.wa>=0&&wa>=0)Sound.play('card',wa>W.wa?1:-1);W.wa=wa}
       // epilogue chat
