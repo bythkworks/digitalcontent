@@ -123,7 +123,8 @@ const CAT={personal:'개인',space:'공간',operator:'운영'};
 //   at: 지도 좌표 [x, y, 지면 높이] — 제품 아이템이 떠 있을 위치 (입구 → 운동장 동선 위)
 const TBD='내용 입력 필요';
 const PRODUCTS=[
- {n:1,name:'KNOBLE',model:'KNOBLE',place:'입구',cat:'personal',kind:'band',at:[766,572,-4]},
+ {n:1,name:'KNOBLE',model:'KNOBLE',place:'입구',cat:'personal',kind:'band',at:[766,572,-4],one:'지금의 나를, 손끝으로',
+  url:'https://claude.ai/artifact/3MKKqcnHG5c2ZXcJSq1PZK'},   // 개인 제품 페이지 (새 탭)
  {n:2,name:'PATH GUARD',model:'PATHGUARD',place:'장소 입력 필요',cat:'space',kind:'light',at:[520,471,4]},
  {n:3,name:'FLOWAY',model:'FLOWAY',place:'운동장',cat:'operator',kind:'pod',at:[646,338,0]}
 ].map(p=>Object.assign({one:'한 줄 소개 — '+TBD,problem:TBD,points:[TBD,TBD,TBD],
@@ -993,7 +994,7 @@ const fpRouteSvg=$('.fp-route',mstage), fpRoute=$('.fp-route path',mstage);
 mstage.insertAdjacentHTML('beforeend',PRODUCTS.map(p=>`<button class="fp-tag" data-n="${p.n}" aria-label="${p.n}번 ${p.name} 소개 열기"><b>0${p.n}</b><span>${p.name}</span></button>`).join(''));
 const fpTags=$$('.fp-tag',mstage);
 fpTags.forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();fpOpen(+b.dataset.n)}));
-function fpOpen(n){const it=FP.items[n-1];if(it){const r=it.scr[2]*2.2;FP.from=[it.scr[1]-r,VW-(it.scr[0]+r),VH-(it.scr[1]+r),it.scr[0]-r].map(v=>Math.max(0,v))}openDetail(n)}
+function fpOpen(n){const pu=PRODUCTS[n-1]&&PRODUCTS[n-1].url;if(pu){const a=document.createElement('a');a.href=pu;a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();return}const it=FP.items[n-1];if(it){const r=it.scr[2]*2.2;FP.from=[it.scr[1]-r,VW-(it.scr[0]+r),VH-(it.scr[1]+r),it.scr[0]-r].map(v=>Math.max(0,v))}openDetail(n)}
 function renderProjects(p){
   pj.p=p;
   const S=fpSK(); FP.s=fpS(p);
