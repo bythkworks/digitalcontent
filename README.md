@@ -71,3 +71,15 @@ python3 -m http.server 8000
 ## 브라우저
 
 최신 Chrome, Edge, Safari, Firefox (데스크톱·모바일)
+
+## 개인 제품 페이지
+
+| 폴더 | 제품 | 상태 |
+|---|---|---|
+| `PRODUCT01/` | KNOBLE | 완성 — 지도에서 1번 제품을 누르면 이동 |
+| `PRODUCT02/` | PATH GUARD | 페이지 준비 중 (지금은 사이트 안 임시 소개) |
+| `PRODUCT03/` | FLOWAY | 페이지 준비 중 (지금은 사이트 안 임시 소개) |
+
+각 제품 페이지는 `index.html` + `assets/(images|videos|models|js|css|fonts)` 구조이고, 상대 경로만 사용합니다.
+제품 페이지 상단: `전체 프로젝트`(../../index.html) · `COLLEGE FESTIVAL 2031`(조 페이지, ../index.html).
+오프라인 테스트: 이 폴더에서 `python3 -m http.server` 실행 후 http://localhost:8000 접속 (파일 더블클릭으로도 동작).

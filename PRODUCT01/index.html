@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KNOBLE · Product 01</title>
+<style>@font-face{font-family:"Pretendard Variable";font-weight:45 920;font-style:normal;font-display:swap;src:url("./assets/fonts/PretendardSubset.woff2") format("woff2")}</style>
+<link rel="stylesheet" href="./assets/css/style.css">
+<style>.crumbs{display:flex;gap:6px;align-items:center}.crumbs .back{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}@media(max-width:700px){.crumbs .back:last-child{display:none}}</style>
+</head>
+<body data-tint="day">
+<div class="bgfx" aria-hidden="true"><i class="orb o1"></i><i class="orb o2"></i><i class="orb o3"></i></div>
+<div class="cursor" id="cursor" aria-hidden="true"></div>
+
+<!-- ============ NAV ============ -->
+<header class="nav" id="nav">
+  <span class="crumbs">
+    <a class="back" href="../../index.html" title="전체 프로젝트로 이동" aria-label="전체 프로젝트"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 7.2 8 2.5l5.5 4.7V13.5h-3.7V9.6H6.2v3.9H2.5z"/></svg> 전체 프로젝트</a>
+    <a class="back" href="../index.html#projects" title="TEAM 페이지(축제 지도)로 이동">COLLEGE FESTIVAL 2031</a>
+  </span>
+  <a class="brand" href="#top">KNOBLE</a>
+  <nav class="tabs" aria-label="섹션">
+    <a href="#problem">문제</a><a href="#doyun">페르소나</a><a href="#day" class="hot">도윤의 하루</a><a href="#features">기능</a><a href="#guide">사용법</a><a href="#system">작동</a><a href="#viewer" class="hot2">3D 체험</a><a href="#spec">사양</a>
+  </nav>
+  <i class="progress" id="progress"></i>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="top">
+  <div class="hero-copy">
+    <span class="pill rise" style="--d:0">PRODUCT 01 · 입구 · PERSONAL AI</span>
+    <h1 class="split" data-split="chars">KNOBLE</h1>
+    <p class="tagline rise" style="--d:.5">지금의 나를, <em>손끝으로</em></p>
+    <p class="lead rise" style="--d:.65">AI는 어제의 나를 기억합니다. Knoble은 <b>지금</b> 원하는 상태를 손끝으로 전하고, AI가 그 의도에 맞춰 돕게 하는 손바닥만 한 오프라인 AI 기기예요.</p>
+    <div class="cta rise" style="--d:.8">
+      <a class="btn dark mag" href="#day">도윤의 하루 따라가기</a>
+      <a class="btn mag" href="#viewer">3D로 만져 보기</a>
+    </div>
+    <ul class="stats rise" style="--d:.95">
+      <li><b data-count="52">0</b><span>mm · 손바닥 크기</span></li>
+      <li><b data-count="45">0</b><span>개 패드</span></li>
+      <li><b data-count="0" data-suffix="">0</b><span>개 화면</span></li>
+      <li><b data-count="100" data-suffix="%">0</b><span>온디바이스 AI</span></li>
+    </ul>
+  </div>
+  <div class="hero-stage">
+    <canvas id="heroGL" aria-label="Knoble 3D 모델. 패드를 누른 채 움직이면 경로가 빛으로 남아요."></canvas>
+    <div class="hero-hud" id="heroHud"><small>CURRENT STATE</small><b id="hState">중립</b><span id="hCoord">업무 0 · 활동 0</span></div>
+    <p class="hero-hint" id="heroHint"><i></i>패드를 누른 채 움직여 보세요</p>
+    <div class="axis-tag t">활동</div><div class="axis-tag b">휴식</div><div class="axis-tag l">업무</div><div class="axis-tag r">오락</div>
+    <div class="loading" id="heroLoading"><i></i>LOADING</div>
+  </div>
+  <a class="scroll-cue" href="#statement" aria-label="아래로"><span></span></a>
+</section>
+
+<!-- ============ STATEMENT ============ -->
+<section class="statement" id="statement">
+  <p class="scrub" id="scrub">AI는 어제의 나를 기억합니다. 하지만 오늘의 나는, 한 시간 전의 나와도 다를 수 있어요. 그래서 Knoble은 묻지 않고, 손끝으로 듣습니다.</p>
+</section>
+
+<!-- ============ PROBLEM ============ -->
+<section class="sec" id="problem">
+  <div class="sec-head"><span class="num reveal">01 · PROBLEM</span><h2 class="split">AI는 어제의 나를 기억합니다</h2>
+  <p class="reveal">2030년, 작은 MCU 기반 AI가 일상이 되었어요. 개인 AI는 지난 경험과 반복된 행동으로 판단하지만, 기록만으로는 <b>지금의 의도</b>를 알 수 없어요.</p></div>
+  <div class="mismatch reveal">
+    <div class="mm-tabs" role="tablist">
+      <button class="on" data-i="0">마감 1시간 전</button><button data-i="1">축제 입구</button><button data-i="2">밤 11시, 집</button>
+    </div>
+    <div class="mm-body">
+      <article class="mm-card past"><span>기록이 말하는 나</span><h3 id="mmPast">축제를 좋아하고, 늘 축제 소식을 챙긴다</h3><p id="mmPastAi">→ AI: 라인업 공개! 푸드트럭 위치 안내!</p></article>
+      <div class="mm-vs">≠</div>
+      <article class="mm-card now"><span>지금의 나</span><h3 id="mmNow">마감까지 집중하고 싶다</h3><p id="mmNowAi">→ 필요한 것: 조용한 한 시간</p></article>
+    </div>
+  </div>
+  <div class="cards two">
+    <article class="card tilt reveal"><span class="ic">🎪</span><h3>놀러 왔는데, 일이 따라와요</h3><p>축제를 운영해 본 적이 있다는 이유로, 즐기러 온 날에도 AI가 운영 점검과 부스 안내를 반복해요.</p></article>
+    <article class="card tilt reveal"><span class="ic">🧭</span><h3>지금의 마음은 기록에 없어요</h3><p>같은 사람이라도 오후엔 마감에 쫓기고, 저녁엔 놀고 싶고, 밤엔 쉬고 싶어요. 반복 행동은 그 변화를 따라가지 못해요.</p></article>
+  </div>
+</section>
+
+<!-- ============ PERSONA ============ -->
+<section class="sec" id="doyun">
+  <div class="sec-head"><span class="num reveal">02 · PERSONA</span><h2 class="split">이도윤을 소개할게요</h2></div>
+  <div class="persona reveal">
+    <figure class="pf"><img src="./assets/images/doyun.jpg" alt="이도윤"><figcaption><b>이도윤</b><span>Lee Doyun · 23 · 3학년</span></figcaption></figure>
+    <div class="pc">
+      <q>기기가 다 해 주니까 확실히 편하긴 한데, 직접 발견하는 재미도 잃고 싶지 않아.</q>
+      <p class="about">축제를 즐겨 본 적도, 운영해 본 적도, 준비해 본 적도 있어서 축제를 조금 다르게 봐요. 새로운 기술에 거부감은 없지만, 기기가 선택을 너무 대신하는 것에는 부담을 느껴요.</p>
+      <div class="tags"><span>호기심이 많음</span><span>사람들과 어울리는 걸 좋아함</span><span>관찰력이 좋음</span><span>계획적이지만 유연함</span><span>기술에 거부감 없음</span><span>기기가 다 정하는 건 불편함</span></div>
+      <div class="pgrid">
+        <div class="pg goal"><b>🎯 주요 목표</b><ul><li>친구들과 즐거운 추억 만들기</li><li>맛있는 음식과 다양한 부스 경험</li><li>공연을 편하게 관람하기</li><li>새로운 MCU 서비스를 직접 체험하고 평가하기</li></ul></div>
+        <div class="pg pain"><b>⚠️ 주요 불편</b><ul><li>사람이 몰려 대기 시간이 길어질 때</li><li>내 취향과 다른 추천만 계속 받을 때</li><li>기기가 내 선택을 너무 대신하는 느낌</li></ul></div>
+      </div>
+      <ol class="timeline"><li><span>1학년</span>친구들과 축제를 즐긴 방문객</li><li><span>2학년</span>학과 부스를 운영한 참여자</li><li><span>3학년</span>학생회로 축제를 준비한 기획자</li></ol>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DAY (cinematic) ============ -->
+<section class="cine" id="day">
+  <div class="cine-scroll" id="cineScroll">
+    <div class="cine-pin" id="cinePin">
+      <div class="cine-head" id="cineHead"><span class="num">03 · A DAY WITH KNOBLE</span><h2>도윤의 하루를 <em>함께</em> 보내요</h2><p>스크롤하면 하루가 시작돼요. 영상 속 기기를 직접 조작해 보세요.</p></div>
+      <div class="frame" id="frame">
+        <canvas id="amb" width="64" height="36" aria-hidden="true"></canvas>
+        <div class="film" id="film">
+          <video id="vid" playsinline muted preload="auto"></video>
+          <img id="poster" class="poster" src="./assets/images/p_ep1_a.jpg" alt="">
+          <canvas id="ix" width="1920" height="1080"></canvas>
+          <div class="laptop" id="laptop"><img src="./assets/images/f_laptop.jpg" alt=""><div class="screen" id="screen"></div></div>
+        </div>
+        <div class="scrim"></div>
+        <div class="chip" id="chip"><b id="chipEp">EP 01</b><span id="chipMeta">16:00 · 학생회실</span></div>
+        <div class="narr" id="narr" aria-live="polite"></div>
+        <div class="notes" id="notes"></div>
+        <div class="caption" id="caption"><span class="step" id="capStep"></span><p id="capText"></p><p class="ai" id="capAI"></p></div>
+        <div class="toast" id="toast"></div>
+        <nav class="rail" id="rail" aria-label="에피소드">
+          <button data-ep="0"><i><b></b></i><span>EP 01 · 과제 마무리</span></button>
+          <button data-ep="1"><i><b></b></i><span>EP 02 · 축제 입장</span></button>
+          <button data-ep="2"><i><b></b></i><span>EP 03 · 집에서 휴식</span></button>
+        </nav>
+        <div class="ctrl"><button id="bSound" class="sound">🔇 소리 켜기</button><button id="bAuto" class="gb">대신 보기</button><button id="bSkip" class="gb">건너뛰기</button></div>
+        <div class="tcard" id="tcard"><span id="tcEp">EP 02</span><b id="tcTime">18:30</b><h3 id="tcTitle">축제 입장</h3><p id="tcPlace">축제 정문</p></div>
+        <div class="startcard off" id="startcard"><button class="play" id="bStart" aria-label="재생">▶</button><p>재생하기</p></div>
+        <div class="outro" id="outro"><h3>도윤의 하루, 끝.</h3><p>같은 사람, 같은 하루. 원하는 상태는 세 번 바뀌었어요.</p><div><button class="btn" id="bReplay">처음부터 다시</button><a class="btn dark" href="#summary">하루 정리 보기 ↓</a></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SUMMARY ============ -->
+<section class="sec" id="summary">
+  <div class="sec-head"><span class="num reveal">04 · ONE DAY, THREE STATES</span><h2 class="split">하루 동안 세 번 바뀐 마음</h2>
+  <p class="reveal">같은 AI가 도윤이 그린 위치에 따라 다가가기도, 물러나기도 했어요.</p></div>
+  <div class="summary">
+    <div class="sum-map reveal" id="sumMap"></div>
+    <div class="sum-rows">
+      <div class="row reveal" style="--c:#9b7cf5"><span class="tag">EP 01 · 업무·활동</span><div><del>라인업 공개 · 부스 체크리스트 · 단톡 12</del><b>알림 23개 보류 · 마감까지 집중</b><small>AI 제안을 받아들였어요</small></div></div>
+      <div class="row reveal" style="--c:#f07fb8"><span class="tag">EP 02 · 오락·활동</span><div><del>운영 점검 18:00 · 재고 확인 · 스태프 단톡</del><b>메인 공연 19:30 · 나머지는 직접 둘러보세요</b><small>AI는 안내를 하나만 남겼어요</small></div></div>
+      <div class="row reveal" style="--c:#6fb5ee"><span class="tag">EP 03 · 휴식</span><div><del>내일 회의 자료 · 사진 52장 업로드 · 단톡 34</del><b>조명은 낮게, 음악은 잔잔하게</b><small>AI 제안을 거절해도 괜찮았어요</small></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FEATURES ============ -->
+<section class="sec" id="features">
+  <div class="sec-head"><span class="num reveal">05 · FEATURES</span><h2 class="split">고르지 않고, 그려서 전해요</h2><p class="reveal">카드 속 패드를 직접 눌러 보세요.</p></div>
+  <div class="cards three">
+    <article class="card feat tilt reveal">
+      <div class="viz" id="vizMap"></div><output class="vout" id="mapOut">칸 위에 올려 보세요</output>
+      <span class="k">01</span><h3>두 축 상태 지도</h3>
+      <p>업무↔오락, 휴식↔활동 두 축 위에 45칸. 네 모드 중 하나가 아니라 <b>위치</b>로 조합과 강도를 전해요. 모서리 4칸을 비워 입력 영역이 원에 가까워요.</p>
+    </article>
+    <article class="card feat tilt reveal">
+      <div class="viz" id="vizPath"></div><output class="vout" id="pathOut"><span>경로 <b id="pLen">0</b>칸</span><span>머문 시간 <b id="pDw">0.0</b>초</span><span>망설임 <b id="pRev">0</b>회</span></output>
+      <span class="k">02</span><h3>경로까지 읽는 입력</h3>
+      <p>마지막 위치뿐 아니라 <b>지나간 경로, 머문 시간, 방향을 바꾼 망설임</b>까지 읽어요. 마음을 단정하는 근거가 아니라, 의도를 더 신중하게 추정하는 단서로만 써요.</p>
+      <button class="mini" id="pReplay">↻ 다시 그리기</button>
+    </article>
+    <article class="card feat tilt reveal">
+      <div class="viz" id="vizSuggest"></div>
+      <label class="switch"><input type="checkbox" id="dl" checked><i></i><span>마감 1시간 전</span></label>
+      <span class="k">03</span><h3>AI의 빛 제안</h3>
+      <p>마감이 가까운데 오락 쪽을 고르면, AI가 업무 쪽 칸을 <b>보랏빛</b>으로 제안해요. 사용자는 두 빛을 비교하고 직접 결정해요. 오른쪽 칸을 눌러 보세요.</p>
+    </article>
+  </div>
+</section>
+
+<!-- ============ STATE GUIDE ============ -->
+<section class="sec" id="guide">
+  <div class="sec-head"><span class="num reveal">06 · HOW TO READ & USE</span><h2 class="split">상태는 이렇게 읽고, 이렇게 전해요</h2></div>
+  <div class="guide reveal">
+    <div class="quad" id="quad">
+      <button class="q tl" data-q="tl"><b>업무 · 활동</b><span>과제에 집중</span></button>
+      <button class="q tr" data-q="tr"><b>오락 · 활동</b><span>축제를 적극적으로</span></button>
+      <button class="q bl" data-q="bl"><b>업무 · 휴식</b><span>쉬면서 남은 일 확인</span></button>
+      <button class="q br" data-q="br"><b>오락 · 휴식</b><span>여유롭게 둘러보기</span></button>
+      <button class="q c" data-q="c"><b>중립</b></button>
+      <i class="ax h"></i><i class="ax v"></i>
+    </div>
+    <div class="qinfo" id="qinfo">
+      <span class="tagq" id="qTag">업무 · 활동</span><h3 id="qTitle">과제에 집중</h3><p id="qDesc">마감, 과제, 몰입이 필요한 순간이에요.</p>
+      <ul id="qList"><li>🔕 알림: 급한 것만 남기고 보류</li><li>🧭 안내: 남은 할 일과 마감 시간</li><li>💡 환경: 밝고 차분한 조명</li></ul>
+      <div class="lv"><span>강도</span><i class="on">1 약하게</i><i>2 보통</i><i>3 강하게</i><small>중앙에서 멀수록 강해져요</small></div>
+    </div>
+  </div>
+  <ol class="howto">
+    <li class="reveal"><div class="hg g1"></div><span>01</span><h3>누르기</h3><p>원하는 상태 위치의 패드를 눌러요. 중앙에서 멀수록 그 성향이 강해요.</p></li>
+    <li class="reveal"><div class="hg g2"></div><span>02</span><h3>쓸기</h3><p>손을 떼지 않고 쓸어 위치를 옮겨요. 지나간 칸에 빛의 궤적이 남아요.</p></li>
+    <li class="reveal"><div class="hg g3"></div><span>03</span><h3>비교하기</h3><p>AI가 다른 빛으로 제안하면, 내 위치와 제안을 나란히 비교해요.</p></li>
+    <li class="reveal"><div class="hg g4"></div><span>04</span><h3>확정하기</h3><p>손을 떼거나 꾹 누르면 확정. 최종 지점이 가장 밝게 숨 쉬어요.</p></li>
+  </ol>
+  <div class="lightlang reveal">
+    <h3>빛의 언어</h3>
+    <div class="ll">
+      <figure><i class="sw s1"></i><figcaption><b>기본</b>4색 파스텔 지도가 은은하게</figcaption></figure>
+      <figure><i class="sw s2"></i><figcaption><b>경로</b>최근 칸일수록 진하게</figcaption></figure>
+      <figure><i class="sw s3"></i><figcaption><b>최종 지점</b>가장 밝게, 숨 쉬듯</figcaption></figure>
+      <figure><i class="sw s4"></i><figcaption><b>AI 제안</b>보랏빛 깜빡임</figcaption></figure>
+      <figure><i class="sw s5"></i><figcaption><b>확정</b>한 번 반짝</figcaption></figure>
+      <figure><i class="sw s6"></i><figcaption><b>테두리 빛점</b>방향과 상태 알림</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SYSTEM ============ -->
+<section class="sec" id="system">
+  <div class="sec-head"><span class="num reveal">07 · SYSTEM</span><h2 class="split">손끝 → 판단 → 빛과 환경</h2></div>
+  <div class="sys">
+    <div class="io reveal">
+      <div class="col"><h4>INPUT</h4><ul><li>패드 위치 <small>(두 축 좌표)</small></li><li>이동 경로</li><li>머문 시간</li><li>방향 전환 · 망설임</li><li>일정 · 마감 맥락</li></ul></div>
+      <div class="core"><i></i><b>On-device AI</b><span>오프라인 MCU</span><small>데이터는 기기 밖으로 나가지 않아요</small></div>
+      <div class="col"><h4>OUTPUT</h4><ul><li>패드 빛 <small>(선택 · 제안)</small></li><li>테두리 빛점</li><li>알림 정책</li><li>안내의 양</li><li>조명 · 스피커</li></ul></div>
+    </div>
+    <div class="layers" id="layers" aria-label="빛이 나오는 층 구조">
+      <div class="ly" style="--i:0"><b>패드 45개</b><span>젖빛 반투명 · 4.4mm · 0.5mm 눌림</span></div>
+      <div class="ly" style="--i:1"><b>상판 커버</b><span>반투명 · 빛이 한 번 더 퍼짐 · 축 아이콘 인쇄</span></div>
+      <div class="ly air" style="--i:2"><b>공기층 2.8mm</b><span>빛이 부드럽게 섞이는 거리</span></div>
+      <div class="ly glow" style="--i:3"><b>발광면 + 테두리 링</b><span>4색 파스텔 지도 · 라벤더 빛점</span></div>
+      <div class="ly base" style="--i:4"><b>트레이 · 배터리 · USB-C</b><span>오팔 화이트 하우징</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3D VIEWER ============ -->
+<section class="sec viewer-sec" id="viewer">
+  <div class="sec-head"><span class="num reveal">08 · HANDS-ON</span><h2 class="split">직접 만져 보세요</h2><p class="reveal">돌려 보고, 분해해 보고, 빛을 켜고 그려 보세요. 점을 누르면 부품 설명이 나와요.</p></div>
+  <div class="viewer reveal" id="viewerBox">
+    <canvas id="viewGL" aria-label="Knoble 3D 뷰어"></canvas>
+    <div class="hots" id="hots">
+      <button data-h="pads" data-part="pads">1</button><button data-h="axis" data-part="Body2">2</button><button data-h="ring" data-part="Body5">3</button>
+      <button data-h="panel" data-part="Body4">4</button><button data-h="usb" data-part="Body287">5</button><button data-h="core" data-part="Body1">6</button>
+    </div>
+    <div class="vpanel" id="vpanel"><span id="vpN">1</span><h4 id="vpT">패드 45개</h4><p id="vpD">4.4mm 젖빛 반투명 키캡. 정전식으로 터치와 경로를 감지하고, 0.5mm 눌려 확정 입력을 받아요.</p></div>
+    <div class="vtools">
+      <div class="grp"><small>시점</small><button data-view="3q" class="on">3/4</button><button data-view="top">윗면</button><button data-view="side">측면</button><button data-view="bottom">바닥</button></div>
+      <div class="grp"><small>빛</small><button data-mode="base" class="on">기본</button><button data-mode="draw">그려 보기</button><button data-mode="ai">AI 제안</button><button data-mode="off">끄기</button></div>
+      <div class="grp range"><small>분해</small><input type="range" id="explode" min="0" max="100" value="0" aria-label="분해 정도"><output id="exOut">0%</output></div>
+    </div>
+    <div class="vhud" id="vhud"><small>STATE</small><b id="vState">중립</b><span id="vCoord">업무 0 · 활동 0</span></div>
+    <p class="vhint" id="vhint">드래그해서 돌리기 · 휠/핀치로 확대</p>
+    <div class="loading" id="viewLoading"><i></i>LOADING</div>
+  </div>
+</section>
+
+<!-- ============ DESIGN ============ -->
+<section class="sec" id="design">
+  <div class="sec-head"><span class="num reveal">09 · DESIGN</span><h2 class="split">손끝과 빛만으로</h2>
+  <p class="reveal">복잡한 화면이나 긴 설명 대신, 부드러운 곡면과 오팔빛 화이트, 반투명 패드 안에서 퍼지는 파스텔 빛으로 대화해요.</p></div>
+  <div class="design">
+    <figure class="dimfig reveal" id="dimFig"></figure>
+    <div class="cmf">
+      <div class="mat reveal"><i style="background:linear-gradient(135deg,#fffdf9,#efe9e1)"></i><b>오팔 화이트 셸</b><span>따뜻한 화이트 · 클리어코트 광택 · 조약돌 곡면</span></div>
+      <div class="mat reveal"><i style="background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(230,226,245,.8));box-shadow:inset 0 0 0 1px #e5e1f3"></i><b>젖빛 반투명 패드</b><span>빛을 머금는 매트 표면 · 살짝 볼록한 윗면</span></div>
+      <div class="mat reveal"><i style="background:linear-gradient(135deg,#B79CF5,#F59CCB 45%,#F8B98F 70%,#7EC3F2)"></i><b>4색 파스텔 발광</b><span>보라 · 분홍 · 피치 · 하늘 — 네 영역의 기본 색</span></div>
+      <div class="mat reveal"><i style="background:radial-gradient(circle at 30% 30%,#a99cff,#e9e5ff 60%)"></i><b>라벤더 빛점</b><span>테두리 링을 따라 움직이는 상태 표시</span></div>
+      <div class="gal reveal"><img src="./assets/images/knoble_3q.webp" alt="3/4"><img src="./assets/images/knoble_side.webp" alt="측면"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SPEC ============ -->
+<section class="sec" id="spec">
+  <div class="sec-head"><span class="num reveal">10 · SPEC</span><h2 class="split">사양</h2></div>
+  <div class="specs">
+    <div class="sg reveal"><h4>본체</h4><dl><dt>크기</dt><dd>52 × 52 × 15.5 mm</dd><dt>형태</dt><dd>둥근 사각 조약돌형</dd><dt>컬러 · 소재</dt><dd>오팔 화이트 · 반투명 패드</dd><dt>무게</dt><dd><i class="tbd">미정</i></dd></dl></div>
+    <div class="sg reveal"><h4>입력</h4><dl><dt>패드</dt><dd>45개 (7×7, 모서리 4칸 제외)</dd><dt>크기 · 간격</dt><dd>4.4 mm · 4.8 mm</dd><dt>감지</dt><dd>정전식 터치 · 경로 · 머문 시간</dd><dt>확정</dt><dd>손 떼기 · 길게 · 0.5mm 눌림</dd></dl></div>
+    <div class="sg reveal"><h4>빛</h4><dl><dt>발광면</dt><dd>4색 파스텔 지도 (패드 하부)</dd><dt>확산</dt><dd>공기층 2.8mm + 젖빛 커버 2중</dd><dt>테두리</dt><dd>링 빛점 · 상태 표시</dd><dt>축 표시</dt><dd>상판 인쇄 아이콘 4종</dd></dl></div>
+    <div class="sg reveal"><h4>AI · 연결 · 전원</h4><dl><dt>연산</dt><dd>오프라인 MCU AI</dd><dt>개인정보</dt><dd>외부 전송 없음</dd><dt>연결</dt><dd>알림 · 조명 · 스피커</dd><dt>충전</dt><dd>USB-C</dd><dt>배터리</dt><dd><i class="tbd">미정</i></dd></dl></div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="sec" id="faq">
+  <div class="sec-head"><span class="num reveal">11 · Q&amp;A</span><h2 class="split">Q&amp;A</h2></div>
+  <div class="faq">
+    <details class="reveal"><summary>AI가 제 마음을 판단하는 건가요?</summary><p>아니에요. 경로와 머문 시간은 마음을 단정하는 근거가 아니라, 의도를 더 신중하게 추정하기 위한 단서예요. 최종 상태는 언제나 사용자가 손을 떼는 위치로 정해져요.</p></details>
+    <details class="reveal"><summary>AI의 제안을 거절하면 어떻게 되나요?</summary><p>그대로 존중해요. 제안의 빛은 조용히 사라지고, 미룬 일은 사용자가 정한 때(예: 다음 날 아침)에 다시 알려 줘요.</p></details>
+    <details class="reveal"><summary>화면이 없는데 상태를 어떻게 알 수 있나요?</summary><p>빛으로 알려 줘요. 지나간 경로는 시간 순으로, 최종 지점은 가장 밝게 숨 쉬듯, AI 제안은 보랏빛으로 깜빡여요. 테두리 빛점은 방향을 보여 줘요.</p></details>
+    <details class="reveal"><summary>데이터는 어디로 가나요?</summary><p>어디로도 가지 않아요. 기기 안의 MCU에서 바로 처리하는 오프라인 AI라서, 입력과 판단 기록이 외부 서버로 전송되지 않아요.</p></details>
+    <details class="reveal"><summary>왜 네 가지 모드 버튼이 아닌가요?</summary><p>사람의 상태는 딱 넷으로 나뉘지 않아요. 업무와 활동 사이, 휴식에 가까운 오락처럼 조합과 정도가 있어서, 45칸의 위치로 세밀하게 전하도록 했어요.</p></details>
+  </div>
+</section>
+
+<footer class="foot">
+  <p class="quote split">AI가 선택을 대신하는 것이 아니라, 지금의 의도를 더 잘 전하고 함께 판단하는 것.</p>
+  <div><a class="btn mag" href="#top">↑ 맨 위로</a><a class="btn dark mag" href="#day">도윤의 하루 다시 보기</a></div>
+  <small>College Festival 2031 · PRODUCT 01 · KNOBLE</small>
+</footer>
+
+<script src="./assets/models/knoble-model.js" defer></script>
+<script src="./assets/js/knoble.bundle.js" defer></script>
+</body>
+</html>

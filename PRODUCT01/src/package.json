@@ -1,0 +1,8 @@
+{
+  "name": "knoble-product01",
+  "private": true,
+  "scripts": {
+    "build": "esbuild app.js --bundle --format=iife --minify --target=es2020 --outfile=../assets/js/knoble.bundle.js"
+  },
+  "devDependencies": { "three": "0.170.0", "esbuild": "^0.24.0" }
+}
