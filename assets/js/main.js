@@ -360,7 +360,7 @@ vec3 lsp(vec3 p){p-=vec3(500.,500.,0.);return vec3(dot(p,uU)/1150.,dot(p,uV)/115
   // main pass
   const vs=`attribute vec4 a;uniform mat4 uM;varying vec3 vP;varying float vCat;void main(){vec3 p=a.xyz/16.;vP=p;vCat=a.w;gl_Position=uM*vec4(p,1.);}`;
   const fs=`${der?'#extension GL_OES_standard_derivatives : enable\n':''}precision highp float;
-varying vec3 vP;varying float vCat;uniform vec3 uView,uHL,uCam;uniform float uFog,uTime,uMaskOn;uniform sampler2D uMask;uniform sampler2D uSh;uniform float uTx;${LS}
+varying vec3 vP;varying float vCat;uniform vec3 uView,uHL,uCam;uniform float uFog,uTime,uMaskOn,uNight;uniform sampler2D uMask;uniform sampler2D uSh;uniform float uTx;${LS}
 float unpack(vec4 c){return dot(c,vec4(1.,1./255.,1./65025.,1./16581375.));}
 float shadowAt(vec3 s,float bias){float lit=0.;
   for(int i=0;i<4;i++){vec2 o=vec2(mod(float(i),2.)-.5,floor(float(i)/2.)-.5)*uTx*1.2;lit+=step(s.z-bias,unpack(texture2D(uSh,s.xy*.5+.5+o)));}
@@ -431,10 +431,14 @@ ${der?'vec3 n=normalize(cross(dFdx(vP),dFdy(vP)));if(dot(n,uCam-vP)<0.)n=-n;':'v
   else {cL=vec3(1.,.99,1.);cS=vec3(.88,.87,.98);}                        // canopy membrane
   vec3 col=mix(cS,cL,lit);
   col=mix(col,vec3(1.,.93,.86),hi*.35*(1.-emi));
+  float gold=sin(3.1416*clamp(uNight*1.6,0.,1.))*(1.-uNight);
+  col*=mix(vec3(1.),vec3(1.06,.93,.90),gold*.8);
+  col=mix(col,col*vec3(.34,.32,.56)+vec3(.015,.01,.05),uNight*.88);
+  float sd=length(vP.xy-vec2(626.,268.));col+=vec3(.55,.30,.62)*exp(-sd/38.)*uNight*.55*step(vP.z,20.);
   col=mix(col,ecol,emi);
   float hl=uHL.z*(1.-smoothstep(36.,100.,length(vP.xy-uHL.xy)));
   col=mix(col,mix(vec3(.74,.84,.97),vec3(.95,.76,.91),clamp(vP.z/80.,0.,1.)),hl*(vCat<.5?.5:.62));
-  col=mix(col,vec3(.975,.935,.955),smoothstep(240.,1100.,length(uCam-vP))*.8*uFog);
+  col=mix(col,mix(vec3(.975,.935,.955),vec3(.24,.20,.40),uNight),smoothstep(240.,1100.,length(uCam-vP))*.8*uFog);
   float r=length(vP.xy-500.);
   col=mix(col,vec3(.975,.91,.94),smoothstep(380.,700.,r)*.55);
   float al=1.-smoothstep(560.,780.,r);gl_FragColor=vec4(col*al,al);}`;
@@ -455,7 +459,7 @@ ${der?'vec3 n=normalize(cross(dFdx(vP),dFdy(vP)));if(dot(n,uCam-vP)<0.)n=-n;':'v
   g.useProgram(sp);const sl=g.getAttribLocation(sp,'a');g.enableVertexAttribArray(sl);g.vertexAttribPointer(sl,4,g.SHORT,false,0,0);
   g.uniform3fv(g.getUniformLocation(sp,'uL'),L);g.uniform3fv(g.getUniformLocation(sp,'uU'),U);g.uniform3fv(g.getUniformLocation(sp,'uV'),V);
   g.drawElements(g.TRIANGLES,idx.length,g.UNSIGNED_SHORT,0);g.bindFramebuffer(g.FRAMEBUFFER,null);
-  const u={};['uM','uCam','uFog','uTime','uMaskOn','uMask','uView','uHL','uSh','uTx','uL','uU','uV'].forEach(k=>u[k]=g.getUniformLocation(pr,k));
+  const u={};['uM','uCam','uFog','uTime','uMaskOn','uMask','uNight','uView','uHL','uSh','uTx','uL','uU','uV'].forEach(k=>u[k]=g.getUniformLocation(pr,k));
   g.useProgram(pr);g.uniform3fv(u.uL,L);g.uniform3fv(u.uU,U);g.uniform3fv(u.uV,V);g.uniform1i(u.uSh,0);g.uniform1f(u.uTx,1/SZ);
   MGL={g,cv,pr,vb,ib,tex,n:idx.length,u,loc:g.getAttribLocation(pr,'a'),hl:0,hx:500,hy:500,w:1,h:1,mask:null};
   g.uniform1i(u.uMask,1);
@@ -522,6 +526,56 @@ gl_FragColor=vec4(min(c,1.),1.);}`;
   g.bindBuffer(g.ELEMENT_ARRAY_BUFFER,MGL.ib);
   FP.ready=true;
 })();
+/* ---- crowd in the fenced pit in front of the stage (fills up as night falls) ---- */
+const PIT={x0:574,x1:662,y0:271,y1:335};
+(function initCrowd(){
+  if(!MGL)return;const g=MGL.g;
+  const vs=`attribute vec3 aB,aO;attribute vec4 aI;uniform mat4 uM;uniform float uT,uC,uN;varying vec3 vW;varying vec4 vI;
+void main(){vI=aI;if(aI.z>uC){gl_Position=vec4(2.,2.,2.,1.);return;}
+float ex=.25+.75*uN, ph=aI.x*6.2831;
+float jump=max(0.,sin(uT*5.2+ph))*1.1*ex*step(.45,fract(aI.x*7.3));
+float sway=sin(uT*2.1+ph)*.35*ex;
+vec3 o=aO; if(aI.w>1.5){o.z+=sin(uT*3.+ph)*.5*ex;o.x+=sin(uT*3.+ph)*.4*ex;}
+vec3 p=aB+o+vec3(sway*(o.z/7.),0.,jump);vW=p;gl_Position=uM*vec4(p,1.);}`;
+  const fs=`#extension GL_OES_standard_derivatives : enable
+precision highp float;varying vec3 vW;varying vec4 vI;uniform vec3 uL;uniform float uN;
+void main(){vec3 n=normalize(cross(dFdx(vW),dFdy(vW)));if(n.z<0.&&abs(n.z)>.9)n=-n;
+float k=floor(vI.y*8.+.5);
+vec3 c=k<1.?vec3(.80,.78,1.):k<2.?vec3(1.,.80,.86):k<3.?vec3(.78,.92,.98):k<4.?vec3(1.,.90,.74):k<5.?vec3(.80,.94,.84):k<6.?vec3(.94,.80,.98):k<7.?vec3(.98,.97,1.):vec3(.62,.60,.82);
+if(vI.w>.5&&vI.w<1.5)c=vec3(.40,.34,.50);
+float lit=smoothstep(-.05,.15,dot(n,uL));c=mix(c*vec3(.78,.76,.92),c,lit);
+c=mix(c,c*vec3(.36,.33,.58),uN*.85);
+float rim=clamp(-n.y,0.,1.)*uN;c+=rim*vec3(.85,.45,.85)*.55;
+if(vI.w>2.5){c=mix(vec3(.9,.92,1.),vec3(1.,1.,1.2),uN);}
+gl_FragColor=vec4(min(c,1.),1.);}`;
+  const mk=(t,s)=>{const o=g.createShader(t);g.shaderSource(o,s);g.compileShader(o);if(!g.getShaderParameter(o,g.COMPILE_STATUS))console.warn(g.getShaderInfoLog(o));return o};
+  const p=g.createProgram();g.attachShader(p,mk(g.VERTEX_SHADER,vs));g.attachShader(p,mk(g.FRAGMENT_SHADER,fs));g.linkProgram(p);
+  if(!g.getProgramParameter(p,g.LINK_STATUS))return;
+  let seed=7;const R=()=>(seed=(seed*16807)%2147483647)/2147483647;
+  const D=[];
+  const push=(b,o,inf)=>D.push(b[0],b[1],b[2],o[0],o[1],o[2],inf[0],inf[1],inf[2],inf[3]);
+  const prism=(b,inf,r0,r1,z0,z1,sides,part)=>{const P=[];for(let i=0;i<sides;i++){const a=i/sides*Math.PI*2;P.push([Math.cos(a),Math.sin(a)*.72])}
+    for(let i=0;i<sides;i++){const a=P[i],c=P[(i+1)%sides];const q=[[a[0]*r0,a[1]*r0,z0],[c[0]*r0,c[1]*r0,z0],[c[0]*r1,c[1]*r1,z1],[a[0]*r1,a[1]*r1,z1]];
+      [q[0],q[1],q[2],q[0],q[2],q[3]].forEach(o=>push(b,o,[inf[0],inf[1],inf[2],part]))}
+    for(let i=1;i<sides-1;i++)[[P[0][0]*r1,P[0][1]*r1,z1],[P[i][0]*r1,P[i][1]*r1,z1],[P[i+1][0]*r1,P[i+1][1]*r1,z1]].forEach(o=>push(b,o,[inf[0],inf[1],inf[2],part]))};
+  const head=(b,inf,z,r)=>{const V=[[0,0,z+r*1.15],[r,0,z],[0,r,z],[-r,0,z],[0,-r,z],[0,0,z-r*.9]];
+    [[0,1,2],[0,2,3],[0,3,4],[0,4,1],[5,2,1],[5,3,2],[5,4,3],[5,1,4]].forEach(f=>f.forEach(i=>push(b,V[i],[inf[0],inf[1],inf[2],1])))};
+  for(let y=PIT.y0;y<=PIT.y1;y+=2.7)for(let x=PIT.x0;x<=PIT.x1;x+=2.5){
+    const front=(y-PIT.y0)/(PIT.y1-PIT.y0); if(R()>.92-front*.35)continue;
+    const b=[x+(R()-.5)*1.8,y+(R()-.5)*1.8,0], hgt=.88+R()*.24, inf=[R(),Math.floor(R()*8)/8+.01,R()*.75+front*.25];
+    prism(b,inf,.78*hgt,.9*hgt,0,4.9*hgt,6,0); head(b,inf,5.75*hgt,.72*hgt);
+    if(R()<.32){const side=R()<.5?-1:1;prism([b[0]+side*.95*hgt,b[1],b[2]],inf,.28,.24,4.2*hgt,7.6*hgt,4,2);
+      if(R()<.6){const z=7.7*hgt;[[-.35,0,z],[.35,0,z],[.35,0,z+.75],[-.35,0,z],[.35,0,z+.75],[-.35,0,z+.75]].forEach(o=>push([b[0]+side*.95*hgt,b[1]-.3,b[2]],o,[inf[0],inf[1],inf[2],3]))}}
+  }
+  const buf=g.createBuffer();g.bindBuffer(g.ARRAY_BUFFER,buf);g.bufferData(g.ARRAY_BUFFER,new Float32Array(D),g.STATIC_DRAW);
+  FP.crowd={p,buf,n:D.length/10,u:Object.fromEntries(['uM','uT','uC','uN','uL'].map(k=>[k,g.getUniformLocation(p,k)])),a:['aB','aO','aI'].map(k=>g.getAttribLocation(p,k))};
+})();
+function drawCrowd(M,t){const C=FP.crowd;if(!C||(FP.crowdK||0)<.005)return;const g=MGL.g;
+  g.useProgram(C.p);g.uniformMatrix4fv(C.u.uM,false,new Float32Array(M));g.uniform1f(C.u.uT,t);g.uniform1f(C.u.uC,FP.crowdK);g.uniform1f(C.u.uN,FP.night||0);g.uniform3fv(C.u.uL,TOON_SUN);
+  g.bindBuffer(g.ARRAY_BUFFER,C.buf);C.a.forEach(a=>g.enableVertexAttribArray(a));
+  g.vertexAttribPointer(C.a[0],3,g.FLOAT,false,40,0);g.vertexAttribPointer(C.a[1],3,g.FLOAT,false,40,12);g.vertexAttribPointer(C.a[2],4,g.FLOAT,false,40,24);
+  g.drawArrays(g.TRIANGLES,0,C.n);C.a.forEach(a=>g.disableVertexAttribArray(a));}
+
 function drawMapGL(){
   if(!MGL)return;const {g,u}=MGL;
   const a=MGL.w/Math.max(1,MGL.h), P=M4.persp(FP.fov*Math.PI/180,a,FP.near||1.5,FP.far||3200);
@@ -531,10 +585,11 @@ function drawMapGL(){
   g.viewport(0,0,MGL.cv.width,MGL.cv.height);g.clearColor(0,0,0,0);g.clear(g.COLOR_BUFFER_BIT|g.DEPTH_BUFFER_BIT);g.enable(g.DEPTH_TEST);g.disable(g.CULL_FACE);
   g.useProgram(MGL.pr);g.activeTexture(g.TEXTURE0);g.bindTexture(g.TEXTURE_2D,MGL.tex);
   g.bindBuffer(g.ARRAY_BUFFER,MGL.vb);g.bindBuffer(g.ELEMENT_ARRAY_BUFFER,MGL.ib);g.enableVertexAttribArray(MGL.loc);g.vertexAttribPointer(MGL.loc,4,g.SHORT,false,0,0);
-  g.uniformMatrix4fv(u.uM,false,new Float32Array(M));g.uniform3f(u.uCam,e[0],e[1],e[2]);g.uniform1f(u.uFog,FP.fog??1);g.uniform1f(u.uTime,performance.now()/1000);g.uniform1f(u.uMaskOn,MGL.mask?1:0);if(MGL.mask){g.activeTexture(g.TEXTURE1);g.bindTexture(g.TEXTURE_2D,MGL.mask);g.activeTexture(g.TEXTURE0)}g.uniform3f(u.uHL,MGL.hx,MGL.hy,MGL.hl);
+  g.uniformMatrix4fv(u.uM,false,new Float32Array(M));g.uniform3f(u.uCam,e[0],e[1],e[2]);g.uniform1f(u.uFog,FP.fog??1);g.uniform1f(u.uNight,FP.night||0);g.uniform1f(u.uTime,performance.now()/1000);g.uniform1f(u.uMaskOn,MGL.mask?1:0);if(MGL.mask){g.activeTexture(g.TEXTURE1);g.bindTexture(g.TEXTURE_2D,MGL.mask);g.activeTexture(g.TEXTURE0)}g.uniform3f(u.uHL,MGL.hx,MGL.hy,MGL.hl);
   g.drawElements(g.TRIANGLES,MGL.n,g.UNSIGNED_SHORT,0);
   g.disableVertexAttribArray(MGL.loc);
   const t=performance.now()/1000;
+  drawCrowd(M,t);
   drawBeams(M,e,t);
   if(!FP.ready)return;
   g.useProgram(FP.ip);g.uniformMatrix4fv(FP.iu.uM,false,new Float32Array(M));g.uniform3f(FP.iu.uCam,e[0],e[1],e[2]);g.uniform3fv(FP.iu.uL,TOON_SUN);
@@ -570,7 +625,7 @@ void main(){float a=aT.y*6.2831853;vec3 p=uA+uD*aT.x*uL+(uU*cos(a)+uV*sin(a))*aT
     const tg=[f[0]+sw*26+(i-3.5)*4,f[1]+60+sw2*30,0];const d=sub3(tg,f),L=Math.hypot(...d),D=d.map(v=>v/L);
     const U=norm3(cross3(D,[0,0,1])),V=cross3(U,D);
     g.uniform3fv(B.u.uA,f);g.uniform3fv(B.u.uD,D);g.uniform3fv(B.u.uU,U);g.uniform3fv(B.u.uV,V);g.uniform1f(B.u.uL,L);g.uniform1f(B.u.uR,L*.09);
-    g.uniform3fv(B.u.uC,COL[i%4]);g.uniform1f(B.u.uK,.16*(.75+.25*Math.sin(t*2.1+i)));g.drawArrays(g.TRIANGLES,0,B.n)});
+    g.uniform3fv(B.u.uC,COL[i%4]);g.uniform1f(B.u.uK,(.12+.3*(FP.night||0))*(.75+.25*Math.sin(t*2.1+i)));g.drawArrays(g.TRIANGLES,0,B.n)});
   g.disableVertexAttribArray(B.a);g.depthMask(true);g.disable(g.BLEND);
 }
 function fpProject(p){const M=FP.M;if(!M)return null;const x=p[0],y=p[1],z=p[2];
@@ -928,7 +983,7 @@ function tickSystem2(now){
 }
 
 /* ======================= PROJECTS · first-person walk (scroll) ======================= */
-const pj={el:$('#projects'),p:0,t:0,stop:-2};
+const pj={el:$('#projects'),p:0,t:0,stop:-2}; const pjNight=$('#pjNight');
 const pjSticky=$('.pj-sticky'), pjHead=$('.pj-head'), pjTour=$('#pjTour'), ptK=$('#ptK'), ptN=$('#ptN'), ptO=$('#ptO'), ptGo=$('#ptGo'), fpHint=$('.map-hint');
 const PJ_KN=[.2,.36,.57,.77,.94]; let pjTourActive=false;                      // scroll progress: start of walk, each product, playground
 let FP_SK=null; const fpSK=()=>FP_SK||(FP_SK=[0,...fpStops(),FP.L]);
@@ -978,7 +1033,7 @@ function tickFP(now){
   let tgt=fpAt(s+46); tgt=[tgt[0],tgt[1],here[2]+FP_EYE-1.5];
   // turn toward the product at each stop, and toward the stage at the end
   PJ_KN.slice(1,4).forEach((kn,i)=>{const w=eIO(clamp(1-Math.abs(p-kn)/.075));if(w>0){const q=PRODUCTS[i].at;tgt=[lerp(tgt[0],q[0],w),lerp(tgt[1],q[1],w),lerp(tgt[2],q[2]+FP_ITEM_Z-1,w)]}});
-  const we=eIO(range(p,PJ_KN[3]+.05,PJ_KN[4])); tgt=[lerp(tgt[0],FP_STAGE[0],we),lerp(tgt[1],FP_STAGE[1],we),lerp(tgt[2],FP_STAGE[2]+6,we)];
+  const we=eIO(range(p,PJ_KN[3]+.05,PJ_KN[4])); eye[2]+=8*we; tgt=[lerp(tgt[0],FP_STAGE[0],we),lerp(tgt[1],FP_STAGE[1],we),lerp(tgt[2],FP_STAGE[2]+6,we)];
   // drag offsets ease back when the walk moves on
   if(Math.abs(s-(FP.ls??s))>.5&&now-(FP.lastDrag||0)>900){FP.yawT*=.9;FP.pitchT*=.9} FP.ls=s;
   FP.yaw=lerp(FP.yaw,FP.yawT,.12);FP.pitch=lerp(FP.pitch,FP.pitchT,.12);
@@ -989,6 +1044,9 @@ function tickFP(now){
   FP.cam=[lerp(O.e[0],eye[0],kx),lerp(O.e[1],eye[1],kx),lerp(O.e[2],eye[2],kz)];
   FP.look=[lerp(O.c[0],tgt[0],kx),lerp(O.c[1],tgt[1],kx),lerp(O.c[2],tgt[2],kz)];
   FP.fov=lerp(O.fv,mob?74:62,kd); FP.near=lerp(40,1.5,kd); FP.far=lerp(Math.hypot(...sub3(O.e,O.c))*2.2,3200,kd); FP.fog=eIn(range(k,.55,1));
+  FP.night=eIO(clamp((p-.26)/(.9-.26))); FP.crowdK=eIO(clamp((p-.3)/(.82-.3)));
+  pjNight.style.opacity=FP.night.toFixed(3); pjSky.style.setProperty('--dusk',(Math.sin(Math.PI*clamp(FP.night*1.6))*(1-FP.night)).toFixed(3));
+  pjSticky.classList.toggle('fp-dark',FP.night>.55);
   FP.items.forEach((it,i)=>{const tg=FP.act===i+1||FP.hover===i+1?1:0;it.glow=lerp(it.glow,tg,.08)});
   drawMapGL();
   if(k<1){let d='';for(let i=0;i<FP_PATH.length;i+=2){const q=fpProject([FP_PATH[i][0],FP_PATH[i][1],FP_PATH[i][2]+1]);if(q)d+=(d?'L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1)}
