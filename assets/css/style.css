@@ -1101,6 +1101,8 @@ body:has(#detail.open) .snd,body:has(#detail.open) .day-clock{opacity:0;pointer-
 /* ---- shooting stars that become the products ---- */
 .fp-stars{position:absolute;inset:0;z-index:7;pointer-events:none;overflow:hidden}
 .fp-star{position:absolute;left:0;top:0;opacity:0;will-change:transform}
+.fp-fly{position:absolute;left:0;top:0;width:360px;height:360px;opacity:0;pointer-events:none;transform-origin:180px 180px;will-change:transform,filter,opacity}
+.fp-star.p3 .head{display:none}.fp-star.p3 .tail{opacity:.7}
 .fp-star .head{position:absolute;left:-15px;top:-15px;width:30px;height:30px;border-radius:50%;
   background:radial-gradient(circle,#fff 0 28%,var(--c) 52%,rgba(255,255,255,0) 72%);box-shadow:0 0 18px 6px var(--g),0 0 44px 14px var(--g)}
 .fp-star .tail{position:absolute;right:0;top:-4px;height:8px;width:var(--tl,120px);border-radius:6px;

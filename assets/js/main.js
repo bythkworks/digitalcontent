@@ -554,6 +554,7 @@ gl_FragColor=vec4(min(c,1.),1.);}`;
     return {vb,ib,n:ix.length/2,glow:0,scr:[-999,-999,0],z:pr.at[2]??0}});
   g.bindBuffer(g.ELEMENT_ARRAY_BUFFER,MGL.ib);
   FP.ready=true;
+  if(window.Prod3D&&window.PROD_GLB)setTimeout(()=>{try{Prod3D.init({stage:mstage,flyHost:fpStars,models:PRODUCTS.map(pr=>({key:pr.model,b64:PROD_GLB[pr.model]}))})}catch(e){console.warn('prod3d',e)}},0);
 })();
 /* ---- crowd in the fenced pit in front of the stage (fills up as night falls) ---- */
 const PIT={x0:574,x1:662,y0:271,y1:335};
@@ -622,8 +623,9 @@ function drawMapGL(){
   drawBeams(M,e,t);
   if(!FP.ready)return;
   g.useProgram(FP.ip);g.uniformMatrix4fv(FP.iu.uM,false,new Float32Array(M));g.uniform3f(FP.iu.uCam,e[0],e[1],e[2]);g.uniform3fv(FP.iu.uL,TOON_SUN);
-  FP.items.forEach((it,i)=>{const pr=PRODUCTS[i],lf=FP.lift||0,S=STAGE_SLOTS[i],q=[lerp(pr.at[0],S[0],lf),lerp(pr.at[1],S[1],lf),lerp(pr.at[2],S[2],lf)],cf=ITEM_CFG[pr.model]||{s:4,tilt:.4}, z=q[2]+FP_ITEM_Z*(1-lf)+Math.sin(t*1.6+i*2)*1.2, sc=cf.s*(1+it.glow*.1);
-    const L=it.land??1; if(L<.003){const cl=fpProject([q[0],q[1],z]);it.scr=cl?[cl[0],cl[1],sc*cl[2]]:[-999,-999,0];return}
+  FP.items.forEach((it,i)=>{const pr=PRODUCTS[i],lf=FP.lift||0,S=STAGE_SLOTS[i],q=[lerp(pr.at[0],S[0],lf),lerp(pr.at[1],S[1],lf),lerp(pr.at[2],S[2],lf)],cf=ITEM_CFG[pr.model]||{s:4,tilt:.4}, ob=lerp(3.4,1,FP.kw??1), z=q[2]+(FP_ITEM_Z+cf.s*(ob-1)*.8)*(1-lf)+Math.sin(t*1.6+i*2)*1.2, sc=cf.s*ob*(1+it.glow*.1);
+    const L=it.land??1; it.pose={pos:[q[0],q[1],z],rz:t*.8+i*2.1+(1-Math.min(1,L))*4,tilt:cf.tilt+Math.sin(t*.7+i)*.08,scale:sc,land:L};
+    if(L<.003||(window.Prod3D&&Prod3D.ready)){const cl=fpProject([q[0],q[1],z]);it.scr=cl?[cl[0],cl[1],sc*cl[2]]:[-999,-999,0];return}
     const W=M4.mul(M4.tr(q[0],q[1],z),M4.mul(M4.rz(t*.8+i*2.1+(1-Math.min(1,L))*4),M4.mul(M4.rx(cf.tilt+Math.sin(t*.7+i)*.08),M4.mul(M4.sc(sc*L),[1,0,0,0,0,-1,0,0,0,0,1,0,0,0,0,1]))));
     g.uniformMatrix4fv(FP.iu.uW,false,new Float32Array(W));g.uniform1f(FP.iu.uGlow,it.glow);
     g.bindBuffer(g.ARRAY_BUFFER,it.vb);g.bindBuffer(g.ELEMENT_ARRAY_BUFFER,it.ib);FP.ia.forEach(a=>g.enableVertexAttribArray(a));
@@ -1045,12 +1047,15 @@ fpStars.innerHTML=[0,1,2].map(i=>`<div class="fp-star s${i}"><i class="tail"></i
 const fpStarEl=$$('.fp-star',fpStars), fpBurstEl=$$('.fp-burst',fpStars), FS={t0:0};
 const backOut=x=>{const c=1.9;return 1+(c+1)*Math.pow(x-1,3)+c*Math.pow(x-1,2)};
 function tickStars(now,top,p){
-  if(top>VH*.4){if(FS.t0){FS.t0=0;FP.items.forEach(it=>{it.land=0;it.lt=0;it.fell=0});fpStarEl.forEach(e=>e.style.opacity=0)}return}
+  if(top>VH*.4){if(FS.t0){FS.t0=0;FP.items.forEach((it,i)=>{it.land=0;it.lt=0;it.fell=0;it.wind=0;if(window.Prod3D&&Prod3D.ready)Prod3D.flyFrame(i,{on:false})});FP.shake=0;fpStarEl.forEach(e=>e.style.opacity=0)}return}
   if(!FS.t0){FS.t0=(p>.12||reduce)?now-1e5:now+200;FP.items.forEach(it=>{it.land=0;it.lt=0;it.fell=0})}
   FP.items.forEach((it,i)=>{const el=fpStarEl[i],DUR=2.4,u=((now-FS.t0)/1000-i*.28)/DUR;
-    if(it.lt){it.land=Math.min(1.05,backOut(clamp((now-it.lt)/700)));if(now-it.lt>700)it.land=1;el.style.opacity=0;return}
-    if(u<0){it.land=0;el.style.opacity=0;it.pv=null;return}
+    const P3=window.Prod3D&&Prod3D.ready;
+    if(it.lt){it.land=Math.min(1.05,backOut(clamp((now-it.lt)/700)));if(now-it.lt>700)it.land=1;el.style.opacity=0;
+      if(P3){const fo=1-clamp((now-it.lt)/260);Prod3D.flyFrame(i,fo>0?Object.assign({},it.fs,{op:fo}):{on:false})}it.wind=0;return}
+    if(u<0){it.land=0;el.style.opacity=0;it.pv=null;it.wind=0;if(P3)Prod3D.flyFrame(i,{on:false});return}
     const [tx,ty]=it.scr; if(u>=1||tx<-900){it.lt=now-(u>3?1e4:0);el.style.opacity=0;
+      if(P3&&u>=3)Prod3D.flyFrame(i,{on:false});
       if(u<3){const b=fpBurstEl[i];b.style.transform=`translate(${tx.toFixed(1)}px,${ty.toFixed(1)}px)`;b.classList.remove('go');void b.offsetWidth;b.classList.add('go');if(typeof Sound!=='undefined')Sound.play('star',i)}return}
     if(!it.fell){it.fell=1;if(typeof Sound!=='undefined')Sound.play('fall',i)}
     // enters from beside the camera (huge, out of focus), spirals close to the lens, then recedes into the map to its spot
@@ -1061,10 +1066,17 @@ function tickStars(now,top,p){
     const sc=lerp(7,1,1-Math.pow(1-d,2.2));          // perspective: near → far
     const pv=it.pv||[x,y]; const vx=x-pv[0], vy=y-pv[1]; it.pv=[x,y];
     const ang=Math.atan2(vy,vx)*180/Math.PI, sp=Math.min(1,Math.hypot(vx,vy)/40);
-    el.style.opacity=(Math.min(1,u*8)).toFixed(3);
-    el.style.transform=`translate(${x.toFixed(1)}px,${y.toFixed(1)}px) rotate(${ang.toFixed(1)}deg) scale(${sc.toFixed(3)})`;
-    el.style.filter=sc>1.6?`blur(${((sc-1.6)*.9).toFixed(2)}px)`:'none';
-    el.style.setProperty('--tl',(40+180*sp).toFixed(0)+'px')});
+    el.style.opacity=(Math.min(1,u*8)*(P3?.55:1)).toFixed(3); el.classList.toggle('p3',!!P3);
+    el.style.transform=`translate(${x.toFixed(1)}px,${y.toFixed(1)}px) rotate(${ang.toFixed(1)}deg) scale(${(P3?1:sc).toFixed(3)})`;
+    el.style.filter=!P3&&sc>1.6?`blur(${((sc-1.6)*.9).toFixed(2)}px)`:'none';
+    el.style.setProperty('--tl',(40+180*sp).toFixed(0)+'px');
+    // the real product shape: huge and soft near the lens, sharp and small as it reaches its spot
+    const Dn=Math.min(VW,VH)*1.05, Df=Math.max(8,(it.scr[2]||8)*2.1), px=Math.exp(lerp(Math.log(Dn),Math.log(Df),1-Math.pow(1-d,2.2)));
+    const near=clamp((px-Math.min(VW,VH)*.28)/(Math.min(VW,VH)*.7));
+    it.wind=near*Math.min(1,sp*1.4);
+    if(it.wind>.5&&!it.gust){it.gust=1;if(typeof Sound!=='undefined')Sound.play('gust',i)} if(it.wind<.2)it.gust=0;
+    if(P3){it.fs={on:true,x,y,px,op:Math.min(1,u*10),blur:near*near*16,rx:.5+u*5.5+i,ry:Math.sin(u*6+i)*.6,rz:u*7+i*2};Prod3D.flyFrame(i,it.fs)}});
+  FP.shake=Math.max(0,...FP.items.map(it=>it.wind||0));
 }
 fpTags.forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();fpOpen(+b.dataset.n)}));
 function fpOpen(n){Sound.play('open');const pu=PRODUCTS[n-1]&&PRODUCTS[n-1].url;if(pu){if(!/^https?:/.test(pu)){location.href=pu;return}let w=null;try{w=window.open(pu,'_blank')}catch(e){}if(w)return;const a=document.createElement('a');a.href=pu;a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();return}const it=FP.items[n-1];if(it){const r=it.scr[2]*2.2;FP.from=[it.scr[1]-r,VW-(it.scr[0]+r),VH-(it.scr[1]+r),it.scr[0]-r].map(v=>Math.max(0,v))}openDetail(n)}
@@ -1102,7 +1114,7 @@ function fpOverview(){const a=MGL.w/Math.max(1,MGL.h), mob=a<.9, fv=mob?30:16, t
   return {c,fv,e:[c[0]+Math.sin(r)*Math.cos(el)*D,c[1]+Math.cos(r)*Math.cos(el)*D,Math.sin(el)*D]}}
 function tickFP(now){
   const r=pjSticky.getBoundingClientRect(); if(r.bottom<0||r.top>VH||!MGL)return;
-  const p=pj.p, mob=VW<700, k=eIO(range(p,.07,PJ_KN[0]));
+  const p=pj.p, mob=VW<700, k=eIO(range(p,.07,PJ_KN[0])); FP.kw=k;
   const s=FP.s, here=fpAt(s), eye=[here[0],here[1],here[2]+FP_EYE];
   let tgt=fpAt(s+46); tgt=[tgt[0],tgt[1],here[2]+FP_EYE-1.5];
   // turn toward the product at each stop, and toward the stage at the end
@@ -1123,11 +1135,12 @@ function tickFP(now){
   pjSticky.classList.toggle('fp-dark',FP.night>.55);
   FP.items.forEach((it,i)=>{const tg=FP.act===i+1||FP.hover===i+1?1:0;it.glow=lerp(it.glow,tg,.08)});
   drawMapGL(); tickStars(now,r.top,p);
+  if(window.Prod3D&&Prod3D.ready)Prod3D.frame({cam:FP.cam,look:FP.look,fov:FP.fov,w:MGL.w,h:MGL.h,t:now/1000,items:FP.items.map(it=>it.pose||{land:0})});
   if(k<1){let d='';for(let i=0;i<FP_PATH.length;i+=2){const q=fpProject([FP_PATH[i][0],FP_PATH[i][1],FP_PATH[i][2]+1]);if(q)d+=(d?'L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1)}
     fpRoute.setAttribute('d',d);} fpRouteSvg.style.opacity=(1-eIO(range(k,0,.35))).toFixed(3);
   fpTags.forEach((b,i)=>{const it=FP.items[i],[x,y,rr]=it.scr,ov=1-eIO(range(k,0,.3)),o=Math.max(ov,k>.85&&rr>2.5?clamp((rr-2.5)/4):0)*clamp(((it.land??1)-.4)*2.5);
     b.style.opacity=o.toFixed(3);b.style.pointerEvents=o>.4?'auto':'none';
-    b.style.transform=`translate(${x.toFixed(1)}px,${(y-rr*1.9-14).toFixed(1)}px) translate(-50%,-100%) scale(${(.85+.15*it.glow).toFixed(3)})`;
+    b.style.transform=`translate(${x.toFixed(1)}px,${(y-rr*1.15-10).toFixed(1)}px) translate(-50%,-100%) scale(${(.85+.15*it.glow).toFixed(3)})`;
     b.classList.toggle('on',it.glow>.5)});
 }
 
@@ -1146,7 +1159,8 @@ function tickPjSky(){
   pjSticky.style.setProperty('--b',(VH*.45*clamp((VH-r.bottom)/(VH*.3))).toFixed(1)+'px');
   pjSky.style.setProperty('--sy',(30*(1-kin)).toFixed(2)+'vh');
   pjSky.style.setProperty('--ss',(.8+.2*kin).toFixed(3));
-  const cv=pjMapCv(); if(cv){cv.style.opacity=k.toFixed(3);cv.style.transform=`translateY(${(6*(1-kin)).toFixed(2)}vh) scale(${(1.04-.04*kin).toFixed(4)})`}
+  const W=FP.shake||0, tt=performance.now()/1000, shx=W*(7*Math.sin(tt*37)+4*Math.sin(tt*23+1)), shy=W*(5*Math.sin(tt*31+2)+3*Math.sin(tt*19)), shr=W*(.55*Math.sin(tt*27)+.3*Math.sin(tt*41));
+  $$('.map-gl').forEach(cv=>{cv.style.opacity=k.toFixed(3);cv.style.transform=`translateY(${(6*(1-kin)).toFixed(2)}vh) translate(${shx.toFixed(2)}px,${shy.toFixed(2)}px) rotate(${shr.toFixed(3)}deg) scale(${(1.04-.04*kin+W*.012).toFixed(4)})`;cv.style.filter=W>.05?`blur(${(W*1.4).toFixed(2)}px)`:''})
 }
 /* ======================= SCROLL PAUSES + SNAP ======================= */
 // mapped progress values where the scene should rest (content fully shown)
@@ -1665,6 +1679,7 @@ const Sound=(()=>{
     core(i){const t=T();glass(pick([5,7,8][i]),t,.08,3);box(pick([0,2,3][i]),t+.05,.05,1.2)},
     answer(){const t=T();pad([293.66,369.99,440,587.33,739.99],t,4.5,.035);arp(t+.15,[0,2,3,5,7,8],.09,.06);glass(pick(8),t+.7,.05,3)},
     fall(i){const t=T();air(t,1.1,7000,1400,.07,1.2,.9);tone(pick(9-i)*2,t,1.1,.012,'sine',.9,.5,.4)},
+    gust(i){const t=T();air(t,.9,900,5200,.16,.7,.6);air(t+.05,.7,4800,700,.09,1.2,.3)},
     star(i){const t=T();glass(pick([5,7,8][i]||5),t,.07,2.6);box(pick([2,4,5][i]||3),t+.03,.06,1);sparkle(t+.08,6,4+i,5,.04,.03)},
     release(){const t=T();air(t,1.4,800,6800,.14);sparkle(t+.2,8,4,6,.05,.035)},
   };

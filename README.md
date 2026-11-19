@@ -17,7 +17,7 @@ MCUAI가 축제 공간에서 상황을 감지하고, 판단하고, 대응하는 
 | 02 | WORLD | 흩어진 카드에서 화면 전체로 확장되는 시네마틱 챕터 4개 (아래에서 덮는 와이프 전환) |
 | 02 | EPILOGUE | 흐르는 파스텔 그라데이션 위 AI 대화 (대화 흐름·고른 장소에 따라 색이 바뀜), 핵심 문장과 파동 |
 | — | QUESTION | "하지만," 글리치 등장 후 스크롤이 한 번 멈춤 → 어두운 3D 공간에 "과연" 질문 (오목 렌즈·비네트로 중앙 집중) → "이러한 문제를 해결하기 위한 3가지 제품" |
-| 03 | PROJECTS | "3가지 제품"의 구슬 세 개가 화면 위로 날아갔다가 카메라 밖에서 들어와 화면 가까이 나선을 그리며 멀어져 지도 위 제품이 됨. 캠퍼스 3D 지도를 1인칭으로 걸으며 제품 3개(KNOBLE → PATH GUARD → FLOWAY) 순서대로 방문. 걸을수록 해가 지고 무대 앞에 관객이 모임 |
+| 03 | PROJECTS | "3가지 제품"의 구슬 세 개가 화면 위로 날아갔다가, 제품 모양(사이트 톤의 펄 파스텔 재질)으로 카메라 밖에서 들어와 화면 가까이 나선을 그리며 멀어짐 — 가까울 땐 아웃포커스, 카메라 앞을 지날 땐 화면이 바람에 흔들림 — 지도에 안착하면 각 GLB 원본 재질(PBR·텍스처·발광)로 렌더링. 캠퍼스 3D 지도를 1인칭으로 걸으며 제품 3개(KNOBLE → PATH GUARD → FLOWAY) 순서대로 방문. 걸을수록 해가 지고 무대 앞에 관객이 모임 |
 
 ### 사운드
 
@@ -35,9 +35,11 @@ college-festival-2031/
 │  ├─ css/style.css      전체 스타일
 │  ├─ js/main.js         인터랙션·스크롤·3D 지도 스크립트
 │  ├─ js/intro-flight.js 인트로 비행 전환 (구름을 지나 축제 공간으로)
+│  ├─ js/prod3d.js       제품 GLB 렌더러 (three.js 번들, 오프라인) · prod3d.src.js 원본
+│  ├─ js/products-glb.js 웹용 제품 GLB(base64, file:// 지원)
 │  ├─ js/map-data.js     3D 지도용 모델 데이터 (campus.blend에서 변환, 제품 모델 포함)
 │  ├─ models/            campus.blend (캠퍼스 원본), environment.glb (이전 지도 모델),
-│  │                     products/knoble.glb · path-guard.glb · floway.glb (제품 원본)
+│  │                     products/knoble.glb · path-guard.glb · floway.glb (제품 원본), products/web/ (웹용 경량화본)
 │  ├─ fonts/             Pretendard Variable (SIL OFL 라이선스 포함)
 │  └─ images/            team-hero.webp, team-environment-01~05.webp
 ├─ PRODUCT01~03/         개인 제품 페이지 (KNOBLE · PATH GUARD · FLOWAY)
