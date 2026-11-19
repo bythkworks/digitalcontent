@@ -215,14 +215,21 @@ CHAPTERS.forEach((c,i)=>{
   waBg.insertAdjacentHTML('beforeend',`<div class="wa-bi">${WORLD_ART[i+1]}</div>`);
   waProg.insertAdjacentHTML('beforeend',`<button data-wch="${i}" aria-label="${c.k} ${c.t}">${WORLD_ART[i+1]}<span>${c.k}</span></button>`);
 });
-$$('#waProg .world-art').forEach(im=>im.remove());$$('#waBg .world-art').forEach(im=>{im.alt=''});
-const waCs=$$('.wa-c'), waCards=$$('.wa-card'), waBtns=$$('#waProg button'); const waBis=$$('.wa-bi'), waBimg=waBis.map(b=>b.firstElementChild);
+$$('#waProg .world-art').forEach(im=>im.remove());
+// Apple-style feature list: pills on the left, the active one opens into a card
+$('#wfList').innerHTML=CHAPTERS.map((c,i)=>`<button type="button" class="wf-pill" data-i="${i}" aria-expanded="false"><span class="wf-hw"><span class="wf-clip"><span class="wf-head"><i class="wf-ic" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></i>${c.t}</span></span></span><span class="wf-bw"><span class="wf-clip"><span class="wf-body"><b>${c.t}.</b> ${c.d}</span></span></span></button>`).join('');$$('#waBg .world-art').forEach(im=>{im.alt=''});
+const waCs=$$('.wa-c'), waCards=$$('.wa-card'), waBtns=$$('#waProg button');
+const waFeat=$('#waFeat'), wfPills=$$('.wf-pill'), wfArr=$$('.wf-arr');
+function wfMeasure(){wfPills.forEach(p=>{const h=p.querySelector('.wf-head');p.style.setProperty('--pw',(h.scrollWidth+44)+'px')})}
+wfMeasure();addEventListener('resize',wfMeasure);(document.fonts?document.fonts.ready:Promise.resolve()).then(wfMeasure);
+wfPills.forEach(p=>p.addEventListener('click',()=>scrollToY(holdY('world-a',+p.dataset.i+1))));
+wfArr.forEach(b=>b.addEventListener('click',()=>{const a=clamp((worldA.act??0)+ +b.dataset.d,0,3);scrollToY(holdY('world-a',a+1))})); const waBis=$$('.wa-bi'), waBimg=waBis.map(b=>b.firstElementChild);
 // scattered (intro) poses: [x%, y%, zpx, rotY, rotZ, scale]
 const WA_SC=[[-34,-40,-300,22,-8,.6],[40,-50,-560,-12,7,.5],[-52,44,-420,16,9,.52],[44,42,-180,-18,-6,.62]];
 const WA_SCM=[[-26,-20,-260,16,-6,.6],[30,-26,-420,-10,6,.52],[-30,30,-360,12,7,.52],[28,26,-160,-12,-5,.62]];
 function renderWorldA(p){
   const s=clamp((p-.24)/.62)*3, act=Math.min(3,Math.round(s));
-  if(act!==worldA.act){worldA.act=act;waBtns.forEach((b,i)=>b.classList.toggle('on',i===act));waCs.forEach((c,i)=>c.setAttribute('aria-hidden',i===act?'false':'true'));chBtns.forEach((b,i)=>b.classList.toggle('on',i===act))}
+  if(act!==worldA.act){worldA.act=act;waBtns.forEach((b,i)=>b.classList.toggle('on',i===act));waCs.forEach((c,i)=>c.setAttribute('aria-hidden',i===act?'false':'true'));chBtns.forEach((b,i)=>b.classList.toggle('on',i===act));wfPills.forEach((b,i)=>{b.classList.toggle('on',i===act);b.setAttribute('aria-expanded',String(i===act))});wfArr[0].disabled=act===0;wfArr[1].disabled=act===3}
   waProg.classList.toggle('show',p>.2&&p<.93);
 }
 function tickWorld(now){
@@ -242,15 +249,15 @@ function tickWorld(now){
    const ins=`inset(${(r.top*gi).toFixed(1)}px ${((VW-r.right)*gi).toFixed(1)}px ${((VH-r.bottom)*gi).toFixed(1)}px ${(r.left*gi).toFixed(1)}px round ${rad.toFixed(1)}px)`;
    waBg.style.clipPath=g>=1?'none':ins; waBg.style.opacity=(g>0?1:0)*(1-ex);
    worldA.el.classList.toggle('wa-cine',g>.35);
-   waBis.forEach((b,k)=>{const d=s-k;
-     if(d<=-1||d>=1.6){b.style.visibility='hidden';return} b.style.visibility='visible';
-     let clip='none', sc, ty=0, br=1;
-     if(d<0){const r2=eIO(1+d); clip=`inset(${((1-r2)*100).toFixed(2)}% 0 0 0)`; sc=1.18-.1*r2; ty=(1-r2)*8}
-     else {const q=Math.min(1,d); sc=1.08+.12*q; ty=-q*6; br=1-.55*q}
-     b.style.clipPath=clip; b.style.zIndex=10+k;
+   waBis.forEach((b,k)=>{const d=s-k, ad=Math.abs(d), o=k===0&&d<0?1:eIO(clamp(1-(ad-.18)*1.9));
+     if(o<=.002){b.style.visibility='hidden';return} b.style.visibility='visible';
+     const sc=1.04+.06*Math.min(1,ad), ty=-d*2.5, br=1;
+     b.style.clipPath='none'; b.style.opacity=o.toFixed(3); b.style.zIndex=10+Math.round((1-ad)*10);
      waBimg[k].style.transform=`translate(${(-tx*14).toFixed(1)}px,calc(${ty.toFixed(2)}% + ${(-tilt.y*10).toFixed(1)}px)) scale(${(sc+Math.sin(t*.25+k)*.01).toFixed(4)})`;
      b.style.filter=br<.995?`brightness(${br.toFixed(3)})`:'none'});}
   // copy per chapter
+  {const fo=eIO(range(p,.17,.25))*(1-ex);waFeat.style.opacity=fo.toFixed(3);waFeat.style.visibility=fo>.01?'visible':'hidden';waFeat.style.pointerEvents=fo>.5?'auto':'none';
+   waFeat.style.transform=`translateY(calc(${mob?'0px':'-50%'} + ${((1-fo)*30).toFixed(1)}px))`}
   waCs.forEach((c,k)=>{const d=s-k,ad=Math.abs(d),o=clamp(1-ad*2.4)*eIO(range(p,.17,.25))*(1-ex);
     c.style.opacity=o.toFixed(3);
     c.style.transform=`translateY(calc(${mob?'0%':'-50%'} + ${(-d*50).toFixed(1)}px)) skewY(${(-jel*2.2).toFixed(2)}deg)`;

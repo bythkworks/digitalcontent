@@ -1143,6 +1143,35 @@ body:has(#detail.open) .snd,body:has(#detail.open) .day-clock{opacity:0;pointer-
 .dd-in button i{width:14px;height:14px;border-radius:50%;flex:none;background:radial-gradient(circle at 35% 35%,#fff,var(--c) 60%);box-shadow:0 0 10px var(--c)}
 .dd-in button i.all{background:none;border:1.5px dashed #B8B6E5;box-shadow:none}
 @media (hover:none){.nav-dd{display:none}}
+
+/* ---- WORLD v4: Apple-style feature list (pills → card) over the crossfading scene ---- */
+#world-a .wa-copy,#world-a .wa-prog{display:none!important}
+.wa-feat{position:absolute;left:clamp(16px,3.4vw,56px);top:50%;z-index:6;display:flex;align-items:center;gap:clamp(14px,2vw,30px);opacity:0;visibility:hidden}
+.wf-arrows{display:flex;flex-direction:column;gap:16px}
+.wf-arr{width:46px;height:46px;border-radius:50%;border:0;display:grid;place-items:center;cursor:pointer;color:#fff;background:rgba(30,28,46,.74);transition:background .25s,opacity .25s,transform .25s}
+.wf-arr:hover{background:rgba(52,48,78,.9);transform:scale(1.06)}.wf-arr:disabled{opacity:.35;cursor:default;transform:none}
+.wf-arr:focus-visible,.wf-pill:focus-visible{outline:2px solid #C9C6FF;outline-offset:3px}
+.wf-list{display:flex;flex-direction:column;align-items:flex-start;gap:12px}
+.wf-pill{--pw:240px;position:relative;display:block;width:var(--pw);max-width:calc(100vw - 110px);padding:0;border:0;border-radius:30px;cursor:pointer;text-align:left;font-family:inherit;color:#fff;
+  background:rgba(30,28,46,.74);box-shadow:0 10px 30px rgba(10,8,30,.18);overflow:hidden;
+  transition:width .55s cubic-bezier(.3,.7,.2,1),background .3s,border-radius .5s}
+.wf-pill:hover{background:rgba(48,44,72,.86)}
+.wf-pill.on{width:min(460px,calc(100vw - 110px));border-radius:28px;background:rgba(34,32,52,.84);cursor:default}
+.wf-hw,.wf-bw{display:grid;transition:grid-template-rows .5s cubic-bezier(.3,.7,.2,1),opacity .35s}
+.wf-hw{grid-template-rows:1fr}.wf-bw{grid-template-rows:0fr;opacity:0}
+.wf-pill.on .wf-hw{grid-template-rows:0fr;opacity:0}.wf-pill.on .wf-bw{grid-template-rows:1fr;opacity:1;transition-delay:.08s}
+.wf-clip{display:block;overflow:hidden;min-height:0}
+.wf-head{display:flex;align-items:center;gap:12px;padding:13px 22px 13px 14px;font-size:16px;font-weight:700;letter-spacing:-.01em;white-space:nowrap}
+.wf-ic{flex:none;width:28px;height:28px;border-radius:50%;border:1.6px solid rgba(255,255,255,.9);display:grid;place-items:center;transition:transform .35s}
+.wf-pill:hover .wf-ic{transform:rotate(90deg)}
+.wf-body{display:block;width:min(460px,calc(100vw - 110px));padding:26px 32px;font-size:16.5px;line-height:1.75;color:rgba(255,255,255,.86);word-break:keep-all}
+.wf-body b{color:#fff;font-weight:700}
+@media (max-width:900px){
+  .wa-feat{top:auto;bottom:84px;left:16px;right:16px;align-items:flex-end;gap:10px}
+  .wf-arrows{display:none}
+  .wf-list{gap:8px}.wf-head{font-size:13.5px;padding:10px 16px 10px 10px}.wf-ic{width:24px;height:24px}
+  .wf-pill{max-width:calc(100vw - 32px)}.wf-pill.on,.wf-body{width:calc(100vw - 32px)}.wf-body{padding:18px 20px;font-size:14.5px;line-height:1.65}
+}
 /* ---- "하지만," glitch ---- */
 #turn.t-glitch .t-pre .t-h{animation:gMain 1.3s steps(1,end)}
 #turn.t-glitch .t-pre .t-h::before{animation:gA 1.3s steps(1,end)}
