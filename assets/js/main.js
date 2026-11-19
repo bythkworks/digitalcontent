@@ -273,6 +273,16 @@ function tickWorld(now){
   });
 }
 waBtns.forEach(b=>b.addEventListener('click',()=>scrollToY(holdY('world-a',+b.dataset.wch+1))));
+/* ---- nav dropdowns: jump straight to a WORLD chapter or a product on the map ---- */
+{const PCOL=['#9CC8E2','#B8B6E5','#E8B0DD'];
+ $('#ddWorld').innerHTML='<div class="dd-in">'+CHAPTERS.map((c,i)=>`<button type="button" data-jw="${i}"><b>0${i+1}</b><span><em>${c.k}</em>${c.t}</span></button>`).join('')
+   +'<hr><button type="button" data-jx="world-c"><b>05</b><span><em>EPILOGUE</em>AI와 나누는 대화</span></button><button type="button" data-jx="turn"><b>06</b><span><em>QUESTION</em>과연 AI가…</span></button></div>';
+ $('#ddProj').innerHTML='<div class="dd-in">'+PRODUCTS.map((p,i)=>`<button type="button" data-jp="${p.n}"><i style="--c:${PCOL[i]}"></i><span><em>0${p.n} · ${CAT[p.cat]}</em>${p.name}</span></button>`).join('')
+   +'<hr><button type="button" data-jp="0"><i class="all"></i><span><em>MAP</em>전체 지도 보기</span></button></div>';
+ $$('.nav-dd').forEach(dd=>dd.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;e.preventDefault();
+   const x=b.dataset.jx, y=b.dataset.jw!=null?holdY('world-a',+b.dataset.jw+1):x==='turn'?holdY('turn',1):x?holdY(x,0):holdY('projects',+b.dataset.jp);
+   jumpTo(y);
+   const li=dd.closest('li');li.classList.add('dd-off');b.blur();setTimeout(()=>li.classList.remove('dd-off'),600)}));}
 chBtns.forEach(b=>b.addEventListener('click',()=>{const i=+b.dataset.ch;const el=worldA.el;const top=el.offsetTop, h=el.offsetHeight-VH;scrollToY(holdY('world-a',i+1))}));
 
 /* ======================= WORLD C ======================= */
@@ -815,6 +825,12 @@ $('#lbX').onclick=closeLB; lbx.addEventListener('click',e=>{if(e.target===lbx)cl
 const nav=$('#nav'), dots=$('#dots');
 const secOrder=['intro','world-a','projects'];
 function scrollToY(y){smoothTo(y)}
+// far jumps from the nav: a soft veil instead of scrolling through every scene on the way
+function jumpTo(y){if(Math.abs(y-scrollY)<VH*1.6||reduce){smoothTo(y);return}
+  const v=$('#jumpVeil');v.classList.add('on');
+  setTimeout(()=>{window.scrollTo(0,y);SS.on=false;SS.cur=SS.tgt=y;lastSY=y;
+    scenes.forEach(([s,fn])=>{s.t=s.p=progressOf(s.el);fn(s.p)});
+    requestAnimationFrame(()=>requestAnimationFrame(()=>v.classList.remove('on')))},320)}
 function goTo(id){const el=$('#'+id); let y=HOLDS[id]?holdY(id,0):el.offsetTop; if(id==='intro')y=0; scrollToY(y)}
 $$('[data-go]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();goTo(a.dataset.go)}));
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.15});
