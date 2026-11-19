@@ -275,10 +275,11 @@ function tickWorld(now){
 waBtns.forEach(b=>b.addEventListener('click',()=>scrollToY(holdY('world-a',+b.dataset.wch+1))));
 /* ---- nav dropdowns: jump straight to a WORLD chapter or a product on the map ---- */
 {const PCOL=['#9CC8E2','#B8B6E5','#E8B0DD'];
- $('#ddWorld').innerHTML='<div class="dd-in">'+CHAPTERS.map((c,i)=>`<button type="button" data-jw="${i}"><b>0${i+1}</b><span><em>${c.k}</em>${c.t}</span></button>`).join('')
-   +'<hr><button type="button" data-jx="world-c"><b>05</b><span><em>EPILOGUE</em>AI와 나누는 대화</span></button><button type="button" data-jx="turn"><b>06</b><span><em>QUESTION</em>과연 AI가…</span></button></div>';
- $('#ddProj').innerHTML='<div class="dd-in">'+PRODUCTS.map((p,i)=>`<button type="button" data-jp="${p.n}"><i style="--c:${PCOL[i]}"></i><span><em>0${p.n} · ${CAT[p.cat]}</em>${p.name}</span></button>`).join('')
-   +'<hr><button type="button" data-jp="0"><i class="all"></i><span><em>MAP</em>전체 지도 보기</span></button></div>';
+ const WW=['ENTER','SENSE','UNDERSTAND','TOGETHER'];
+ $('#ddWorld').innerHTML='<div class="dd-in">'+CHAPTERS.map((c,i)=>`<button type="button" data-jw="${i}" title="${c.t}"><b>0${i+1}</b><span>${WW[i]}</span></button>`).join('')
+   +'<hr><button type="button" data-jx="world-c"><b>05</b><span>EPILOGUE</span></button><button type="button" data-jx="turn"><b>06</b><span>QUESTION</span></button></div>';
+ $('#ddProj').innerHTML='<div class="dd-in">'+PRODUCTS.map((p,i)=>`<button type="button" data-jp="${p.n}"><i style="--c:${PCOL[i]}"></i><span>${p.name}</span></button>`).join('')
+   +'<hr><button type="button" data-jp="0"><i class="all"></i><span>FULL MAP</span></button></div>';
  $$('.nav-dd').forEach(dd=>dd.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;e.preventDefault();
    const x=b.dataset.jx, y=b.dataset.jw!=null?holdY('world-a',+b.dataset.jw+1):x==='turn'?holdY('turn',1):x?holdY(x,0):holdY('projects',+b.dataset.jp);
    jumpTo(y);
