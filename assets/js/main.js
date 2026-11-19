@@ -1529,35 +1529,70 @@ sizeGL(); requestAnimationFrame(fxLoop);
 
 /* ======================= SOUND · short cues for key moments (synthesized in the browser, no audio files) ======================= */
 const Sound=(()=>{
-  let ctx=null,out,verb,echo,on=false;
-  const btn=document.createElement('button');btn.className='snd-btn';btn.type='button';btn.setAttribute('aria-pressed','false');
-  btn.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path class="w1" d="M15.5 8.5a5 5 0 0 1 0 7"/><path class="w2" d="M18.5 5.5a9 9 0 0 1 0 13"/><path class="x" d="m16 9 6 6m0-6-6 6"/></svg><span>소리 켜기</span>';
-  document.body.appendChild(btn);
+  let ctx=null,out,verb,echo,on=false,mlp,mvol,wet,eg;
+  // ---- user settings (persisted) ----
+  const MOODS={'경쾌':{space:.28,echo:.25,bright:.9,oct:0},'몽환':{space:.6,echo:.55,bright:.72,oct:0},'차분':{space:.45,echo:.3,bright:.38,oct:-1},'반짝':{space:.5,echo:.7,bright:1,oct:1}};
+  const TEX={musicbox:'오르골',glass:'유리 벨',soft:'소프트 패드',pluck:'플럭'};
+  const P=Object.assign({vol:.8,tex:'musicbox',mood:'몽환',ix:true},MOODS['몽환']);
+  try{Object.assign(P,JSON.parse(localStorage.getItem('cf-sound-set')||'{}'))}catch(e){}
+  const saveP=()=>{try{localStorage.setItem('cf-sound-set',JSON.stringify(P))}catch(e){}};
+  const ICON_SND='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path class="w1" d="M15.5 8.5a5 5 0 0 1 0 7"/><path class="w2" d="M18.5 5.5a9 9 0 0 1 0 13"/><path class="x" d="m16 9 6 6m0-6-6 6"/></svg>';
+  const ICON_SET='<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>';
+  const wrap=document.createElement('div');wrap.className='snd';
+  wrap.innerHTML=`<svg class="snd-defs" width="0" height="0" aria-hidden="true"><filter id="sndGoo"><feGaussianBlur in="SourceGraphic" stdDeviation="6" result="b"/><feColorMatrix in="b" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -10" result="g"/><feComposite in="SourceGraphic" in2="g" operator="atop"/></filter></svg>
+    <div class="snd-goo" aria-hidden="true"><i class="b1"></i><i class="b2"></i></div>
+    <button class="snd-btn" type="button" aria-pressed="false">${ICON_SND}<span class="sr">소리 켜기</span></button>
+    <button class="snd-set" type="button" aria-label="사운드 설정" aria-expanded="false" tabindex="-1">${ICON_SET}</button>
+    <div class="snd-panel" role="dialog" aria-label="사운드 설정">
+      <div class="sp-h"><b>사운드 설정</b><button type="button" class="sp-x" aria-label="닫기">×</button></div>
+      <label class="sp-row"><span>볼륨</span><input type="range" min="0" max="1" step=".01" data-k="vol"><em data-v="vol"></em></label>
+      <div class="sp-row col"><span>분위기</span><div class="sp-chips" data-g="mood">${Object.keys(MOODS).map(m=>`<button type="button" data-m="${m}">${m}</button>`).join('')}</div></div>
+      <div class="sp-row col"><span>질감</span><div class="sp-chips" data-g="tex">${Object.entries(TEX).map(([k,v])=>`<button type="button" data-t="${k}">${v}</button>`).join('')}</div></div>
+      <label class="sp-row"><span>공간감</span><input type="range" min="0" max="1" step=".01" data-k="space"><em data-v="space"></em></label>
+      <label class="sp-row"><span>잔향(에코)</span><input type="range" min="0" max="1" step=".01" data-k="echo"><em data-v="echo"></em></label>
+      <label class="sp-row"><span>밝기</span><input type="range" min="0" max="1" step=".01" data-k="bright"><em data-v="bright"></em></label>
+      <div class="sp-row"><span>음높이</span><div class="sp-chips sm" data-g="oct"><button type="button" data-o="-1">낮게</button><button type="button" data-o="0">기본</button><button type="button" data-o="1">높게</button></div></div>
+      <label class="sp-row sw"><span>글자·마우스 반응음</span><input type="checkbox" data-k="ix"><i></i></label>
+      <div class="sp-f"><button type="button" class="sp-try">미리 듣기</button><button type="button" class="sp-reset">기본값</button></div>
+    </div>`;
+  document.body.appendChild(wrap);
+  const btn=wrap.querySelector('.snd-btn'),setB=wrap.querySelector('.snd-set'),panel=wrap.querySelector('.snd-panel');
   let NB=null;
   function noise(){if(NB)return NB;const b=ctx.createBuffer(1,ctx.sampleRate*3,ctx.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;return NB=b}
   function init(){
     ctx=new (window.AudioContext||window.webkitAudioContext)();
-    out=ctx.createGain();out.gain.value=.8;const comp=ctx.createDynamicsCompressor();out.connect(comp);comp.connect(ctx.destination);
+    out=ctx.createGain();out.gain.value=.8;const comp=ctx.createDynamicsCompressor();mlp=ctx.createBiquadFilter();mlp.type='lowpass';mlp.Q.value=.5;mvol=ctx.createGain();out.connect(mlp);mlp.connect(mvol);mvol.connect(comp);comp.connect(ctx.destination);
     // soft hall reverb from a generated impulse
     verb=ctx.createConvolver();const L=ctx.sampleRate*2.6,ir=ctx.createBuffer(2,L,ctx.sampleRate);
     for(let c=0;c<2;c++){const d=ir.getChannelData(c);for(let i=0;i<L;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/L,3.2)}
-    verb.buffer=ir;const wet=ctx.createGain();wet.gain.value=.35;verb.connect(wet);wet.connect(out);
+    verb.buffer=ir;wet=ctx.createGain();wet.gain.value=.35;verb.connect(wet);wet.connect(out);
     // ping-pong echo (dreamy tails)
-    echo=ctx.createGain();const dl=ctx.createDelay(1),dr=ctx.createDelay(1),fb=ctx.createGain(),pl=ctx.createStereoPanner(),pr=ctx.createStereoPanner(),eg=ctx.createGain(),lp=ctx.createBiquadFilter();
+    echo=ctx.createGain();const dl=ctx.createDelay(1),dr=ctx.createDelay(1),fb=ctx.createGain(),pl=ctx.createStereoPanner(),pr=ctx.createStereoPanner(),lp=ctx.createBiquadFilter();eg=ctx.createGain();
     dl.delayTime.value=.27;dr.delayTime.value=.27;fb.gain.value=.38;pl.pan.value=-.7;pr.pan.value=.7;eg.gain.value=.5;lp.type='lowpass';lp.frequency.value=4200;
     echo.connect(lp);lp.connect(dl);dl.connect(pl);pl.connect(eg);dl.connect(dr);dr.connect(pr);pr.connect(eg);dr.connect(fb);fb.connect(dl);eg.connect(out);
+    applyP(true);
   }
+  function applyP(now){if(!ctx)return;const t=ctx.currentTime,k=now?.001:.08;
+    mvol.gain.setTargetAtTime(P.vol*1.15,t,k);wet.gain.setTargetAtTime(.05+P.space*.6,t,k);eg.gain.setTargetAtTime(P.echo*.95,t,k);
+    mlp.frequency.setTargetAtTime(900*Math.pow(18000/900,P.bright),t,k)}
   const T=()=>ctx.currentTime;
   // light + dreamy palette: D major pentatonic, music-box / kalimba / glass tones, ping-pong echo + airy reverb
   const PN=[587.33,659.25,739.99,880,987.77,1174.66,1318.51,1479.98,1760,1975.53,2349.32];
-  const pick=i=>PN[((i%PN.length)+PN.length)%PN.length];
+  const PF=()=>Math.pow(2,P.oct||0);
+  const pick=i=>PN[((i%PN.length)+PN.length)%PN.length]*PF();
   function bus(dry=1,rev=.5,del=.25){const g=ctx.createGain();const d=ctx.createGain(),r=ctx.createGain(),e=ctx.createGain();d.gain.value=dry;r.gain.value=rev;e.gain.value=del;
     g.connect(d);d.connect(out);g.connect(r);r.connect(verb);g.connect(e);e.connect(echo);return g}
   function env(g,t,a,dur,vol){g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+a);g.gain.exponentialRampToValueAtTime(.0001,t+dur)}
   function tone(f,t,dur,vol,type='sine',rev=.6,glide=0,del=.2){const o=ctx.createOscillator(),g=ctx.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(glide)o.frequency.exponentialRampToValueAtTime(f*glide,t+dur);
     o.connect(g);g.connect(bus(1,rev,del));env(g,t,.006,dur,vol);o.start(t);o.stop(t+dur+.05)}
   // music box / kalimba: sine with a quick bright overtone and tiny pitch blip
-  function box(f,t,vol=.09,dur=1.1,del=.35){const o=ctx.createOscillator(),o2=ctx.createOscillator(),g=ctx.createGain(),g2=ctx.createGain();
+  function box(f,t,vol=.09,dur=1.1,del=.35){
+    if(P.tex==='glass'){glass(f,t,vol*.85,Math.max(.8,dur*1.6));return}
+    if(P.tex==='soft'){const b=bus(.9,.9,del);[-8,8].forEach(dt=>{const o=ctx.createOscillator(),lp=ctx.createBiquadFilter(),g=ctx.createGain();o.type='triangle';o.frequency.value=f;o.detune.value=dt;lp.type='lowpass';lp.frequency.value=Math.min(6000,f*2.2);
+      o.connect(lp);lp.connect(g);g.connect(b);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol*.6,t+.05);g.gain.exponentialRampToValueAtTime(.0001,t+dur*1.5);o.start(t);o.stop(t+dur*1.5+.05)});return}
+    if(P.tex==='pluck'){const o=ctx.createOscillator(),lp=ctx.createBiquadFilter(),g=ctx.createGain();o.type='sawtooth';o.frequency.value=f;lp.type='lowpass';lp.Q.value=4;lp.frequency.setValueAtTime(Math.min(18000,f*8),t);lp.frequency.exponentialRampToValueAtTime(Math.min(16000,f*1.1),t+.18);
+      o.connect(lp);lp.connect(g);g.connect(bus(1,.5,del));env(g,t,.003,dur*.7,vol*.55);o.start(t);o.stop(t+dur*.7+.05);return}
+    const o=ctx.createOscillator(),o2=ctx.createOscillator(),g=ctx.createGain(),g2=ctx.createGain();
     o.frequency.setValueAtTime(f*1.012,t);o.frequency.exponentialRampToValueAtTime(f,t+.04);o2.frequency.value=f*4.02;o2.type='sine';
     o.connect(g);o2.connect(g2);const b=bus(1,.7,del);g.connect(b);g2.connect(b);env(g,t,.004,dur,vol);env(g2,t,.002,.18,vol*.35);o.start(t);o2.start(t);o.stop(t+dur+.05);o2.stop(t+.25)}
   // glass bell: soft FM
@@ -1567,7 +1602,7 @@ const Sound=(()=>{
   function air(t,dur,f0,f1,vol=.16,q=.8,rev=.8){const s=ctx.createBufferSource();s.buffer=noise();const hp=ctx.createBiquadFilter();hp.type='highpass';hp.frequency.value=500;const f=ctx.createBiquadFilter();f.type='bandpass';f.Q.value=q;
     f.frequency.setValueAtTime(f0,t);f.frequency.exponentialRampToValueAtTime(f1,t+dur);const g=ctx.createGain();s.connect(hp);hp.connect(f);f.connect(g);g.connect(bus(1,rev,.15));
     g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+dur*.5);g.gain.exponentialRampToValueAtTime(.0001,t+dur);s.start(t,Math.random()*2);s.stop(t+dur+.05)}
-  function pad(fs,t,dur,vol=.035){fs.forEach((f,i)=>{[-7,7].forEach(dt=>{const o=ctx.createOscillator(),g=ctx.createGain(),lp=ctx.createBiquadFilter();lp.type='lowpass';lp.frequency.setValueAtTime(700,t);lp.frequency.linearRampToValueAtTime(2600,t+dur*.5);
+  function pad(fs,t,dur,vol=.035){const pf=PF();fs=fs.map(f=>f*pf);fs.forEach((f,i)=>{[-7,7].forEach(dt=>{const o=ctx.createOscillator(),g=ctx.createGain(),lp=ctx.createBiquadFilter();lp.type='lowpass';lp.frequency.setValueAtTime(700,t);lp.frequency.linearRampToValueAtTime(2600,t+dur*.5);
     o.type='triangle';o.frequency.value=f;o.detune.value=dt;o.connect(lp);lp.connect(g);g.connect(bus(.7,1,.2));g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+dur*.4);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.start(t);o.stop(t+dur+.1)})})}
   function sparkle(t,n,from=5,spread=6,step=.045,vol=.04,up=true){for(let k=0;k<n;k++){const i=up?from+k%spread:from+spread-1-k%spread;box(pick(i)*(k>=spread?2:1),t+k*step,vol,.6,.45)}}
   function arp(t,idx,step=.08,vol=.07){idx.forEach((i,k)=>box(pick(i),t+k*step,vol))}
@@ -1602,10 +1637,10 @@ const Sound=(()=>{
     answer(){const t=T();pad([293.66,369.99,440,587.33,739.99],t,4.5,.035);arp(t+.15,[0,2,3,5,7,8],.09,.06);glass(pick(8),t+.7,.05,3)},
     release(){const t=T();air(t,1.4,800,6800,.14);sparkle(t+.2,8,4,6,.05,.035)},
   };
-  function play(k,...a){if(!on||!ctx)return;try{C[k](...a)}catch(e){console.warn('sound',k,e)}}
+  function play(k,...a){if(!on||!ctx)return;if(!P.ix&&(k==='letter'||k==='hover'||k==='bloom'))return;try{C[k](...a)}catch(e){console.warn('sound',k,e)}}
   let sh=null,lx=0,ly=0,spd=0,lt=0;
   addEventListener('pointermove',e=>{const now=performance.now(),dt=Math.max(8,now-lt);spd=Math.min(1,spd*.6+Math.hypot(e.clientX-lx,e.clientY-ly)/dt*.12);lx=e.clientX;ly=e.clientY;lt=now},{passive:true});
-  function shimmer(active){if(!on||!ctx)return;
+  function shimmer(active){if(!on||!ctx)return;if(!P.ix)active=false;
     if(!sh){const s=ctx.createBufferSource();s.buffer=noise();s.loop=true;const f=ctx.createBiquadFilter();f.type='bandpass';f.Q.value=6;const g=ctx.createGain();g.gain.value=0;
       const o=ctx.createOscillator();o.type='sine';const og=ctx.createGain();og.gain.value=0;o.connect(og);og.connect(bus(.6,1,.6));
       s.connect(f);f.connect(g);g.connect(bus(.7,1));s.start();o.start();sh={f,g,o,og}}
@@ -1628,10 +1663,45 @@ const Sound=(()=>{
     fl.os.forEach((o,i)=>o.frequency.setTargetAtTime([293.66,440,587.33,739.99,880][i]*(1+q*.26),t,.3));
     // a rising music-box note every tenth of the flight
     const st=active?Math.floor(q*10):-1; if(active&&on&&st>flStep&&flStep>=0)box(pick(4+st),t,.045,.9,.5);if(st%2)box(pick(6+st),t+.09,.03,.7,.5); flStep=active?st:-1}
-  function set(v){on=v;if(!v&&fl){fly(false,0)}btn.setAttribute('aria-pressed',String(on));btn.classList.toggle('on',on);btn.querySelector('span').textContent=on?'소리 끄기':'소리 켜기';
+  function set(v){on=v;if(!v&&fl){fly(false,0)}btn.setAttribute('aria-pressed',String(on));btn.classList.toggle('on',on);btn.querySelector('span').textContent=on?'소리 끄기':'소리 켜기';btn.title=on?'소리 끄기 (길게 누르거나 올려두면 설정)':'소리 켜기';wrap.classList.toggle('on',on);
     try{sessionStorage.setItem('cf-sound',on?'1':'0')}catch(e){}
     if(on){if(!ctx)init();ctx.resume();play('on')}}
-  btn.addEventListener('click',()=>set(!on));
+  // ---- droplet: hover (or long-press on touch) splits off the settings bubble ----
+  let lpT=0,lpFired=false,hideT=0;
+  const openDrop=()=>{clearTimeout(hideT);wrap.classList.add('drop');setB.tabIndex=0};
+  const closeDrop=()=>{if(wrap.classList.contains('panel'))return;clearTimeout(hideT);hideT=setTimeout(()=>{wrap.classList.remove('drop');setB.tabIndex=-1},380)};
+  wrap.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse')openDrop()});
+  wrap.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')closeDrop()});
+  btn.addEventListener('pointerdown',e=>{lpFired=false;clearTimeout(lpT);lpT=setTimeout(()=>{lpFired=true;openDrop();if(navigator.vibrate)try{navigator.vibrate(12)}catch(_){}} ,450)});
+  ['pointerup','pointercancel','pointerleave'].forEach(ev=>btn.addEventListener(ev,()=>clearTimeout(lpT)));
+  btn.addEventListener('contextmenu',e=>e.preventDefault());
+  btn.addEventListener('click',e=>{if(lpFired){e.preventDefault();lpFired=false;return}set(!on)});
+  btn.addEventListener('focus',openDrop);
+  const showPanel=v=>{wrap.classList.toggle('panel',v);setB.setAttribute('aria-expanded',String(v));if(v){openDrop();syncUI()}else closeDrop()};
+  setB.addEventListener('click',()=>showPanel(!wrap.classList.contains('panel')));
+  panel.querySelector('.sp-x').addEventListener('click',()=>showPanel(false));
+  document.addEventListener('pointerdown',e=>{if(!wrap.contains(e.target)){if(wrap.classList.contains('panel'))showPanel(false);else if(wrap.classList.contains('drop')&&e.pointerType!=='mouse'){wrap.classList.remove('drop')}}});
+  addEventListener('keydown',e=>{if(e.key==='Escape'&&wrap.classList.contains('panel')){showPanel(false);btn.focus()}});
+  ['wheel','touchmove'].forEach(ev=>panel.addEventListener(ev,e=>e.stopPropagation(),{passive:true}));
+  const pct=v=>Math.round(v*100)+'%';
+  function syncUI(){panel.querySelectorAll('input[type=range]').forEach(i=>{i.value=P[i.dataset.k];i.style.setProperty('--f',pct(P[i.dataset.k]))});
+    panel.querySelectorAll('[data-v]').forEach(e=>e.textContent=pct(P[e.dataset.v]));
+    panel.querySelectorAll('[data-m]').forEach(b=>b.classList.toggle('on',b.dataset.m===P.mood));
+    panel.querySelectorAll('[data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t===P.tex));
+    panel.querySelectorAll('[data-o]').forEach(b=>b.classList.toggle('on',+b.dataset.o===(P.oct||0)));
+    panel.querySelector('[data-k=ix]').checked=!!P.ix}
+  let tryT=0;const audition=()=>{if(!on)set(true);clearTimeout(tryT);tryT=setTimeout(()=>{const t=T();arp(t,[0,2,3,5,7],.09,.07);glass(pick(8),t+.5,.045,2.2)},60)};
+  const changed=(aud)=>{saveP();applyP();syncUI();if(aud)audition()};
+  panel.addEventListener('input',e=>{const k=e.target.dataset.k;if(!k)return;
+    if(e.target.type==='checkbox')P[k]=e.target.checked;else{P[k]=+e.target.value;if(k!=='vol')P.mood='사용자'}changed(false)});
+  panel.addEventListener('change',e=>{if(e.target.type==='range')audition()});
+  panel.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+    if(b.dataset.m){Object.assign(P,MOODS[b.dataset.m],{mood:b.dataset.m});changed(true)}
+    else if(b.dataset.t){P.tex=b.dataset.t;changed(true)}
+    else if(b.dataset.o!=null){P.oct=+b.dataset.o;P.mood='사용자';changed(true)}
+    else if(b.classList.contains('sp-try'))audition();
+    else if(b.classList.contains('sp-reset')){Object.assign(P,{vol:.8,tex:'musicbox',mood:'몽환',ix:true},MOODS['몽환']);changed(true)}});
+  syncUI();
   try{if(sessionStorage.getItem('cf-sound')==='1'){btn.classList.add('hint');btn.querySelector('span').textContent='소리 다시 켜기'}}catch(e){}
   // watch the page and fire cues on moments
   const W={sec:null,ia:-1,wa:-1,ec:-1,ty:false,act:0,k:-1,hov:0,first:true};
