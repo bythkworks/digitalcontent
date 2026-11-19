@@ -1132,9 +1132,13 @@ body:has(#detail.open) .snd,body:has(#detail.open) .day-clock{opacity:0;pointer-
   border:1px solid rgba(255,255,255,.9);box-shadow:0 18px 50px rgba(60,50,120,.18)}
 .dd-in hr{border:0;height:1px;background:rgba(60,50,120,.08);margin:6px 8px}
 .dd-in button{display:flex;align-items:center;gap:12px;width:100%;padding:10px 14px;border:0;border-radius:12px;background:none;cursor:pointer;text-align:left;font-family:inherit;color:#2E2B45;transition:background .2s}
-.dd-in button:hover,.dd-in button:focus-visible{background:linear-gradient(90deg,rgba(156,200,226,.16),rgba(184,182,229,.2),rgba(232,176,221,.16));outline:none}
+.dd-in button:hover,.dd-in button:focus-visible{background:rgba(184,182,229,.1);outline:none}
 .dd-in button b{font-size:11px;font-weight:700;color:#8E8AD8;width:20px;letter-spacing:.02em}
-.dd-in button span{font-size:12.5px;font-weight:700;letter-spacing:.12em;white-space:nowrap}
+.dd-in button span{font-size:12.5px;font-weight:700;letter-spacing:.12em;white-space:nowrap;color:transparent;
+  background:linear-gradient(90deg,#6FB3E3,#9C92F0 50%,#E58BCB) 0 0/0% 100% no-repeat,linear-gradient(#2E2B45,#2E2B45);
+  -webkit-background-clip:text;background-clip:text;transition:background-size .55s cubic-bezier(.22,.7,.2,1)}
+.dd-in button:hover span,.dd-in button:focus-visible span{background-size:100% 100%,100% 100%}
+.dd-in button b{transition:color .4s}.dd-in button:hover b{color:#E58BCB}
 .dd-in button em{font-style:normal;font-size:10px;font-weight:700;letter-spacing:.14em;color:#8C88A8}
 .dd-in button i{width:14px;height:14px;border-radius:50%;flex:none;background:radial-gradient(circle at 35% 35%,#fff,var(--c) 60%);box-shadow:0 0 10px var(--c)}
 .dd-in button i.all{background:none;border:1.5px dashed #B8B6E5;box-shadow:none}
