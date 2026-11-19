@@ -1047,17 +1047,24 @@ const backOut=x=>{const c=1.9;return 1+(c+1)*Math.pow(x-1,3)+c*Math.pow(x-1,2)};
 function tickStars(now,top,p){
   if(top>VH*.4){if(FS.t0){FS.t0=0;FP.items.forEach(it=>{it.land=0;it.lt=0;it.fell=0});fpStarEl.forEach(e=>e.style.opacity=0)}return}
   if(!FS.t0){FS.t0=(p>.12||reduce)?now-1e5:now+200;FP.items.forEach(it=>{it.land=0;it.lt=0;it.fell=0})}
-  FP.items.forEach((it,i)=>{const el=fpStarEl[i],DUR=1.15,u=((now-FS.t0)/1000-i*.45)/DUR;
+  FP.items.forEach((it,i)=>{const el=fpStarEl[i],DUR=2.4,u=((now-FS.t0)/1000-i*.28)/DUR;
     if(it.lt){it.land=Math.min(1.05,backOut(clamp((now-it.lt)/700)));if(now-it.lt>700)it.land=1;el.style.opacity=0;return}
-    if(u<0){it.land=0;el.style.opacity=0;return}
+    if(u<0){it.land=0;el.style.opacity=0;it.pv=null;return}
     const [tx,ty]=it.scr; if(u>=1||tx<-900){it.lt=now-(u>3?1e4:0);el.style.opacity=0;
       if(u<3){const b=fpBurstEl[i];b.style.transform=`translate(${tx.toFixed(1)}px,${ty.toFixed(1)}px)`;b.classList.remove('go');void b.offsetWidth;b.classList.add('go');if(typeof Sound!=='undefined')Sound.play('star',i)}return}
     if(!it.fell){it.fell=1;if(typeof Sound!=='undefined')Sound.play('fall',i)}
-    const sx=tx+VW*.55+i*60, sy=ty-VH*.95-i*40, e2=u*u*(1.4-.4*u);          // accelerate like a falling star
-    const x=sx+(tx-sx)*e2, y=sy+(ty-sy)*e2, vx=(tx-sx), vy=(ty-sy), ang=Math.atan2(vy,vx)*180/Math.PI;
-    el.style.opacity=Math.min(1,u*6).toFixed(3);
-    el.style.transform=`translate(${x.toFixed(1)}px,${y.toFixed(1)}px) rotate(${ang.toFixed(1)}deg)`;
-    el.style.setProperty('--tl',(90+260*Math.min(1,u*2)*(1-Math.max(0,u-.8)*3)).toFixed(0)+'px')});
+    // enters from beside the camera (huge, out of focus), spirals close to the lens, then recedes into the map to its spot
+    const cx=VW/2, cy=VH*.52, e=eIO(u), d=Math.pow(u,1.6);
+    const R=Math.max(VW,VH)*.62*Math.pow(1-u,1.35), th=(i*2.094)+Math.PI*.25+u*Math.PI*3.2;
+    const ox=lerp(cx,tx,e), oy=lerp(cy,ty,e);
+    const x=ox+Math.cos(th)*R, y=oy+Math.sin(th)*R*.72;
+    const sc=lerp(7,1,1-Math.pow(1-d,2.2));          // perspective: near → far
+    const pv=it.pv||[x,y]; const vx=x-pv[0], vy=y-pv[1]; it.pv=[x,y];
+    const ang=Math.atan2(vy,vx)*180/Math.PI, sp=Math.min(1,Math.hypot(vx,vy)/40);
+    el.style.opacity=(Math.min(1,u*8)).toFixed(3);
+    el.style.transform=`translate(${x.toFixed(1)}px,${y.toFixed(1)}px) rotate(${ang.toFixed(1)}deg) scale(${sc.toFixed(3)})`;
+    el.style.filter=sc>1.6?`blur(${((sc-1.6)*.9).toFixed(2)}px)`:'none';
+    el.style.setProperty('--tl',(40+180*sp).toFixed(0)+'px')});
 }
 fpTags.forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();fpOpen(+b.dataset.n)}));
 function fpOpen(n){Sound.play('open');const pu=PRODUCTS[n-1]&&PRODUCTS[n-1].url;if(pu){if(!/^https?:/.test(pu)){location.href=pu;return}let w=null;try{w=window.open(pu,'_blank')}catch(e){}if(w)return;const a=document.createElement('a');a.href=pu;a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();return}const it=FP.items[n-1];if(it){const r=it.scr[2]*2.2;FP.from=[it.scr[1]-r,VW-(it.scr[0]+r),VH-(it.scr[1]+r),it.scr[0]-r].map(v=>Math.max(0,v))}openDetail(n)}
