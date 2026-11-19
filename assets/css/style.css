@@ -56,7 +56,8 @@ svg{display:block}
 .nav.show{opacity:1;transform:none;pointer-events:auto}
 .nav.glass{background:rgba(255,255,255,.62);backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);border-bottom:1px solid var(--line)}
 .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:14px;letter-spacing:.06em}
-.logo i{width:18px;height:18px;border-radius:50%;background:var(--grad);box-shadow:0 0 14px rgba(184,182,229,.8)}
+.logo-mark{width:26px;height:26px;display:block;flex:none;filter:drop-shadow(0 0 8px rgba(184,182,229,.55));transition:transform .6s cubic-bezier(.34,1.56,.64,1)}
+.logo:hover .logo-mark{transform:rotate(45deg) scale(1.06)}
 .nav ul{display:flex;gap:clamp(18px,2.6vw,40px);list-style:none}
 .nav ul a{position:relative;font-size:13px;font-weight:600;letter-spacing:.06em;color:var(--text-2);padding:6px 0;transition:color .3s}
 .nav ul a::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;border-radius:2px;background:var(--grad);transform:scaleX(0);transform-origin:left;transition:transform .5s var(--ease)}
@@ -324,7 +325,7 @@ footer.site{padding:56px 24px;text-align:center;font-size:13px;color:var(--text-
 
 /* ---------- responsive ---------- */
 @media (max-width:900px){
-  .logo{font-size:12px;white-space:nowrap;gap:8px}.logo i{width:14px;height:14px}
+  .logo{font-size:12px;white-space:nowrap;gap:8px}.logo-mark{width:20px;height:20px}
   .nav ul{gap:14px}.nav ul a{font-size:11px}
   .wa-grid{grid-template-columns:1fr;align-content:center;gap:22px;padding-top:80px}
   .chapters{display:none}
@@ -742,7 +743,7 @@ body.dark-zone #sprog{box-shadow:0 0 14px rgba(232,176,221,.9)}
 .s2-tok::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid rgba(184,182,229,.8);opacity:0;transform:scale(.8);transition:all .6s var(--ease)}
 .s2-tok.on::after{opacity:1;transform:scale(1)}
 
-@media (max-width:520px){.logo{font-size:11px;letter-spacing:.02em;gap:7px}.logo i{width:14px;height:14px}.nav ul{gap:12px}}
+@media (max-width:520px){.logo{font-size:11px;letter-spacing:.02em;gap:7px}.logo-mark{width:19px;height:19px}.nav ul{gap:12px}}
 @media (max-width:900px){
   .wa-head{left:20px;right:20px;width:auto}
   .wa-head h2{font-size:8.6vw}
