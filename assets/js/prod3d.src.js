@@ -127,11 +127,11 @@ const Prod3D = {
     if (!c || c.host !== host) {
       if (c && c.cv.parentNode) c.cv.remove();
       const cv = document.createElement('canvas'); cv.className = 'pc-model'; cv.setAttribute('aria-hidden', 'true'); host.appendChild(cv);
-      const rr = mkRenderer(cv, 320, 320); const sc = new THREE.Scene(); sc.environment = rr.env;
+      const rr = mkRenderer(cv, 720, 720); const sc = new THREE.Scene(); sc.environment = rr.env;
       const l = new THREE.DirectionalLight(0xffffff, 1.6); l.position.set(-1, -2, 3);
-      sc.add(l, new THREE.HemisphereLight(0xEDE8FF, 0xF6D9C8, 0.9));
+      const l2 = new THREE.PointLight(0xC9C6FF, 8, 0); l2.position.set(2.5, 1.5, 1); sc.add(l, l2, new THREE.HemisphereLight(0xEDE8FF, 0xF6D9C8, 1.0));
       const obj = it.placed.clone(true); obj.visible = true; obj.position.set(0, 0, 0); obj.scale.setScalar(1); obj.children[0].rotation.set(0, 0, 0); sc.add(obj);
-      const cam = new THREE.PerspectiveCamera(30, 1, 0.1, 50); cam.up.set(0, 0, 1); cam.position.set(0, -4.6, 1.8); cam.lookAt(0, 0, 0);
+      const cam = new THREE.PerspectiveCamera(30, 1, 0.1, 50); cam.up.set(0, 0, 1); cam.position.set(0, -5.2, 1.9); cam.lookAt(0, 0, 0);
       c = this.cards[i] = { cv, rr, sc, cam, obj, host };
     }
     this.cards.forEach((o, k) => { if (o) o.cv.style.display = k === i ? 'block' : 'none'; });

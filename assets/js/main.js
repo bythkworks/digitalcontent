@@ -1123,7 +1123,7 @@ mstage.insertAdjacentHTML('beforeend',PRODUCTS.map(p=>`<button class="fp-tag" da
 const fpTags=$$('.fp-tag',mstage);
 const pjMapHead=document.createElement('div');pjMapHead.className='pj-maphead';pjMapHead.innerHTML='<span>MAP · 한눈에 보기</span><b>축제 곳곳의 세 가지 제품</b><em>제품에 마우스를 올려 보세요</em>';mstage.appendChild(pjMapHead);
 const pCard=document.createElement('div');pCard.className='p-card';pCard.setAttribute('aria-hidden','true');
-pCard.innerHTML='<div class="pc-stage"></div><div class="pc-txt"><span class="pc-k"></span><b class="pc-n"></b><p class="pc-o"></p><em>클릭하면 제품 페이지로 이동</em></div>';mstage.appendChild(pCard);
+pCard.innerHTML='<div class="pc-txt"><span class="pc-k"></span><b class="pc-n"></b><p class="pc-o"></p><em>클릭하면 제품 페이지로 이동 →</em></div><div class="pc-stage"></div>';mstage.appendChild(pCard);
 const pcStage=pCard.querySelector('.pc-stage');
 // shooting stars: the three orbs from "3가지 제품" fall into the map and become the products
 const fpStars=document.createElement('div');fpStars.className='fp-stars';fpStars.setAttribute('aria-hidden','true');
@@ -1215,7 +1215,7 @@ function tickFP(now){
   FP.cam=[lerp(O.e[0],eye[0],kx),lerp(O.e[1],eye[1],kx),lerp(O.e[2],eye[2],kz)];
   FP.look=[lerp(O.c[0],tgt[0],kx),lerp(O.c[1],tgt[1],kx),lerp(O.c[2],tgt[2],kz)];
   FP.fov=lerp(O.fv,mob?74:62,kd); FP.near=lerp(40,1.5,kd); FP.far=lerp(Math.hypot(...sub3(O.e,O.c))*2.2,3200,kd); FP.fog=eIn(range(k,.55,1));
-  FP.night=eIO(clamp((p-.26)/(.9-.26)))*(1-.55*fo); FP.crowdK=eIO(clamp((p-.3)/(.82-.3)));
+  FP.night=eIO(clamp((p-.26)/(.9-.26))); FP.crowdK=eIO(clamp((p-.3)/(.82-.3)));
   pjNight.style.opacity=FP.night.toFixed(3); pjSky.style.setProperty('--dusk',(Math.sin(Math.PI*clamp(FP.night*1.6))*(1-FP.night)).toFixed(3));
   pjSticky.classList.toggle('fp-dark',FP.night>.55);
   FP.items.forEach((it,i)=>{const tg=FP.act===i+1||FP.hover===i+1?1:0;it.glow=lerp(it.glow,tg,.08);
@@ -1239,9 +1239,7 @@ function tickFP(now){
   if(hv){const i=hv-1,pr=PRODUCTS[i],[x,y,rr]=FP.items[i].scr;
     if(pCard.dataset.i!==String(i)){pCard.dataset.i=i;pCard.querySelector('.pc-k').textContent=`0${pr.n} · ${CAT[pr.cat]} · ${pr.place}`;pCard.querySelector('.pc-n').textContent=pr.name;pCard.querySelector('.pc-o').textContent=pr.one}
     if(window.Prod3D&&Prod3D.ready)Prod3D.cardFrame(i,pcStage,now/1000);
-    const W=pCard.offsetWidth||320,H=pCard.offsetHeight||300,R=mstage.getBoundingClientRect();
-    let cx=x+rr*1.4+18, cy=y-H/2; if(cx+W>R.width-60)cx=x-rr*1.4-18-W; cy=Math.max(80,Math.min(R.height-H-20,cy));
-    pCard.style.transform=`translate(${cx.toFixed(0)}px,${cy.toFixed(0)}px)`; pCard.classList.add('on')}
+    pCard.classList.add('on')}
   else pCard.classList.remove('on');
 }
 
