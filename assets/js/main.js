@@ -1124,7 +1124,10 @@ const fpTags=$$('.fp-tag',mstage);
 const pjMapHead=document.createElement('div');pjMapHead.className='pj-maphead';pjMapHead.innerHTML='<span>MAP · 한눈에 보기</span><b>축제 곳곳의 세 가지 제품</b><em>제품에 마우스를 올려 보세요</em>';mstage.appendChild(pjMapHead);
 const pCard=document.createElement('div');pCard.className='p-card';pCard.setAttribute('aria-hidden','true');
 pCard.innerHTML='<div class="pc-txt"><span class="pc-k"></span><b class="pc-n"></b><p class="pc-o"></p></div><div class="pc-stage"></div><i class="pc-click">CLICK</i>';mstage.appendChild(pCard);
-const pcStage=pCard.querySelector('.pc-stage');
+const pcStage=pCard.querySelector('.pc-stage'), pcClick=pCard.querySelector('.pc-click');
+// the CLICK ring follows the pointer (eased) so it reads as "press here"
+{let tx=0,ty=0,cx=0,cy=0,raf=0;const step=()=>{cx+=(tx-cx)*.25;cy+=(ty-cy)*.25;pcClick.style.transform=`translate(${cx.toFixed(1)}px,${cy.toFixed(1)}px)`;raf=Math.abs(tx-cx)+Math.abs(ty-cy)>.3?requestAnimationFrame(step):0};
+ mstage.addEventListener('pointermove',e=>{const r=mstage.getBoundingClientRect();tx=e.clientX-r.left;ty=e.clientY-r.top;if(!pCard.classList.contains('on')){cx=tx;cy=ty}if(!raf)raf=requestAnimationFrame(step)})}
 // shooting stars: the three orbs from "3가지 제품" fall into the map and become the products
 const fpStars=document.createElement('div');fpStars.className='fp-stars';fpStars.setAttribute('aria-hidden','true');
 fpStars.innerHTML=[0,1,2].map(i=>`<div class="fp-star s${i}"><i class="tail"></i><i class="head"></i></div><div class="fp-burst s${i}"><i></i><i></i></div>`).join('');mstage.appendChild(fpStars);
