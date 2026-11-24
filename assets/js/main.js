@@ -1602,7 +1602,7 @@ const Sound=(()=>{
   const MOODS={'경쾌':{space:.28,echo:.25,bright:.9,oct:0},'몽환':{space:.6,echo:.55,bright:.72,oct:0},'차분':{space:.45,echo:.3,bright:.38,oct:-1},'반짝':{space:.5,echo:.7,bright:1,oct:1}};
   const TEX={musicbox:'오르골',glass:'유리 벨',soft:'소프트 패드',pluck:'플럭'};
   const P=Object.assign({vol:.8,tex:'musicbox',mood:'몽환',ix:true},MOODS['몽환']);
-  try{Object.assign(P,JSON.parse(localStorage.getItem('cf-sound-set')||'{}'))}catch(e){}
+  Object.assign(P,{vol:.8,tex:'musicbox',mood:'사용자',space:.5,echo:.02,bright:.02,oct:-1,ix:true}); // fixed sound setting (settings panel removed)
   const saveP=()=>{try{localStorage.setItem('cf-sound-set',JSON.stringify(P))}catch(e){}};
   const ICON_SND='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path class="w1" d="M15.5 8.5a5 5 0 0 1 0 7"/><path class="w2" d="M18.5 5.5a9 9 0 0 1 0 13"/><path class="x" d="m16 9 6 6m0-6-6 6"/></svg>';
   const ICON_SET='<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>';
@@ -1734,16 +1734,16 @@ const Sound=(()=>{
     fl.os.forEach((o,i)=>o.frequency.setTargetAtTime([293.66,440,587.33,739.99,880][i]*(1+q*.26),t,.3));
     // a rising music-box note every tenth of the flight
     const st=active?Math.floor(q*10):-1; if(active&&on&&st>flStep&&flStep>=0)box(pick(4+st),t,.045,.9,.5);if(st%2)box(pick(6+st),t+.09,.03,.7,.5); flStep=active?st:-1}
-  function set(v){on=v;if(!v&&fl){fly(false,0)}btn.setAttribute('aria-pressed',String(on));btn.classList.toggle('on',on);btn.querySelector('span').textContent=on?'소리 끄기':'소리 켜기';btn.title=on?'소리 끄기 (길게 누르거나 올려두면 설정)':'소리 켜기';wrap.classList.toggle('on',on);
+  function set(v){on=v;if(!v&&fl){fly(false,0)}btn.setAttribute('aria-pressed',String(on));btn.classList.toggle('on',on);btn.querySelector('span').textContent=on?'소리 끄기':'소리 켜기';btn.title=on?'소리 끄기':'소리 켜기';wrap.classList.toggle('on',on);
     try{sessionStorage.setItem('cf-sound',on?'1':'0')}catch(e){}
     if(on){if(!ctx)init();ctx.resume();play('on')}}
   // ---- droplet: hover (or long-press on touch) splits off the settings bubble ----
   let lpT=0,lpFired=false,hideT=0;
-  const openDrop=()=>{clearTimeout(hideT);wrap.classList.add('drop');setB.tabIndex=0};
+  const openDrop=()=>{};
   const closeDrop=()=>{if(wrap.classList.contains('panel'))return;clearTimeout(hideT);hideT=setTimeout(()=>{wrap.classList.remove('drop');setB.tabIndex=-1},380)};
   wrap.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse')openDrop()});
   wrap.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')closeDrop()});
-  btn.addEventListener('pointerdown',e=>{lpFired=false;clearTimeout(lpT);lpT=setTimeout(()=>{lpFired=true;openDrop();if(navigator.vibrate)try{navigator.vibrate(12)}catch(_){}} ,450)});
+  btn.addEventListener('pointerdown',e=>{lpFired=false;clearTimeout(lpT);if(0)lpT=setTimeout(()=>{lpFired=true;openDrop();if(navigator.vibrate)try{navigator.vibrate(12)}catch(_){}} ,450)});
   ['pointerup','pointercancel','pointerleave'].forEach(ev=>btn.addEventListener(ev,()=>clearTimeout(lpT)));
   btn.addEventListener('contextmenu',e=>e.preventDefault());
   btn.addEventListener('click',e=>{if(lpFired){e.preventDefault();lpFired=false;return}set(!on)});
