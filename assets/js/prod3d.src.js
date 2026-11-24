@@ -41,7 +41,7 @@ function normalize(root) {
 
 const Prod3D = {
   ready: false, items: [], fly: [],
-  init({ stage, flyHost, models, onReady }) {
+  init({ stage, flyHost, models, props, onReady }) {
     try {
       this.stage = stage; this.flyHost = flyHost;
       const cv = document.createElement('canvas'); cv.className = 'map-gl map-gl3'; cv.setAttribute('aria-hidden', 'true');
@@ -53,6 +53,8 @@ const Prod3D = {
       this.scene.add(new THREE.HemisphereLight(0xEDE8FF, 0xF6D9C8, 0.6));
       this.cam = new THREE.PerspectiveCamera(30, 1, 0.5, 6000); this.cam.up.set(0, 0, 1);
       const loader = new GLTFLoader(); let left = models.length;
+      this.props = {};
+      (props || []).forEach(m => loader.parse(b64(m.b64), '', (g) => { const o = normalize(g.scene); o.traverse(c => { if (c.isMesh) { c.frustumCulled = false; if (m.color && c.material) { c.material = c.material.clone(); c.material.color = new THREE.Color(m.color); c.material.roughness = 0.45; c.material.envMapIntensity = 1.1; } } }); o.visible = false; this.scene.add(o); this.props[m.key] = o; }, (e) => console.warn('prop', m.key, e)));
       models.forEach((m, i) => {
         loader.parse(b64(m.b64), '', (gltf) => {
           const placed = normalize(gltf.scene);
@@ -79,11 +81,18 @@ const Prod3D = {
     items.forEach((s, i) => {
       const it = this.items[i]; if (!it) return;
       const o = it.placed, show = s.land > 0.003 && s.vis !== false;
-      o.visible = show; if (!show) return; any = true;
+      o.visible = show; if (!show) { (it.extra || []).forEach(c => c.visible = false); return; } any = true;
       o.position.set(s.pos[0], -s.pos[1], s.pos[2]);
       o.rotation.set(0, 0, -s.rz); o.children[0].rotation.set(-s.tilt, 0, 0);
       o.scale.setScalar(s.scale * s.land);
+      // extra units of the same product (e.g. several PATH GUARD robots)
+      it.extra = it.extra || [];
+      (s.extra || []).forEach((e, k) => { let c = it.extra[k]; if (!c) { c = it.extra[k] = o.clone(true); this.scene.add(c); }
+        c.visible = true; c.position.set(e.pos[0], -e.pos[1], e.pos[2]); c.rotation.set(0, 0, -(e.rz ?? s.rz)); c.children[0].rotation.set(-(e.tilt ?? s.tilt), 0, 0); c.scale.setScalar(s.scale * s.land); });
+      for (let k = (s.extra || []).length; k < it.extra.length; k++) it.extra[k].visible = false;
     });
+    (st.props || []).forEach(pr => { const o = this.props && this.props[pr.key]; if (!o) return; o.visible = !!pr.vis; if (!pr.vis) return; any = true;
+      o.position.set(pr.pos[0], -pr.pos[1], pr.pos[2]); o.rotation.set(0, 0, pr.rz); o.scale.setScalar(pr.scale); });
     this.cv.style.visibility = any ? 'visible' : 'hidden';
     if (any) this.main.r.render(this.scene, C);
   },
