@@ -717,7 +717,7 @@ function drawMapGL(){
   drawBeams(M,e,t);
   if(!FP.ready)return;
   g.useProgram(FP.ip);g.uniformMatrix4fv(FP.iu.uM,false,new Float32Array(M));g.uniform3f(FP.iu.uCam,e[0],e[1],e[2]);g.uniform3fv(FP.iu.uL,TOON_SUN);
-  FP.items.forEach((it,i)=>{const pr=PRODUCTS[i],lf=FP.lift||0,S=STAGE_SLOTS[i],q=[lerp(pr.at[0],S[0],lf),lerp(pr.at[1],S[1],lf),lerp(pr.at[2],S[2],lf)],cf=ITEM_CFG[pr.model]||{s:4,tilt:.4}, ob=lerp(3.4,1,FP.kw??1), z=q[2]+(FP_ITEM_Z+cf.s*(ob-1)*.8)*(1-lf)+Math.sin(t*1.6+i*2)*1.2, sc=cf.s*ob*(1+(it.stopK||0)*(pr.model==='PATHGUARD'?.3:.95))*(1+(it.hov||0)*.2);
+  FP.items.forEach((it,i)=>{const pr=PRODUCTS[i],lf=FP.lift||0,S=STAGE_SLOTS[i],q=[lerp(pr.at[0],S[0],lf),lerp(pr.at[1],S[1],lf),lerp(pr.at[2],S[2],lf)],cf=ITEM_CFG[pr.model]||{s:4,tilt:.4}, ob=lerp(3.4,1,(FP.fo||0)>0?1-Math.pow(FP.fo,2.5):(FP.kw??1))*((FP.fo||0)>0?Math.max(.02,Math.min(1,Math.abs(FP.fo-.33)/.33)):1), z=q[2]+(FP_ITEM_Z+cf.s*(ob-1)*.8)*(1-lf)+Math.sin(t*1.6+i*2)*1.2, sc=cf.s*ob*(1+(it.stopK||0)*(pr.model==='PATHGUARD'?.3:.95))*(1+(it.hov||0)*.2);
     const L=it.land??1; it.pose={pos:[q[0],q[1],z],rz:t*.8+i*2.1+(1-Math.min(1,L))*4,tilt:cf.tilt+Math.sin(t*.7+i)*.08,scale:sc,land:L};
     if(pr.model==='PATHGUARD'){const S=PG_LANE.slots, az=PG_LANE.rz;   // standing on the plaza either side of the vehicle lane
       it.pose={pos:[S[0][0],S[0][1],PG_LANE.g+sc],rz:az+(1-Math.min(1,L))*4,tilt:0,scale:sc,land:L,extra:[{pos:[S[1][0],S[1][1],PG_LANE.g+sc],rz:az+Math.PI,tilt:0}]};
@@ -1239,7 +1239,7 @@ function renderProjects(p){
   pjTour.style.filter='none'; pjTour.classList.toggle('live',vis>.6); pjTourActive=vis>.3;
   pjHead.style.opacity=(1-eIO(range(p,.05,.12))).toFixed(3); pjHead.style.pointerEvents='none';
   fpHint.style.opacity=(eOut(range(p,.18,.24))*(1-range(p,.95,.97))).toFixed(3);
-  pjMapHead.style.opacity=eIO(range(p,.975,.993)).toFixed(3);
+  pjMapHead.style.opacity=eIO(range(FP.fo||0,.65,1)).toFixed(3);
 }
 ptGo.addEventListener('click',()=>fpOpen(+ptGo.dataset.n));
 // look around: drag sideways (touch keeps vertical scrolling)
@@ -1260,7 +1260,8 @@ function fpOverview(){const a=MGL.w/Math.max(1,MGL.h), mob=a<.9, fv=mob?30:16, t
   return {c,fv,e:[c[0]+Math.sin(r)*Math.cos(el)*D,c[1]+Math.cos(r)*Math.cos(el)*D,Math.sin(el)*D]}}
 function tickFP(now){
   const r=pjSticky.getBoundingClientRect(); if(r.bottom<0||r.top>VH||!MGL)return;
-  const p=pj.p, mob=VW<700, k0=eIO(range(p,.07,PJ_KN[0])), fo=eIO(range(p,.962,.993)), k=k0*(1-fo); FP.kw=k; FP.fo=fo;
+  const p=pj.p, mob=VW<700, k0=eIO(range(p,.07,PJ_KN[0])), fo=(()=>{const dt=Math.min(.05,(now-(FP.foTs||now))/1000);FP.foTs=now;const tg=p>.963?1:0;   // fly-up to the final map plays on a clock (~2.6s), not on scroll
+      FP.foL=Math.max(0,Math.min(1,(FP.foL||0)+(tg?1:-1)*dt/2.6));const x=FP.foL;return x*x*x*(x*(x*6-15)+10)})(), k=k0*(1-fo); FP.kw=k; FP.fo=fo;
   const s=FP.s, here=fpAt(s), eye=[here[0],here[1],here[2]+FP_EYE];
   let tgt=fpAt(s+46); tgt=[tgt[0],tgt[1],here[2]+FP_EYE-1.5];
   // turn toward the product at each stop, and toward the stage at the end
@@ -1272,7 +1273,7 @@ function tickFP(now){
   let dv=sub3(tgt,eye);const yr=FP.yaw*Math.PI/180,cy=Math.cos(yr),sy=Math.sin(yr);dv=[dv[0]*cy-dv[1]*sy,dv[0]*sy+dv[1]*cy,dv[2]];
   const hl=Math.hypot(dv[0],dv[1]);dv[2]+=Math.tan(-FP.pitch*Math.PI/180)*hl; tgt=[eye[0]+dv[0],eye[1]+dv[1],eye[2]+dv[2]];
   // fly in from above, then walk
-  const O=fpOverview(), kd=eIO(k), kx=fo>0?eIO(k):eOut(Math.min(1,k*1.1)), kz=fo>0?eIO(k):eIn(k);
+  const O=fpOverview(), kd=eIO(k), kx=fo>0?k:eOut(Math.min(1,k*1.1)), kz=fo>0?Math.pow(k,1.6):eIn(k);
   FP.cam=[lerp(O.e[0],eye[0],kx),lerp(O.e[1],eye[1],kx),lerp(O.e[2],eye[2],kz)];
   FP.look=[lerp(O.c[0],tgt[0],kx),lerp(O.c[1],tgt[1],kx),lerp(O.c[2],tgt[2],kz)];
   FP.fov=lerp(O.fv,mob?74:62,kd); FP.near=lerp(40,1.5,kd); FP.far=lerp(Math.hypot(...sub3(O.e,O.c))*2.2,3200,kd); FP.fog=eIn(range(k,.55,1));
