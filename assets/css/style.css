@@ -1235,6 +1235,15 @@ body:has(#detail.open) .snd,body:has(#detail.open) .day-clock{opacity:0;pointer-
 /* final map at night: keep text and labels readable */
 .pj-maphead span{color:#C9C6FF}.pj-maphead b{color:#fff;text-shadow:0 2px 18px rgba(0,0,0,.55)}.pj-maphead em{color:#E3DEFF;text-shadow:0 1px 10px rgba(0,0,0,.5)}
 .pj-fw{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3}
+/* product stop text at night: dark scrim on the left so white type stays readable over the bright stage */
+.pj-sticky::before{content:"";position:absolute;inset:0;z-index:5;pointer-events:none;opacity:0;transition:opacity .6s var(--ease);
+  background:linear-gradient(90deg,rgba(18,12,44,.72) 0%,rgba(18,12,44,.45) 26%,rgba(18,12,44,0) 44%)}
+.pj-sticky.fp-dark:has(.pj-tour.live)::before{opacity:1}
+.pj-sticky.fp-dark .pj-tour h3{text-shadow:0 2px 24px rgba(10,6,30,.6)}
+.pj-sticky.fp-dark .pj-tour p{color:rgba(255,255,255,.86);text-shadow:0 1px 12px rgba(10,6,30,.6)}
+.pj-sticky.fp-dark .pj-tour small{background:rgba(255,255,255,.16);color:#E3DEFF;border-color:rgba(255,255,255,.3)}
+.pj-sticky.fp-dark .pj-tour .btn.dark{background:#fff;color:#2E2B45}
+@media (max-width:700px){.pj-sticky::before{background:linear-gradient(0deg,rgba(18,12,44,.72) 0%,rgba(18,12,44,.45) 35%,rgba(18,12,44,0) 60%)}}
 /* ---- "하지만," glitch ---- */
 #turn.t-glitch .t-pre .t-h{animation:gMain 1.3s steps(1,end)}
 #turn.t-glitch .t-pre .t-h::before{animation:gA 1.3s steps(1,end)}
