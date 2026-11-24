@@ -885,6 +885,38 @@ const DCOL=['255,255,255','156,200,226','201,198,255','242,182,227','255,210,176
 const dust=Array.from({length:T_MOB?170:340},(_,i)=>({x:(Math.random()-.5)*2600,y:(Math.random()-.5)*1700,z:Math.random()*5200,
   a:Math.random()*Math.PI*2,o:.55+Math.random()*.9,sp:.4+Math.random()*1.2,s:.6+Math.random()*1.8,c:DCOL[i%5],k:i%3}));
 function sizeTurn(){dDpr=Math.min(devicePixelRatio||1,1.5);dW=innerWidth;dH=innerHeight;tDust.width=dW*dDpr;tDust.height=dH*dDpr}
+/* ---- the answer crumbles to dust, left to right, as the orbs take off ---- */
+const DUST={ps:null,cv:null,ctx:null,start:0,x0:0,x1:0,done:false};
+function dustBuild(){
+  const cv=DUST.cv||(DUST.cv=document.createElement('canvas')); if(!cv.parentNode){cv.className='t-dust';cv.setAttribute('aria-hidden','true');document.body.appendChild(cv)}
+  const dpr=1; cv.width=VW*dpr; cv.height=VH*dpr; DUST.ctx=cv.getContext('2d');
+  const off=document.createElement('canvas'); off.width=VW; off.height=VH; const o=off.getContext('2d');
+  const em=tA.querySelector('em'), er=em?em.getBoundingClientRect():null, G=['#9CC8E2','#B8B6E5','#E8B0DD'];
+  const gcol=x=>{if(!er)return'#fff';const f=Math.max(0,Math.min(1,(x-er.left)/Math.max(1,er.width)));return f<.5?G[0]:G[f<.75?1:2]};
+  let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9; const w=document.createTreeWalker(tA,NodeFilter.SHOW_TEXT); let n;
+  while((n=w.nextNode())){const el=n.parentElement, cs=getComputedStyle(el), fs=parseFloat(cs.fontSize), inEm=!!el.closest('em');
+    o.font=`${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`; o.textBaseline='alphabetic';
+    for(let i=0;i<n.length;i++){const ch=n.data[i]; if(!ch.trim())continue; const r=document.createRange(); r.setStart(n,i); r.setEnd(n,i+1); const b=r.getBoundingClientRect(); if(!b.width)continue;
+      x0=Math.min(x0,b.left);x1=Math.max(x1,b.right);y0=Math.min(y0,b.top);y1=Math.max(y1,b.bottom);
+      o.fillStyle=inEm?gcol(b.left+b.width/2):'#fff'; o.fillText(ch,b.left,b.top+(b.height+fs*.72)/2)}}
+  if(x1<x0){DUST.ps=[];return}
+  const X=Math.max(0,x0|0),Y=Math.max(0,y0|0),W=Math.min(VW,x1+2|0)-X,H=Math.min(VH,y1+2|0)-Y, d=o.getImageData(X,Y,W,H).data, st=VW<700?3:4, ps=[];
+  for(let yy=0;yy<H;yy+=st)for(let xx=0;xx<W;xx+=st){const k=(yy*W+xx)*4; if(d[k+3]>120){const r=Math.random();
+    ps.push({x:X+xx,y:Y+yy,c:`rgb(${d[k]},${d[k+1]},${d[k+2]})`,vx:.03+r*.13,vy:-(.02+Math.random()*.07),w:Math.random()*6.28,s:st*(.45+Math.random()*.45),j:Math.random()*.25})}}
+  DUST.ps=ps; DUST.x0=x0; DUST.x1=x1}
+function dustTick(t0){
+  if(!t0){if(DUST.ps){DUST.ps=null;DUST.done=false;tA.style.webkitMaskImage=tA.style.maskImage='';if(DUST.cv){DUST.ctx.clearRect(0,0,DUST.cv.width,DUST.cv.height);DUST.cv.style.display='none'}}return}
+  const now=performance.now(), T=now-t0-120, SW=1150, LIFE=1250;
+  if(T<0)return;
+  if(!DUST.ps){dustBuild();DUST.done=false;DUST.cv.style.display='block'}
+  const span=Math.max(1,DUST.x1-DUST.x0), front=DUST.x0+span*Math.min(1,T/SW), ar=tA.getBoundingClientRect(), fx=front-ar.left;
+  tA.style.webkitMaskImage=tA.style.maskImage=T>=SW?'linear-gradient(transparent,transparent)':`linear-gradient(90deg,transparent ${(fx-24).toFixed(0)}px,#000 ${(fx+36).toFixed(0)}px)`;
+  if(DUST.done)return;
+  const c=DUST.ctx; c.clearRect(0,0,DUST.cv.width,DUST.cv.height); let alive=0;
+  for(const p of DUST.ps){const born=(p.x-DUST.x0)/span*SW+p.j*240, a=T-born; if(a<0){continue} if(a>LIFE)continue; alive++;
+    const q=a/LIFE, x=p.x+p.vx*a+Math.sin(p.w+a*.006)*6*q, y=p.y+p.vy*a-.00006*a*a+Math.cos(p.w+a*.005)*4*q;
+    c.globalAlpha=(1-q)*(1-q); c.fillStyle=p.c; c.fillRect(x,y,p.s*(1-q*.5),p.s*(1-q*.5))}
+  c.globalAlpha=1; if(T>SW+LIFE+300&&!alive){DUST.done=true;c.clearRect(0,0,DUST.cv.width,DUST.cv.height)}}
 function renderTurn(p){turn.rp=p}
 function tickTurn(now){
   const el=turn.el,top=el.offsetTop,inView=scrollY+VH>top-10&&scrollY<top+el.offsetHeight+10;
@@ -953,6 +985,7 @@ function tickTurn(now){
     if(window.Prod3D&&Prod3D.ready&&k>.01&&fo<.999){Prod3D.coreFrame(i,e,t);e.classList.add('has-model')}
     const r=e.getBoundingClientRect(); CC.push([r.left+r.width/2,r.top+r.height/2,r.width])});
   tLenses.forEach((l,i)=>l.style.setProperty('--a',((t*50+i*120)%360).toFixed(1)+'deg'));
+  dustTick(tCores.TL&&tCores.TL.t);
   // ---- answer: warped in, crisp at rest, warped out
   const ak=eOut(range(p,.64,.77)), ao=eIn(range(p,.84,.9)), aw=(1-ak)+ao;
   tA.style.opacity=(ak*(1-ao)).toFixed(3);

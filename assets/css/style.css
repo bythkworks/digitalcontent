@@ -1208,6 +1208,7 @@ body:has(#detail.open) .snd,body:has(#detail.open) .day-clock{opacity:0;pointer-
 @media print{.sprail{display:none}}
 #sprog,.dots,.holdbar{display:none!important}
 .snd-set,.snd-panel,.snd-goo .b2{display:none!important}
+.t-dust{position:fixed;inset:0;width:100vw;height:100vh;z-index:6;pointer-events:none;display:none}
 /* ---- "하지만," glitch ---- */
 #turn.t-glitch .t-pre .t-h{animation:gMain 1.3s steps(1,end)}
 #turn.t-glitch .t-pre .t-h::before{animation:gA 1.3s steps(1,end)}
