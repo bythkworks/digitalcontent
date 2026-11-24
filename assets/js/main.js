@@ -629,10 +629,14 @@ gl_FragColor=vec4(min(c,1.),1.);}`;
     if(R()<.32){const side=R()<.5?-1:1;prism([b[0]+side*.95*hgt,b[1],b[2]],inf,.28,.24,4.2*hgt,7.6*hgt,4,2);
       if(R()<.6){const z=7.7*hgt;[[-.35,0,z],[.35,0,z],[.35,0,z+.75],[-.35,0,z],[.35,0,z+.75],[-.35,0,z+.75]].forEach(o=>push([b[0]+side*.95*hgt,b[1]-.3,b[2]],o,[inf[0],inf[1],inf[2],3]))}}
   }
+  // a few visitors around KNOBLE (entrance) and FLOWAY (playground): shows the products are for people. inf.z=-1 → always shown
+  const person=(x,y,z,k)=>{const b=[x,y,z],hgt=.95+R()*.15,inf=[R(),k/8+.01,-1,0];prism(b,inf,.78*hgt,.9*hgt,0,4.9*hgt,6,0);head(b,inf,5.75*hgt,.72*hgt)};
+  [['KNOBLE',[[-7,4],[8,6],[-3,-8],[11,-5],[2,12]]],['FLOWAY',[[-8,3],[7,7],[-2,-9],[10,-4],[-12,-6],[4,13]]]].forEach(([m,offs])=>{
+    const pr=PRODUCTS.find(p=>p.model===m); if(!pr)return; offs.forEach(([dx,dy],i)=>person(pr.at[0]+dx,pr.at[1]+dy,pr.at[2],(i*3)%8))});
   const buf=g.createBuffer();g.bindBuffer(g.ARRAY_BUFFER,buf);g.bufferData(g.ARRAY_BUFFER,new Float32Array(D),g.STATIC_DRAW);
   FP.crowd={p,buf,n:D.length/10,u:Object.fromEntries(['uM','uT','uC','uN','uL','uH'].map(k=>[k,g.getUniformLocation(p,k)])),a:['aB','aO','aI'].map(k=>g.getAttribLocation(p,k))};
 })();
-function drawCrowd(M,t){const C=FP.crowd;if(!C||(FP.crowdK||0)<.005)return;const g=MGL.g;
+function drawCrowd(M,t){const C=FP.crowd;if(!C)return;const g=MGL.g;
   g.useProgram(C.p);g.uniformMatrix4fv(C.u.uM,false,new Float32Array(M));g.uniform1f(C.u.uT,t);g.uniform1f(C.u.uC,FP.crowdK);g.uniform1f(C.u.uN,FP.night||0);g.uniform1f(C.u.uH,FP.hype||0);g.uniform3fv(C.u.uL,TOON_SUN);
   g.bindBuffer(g.ARRAY_BUFFER,C.buf);C.a.forEach(a=>g.enableVertexAttribArray(a));
   g.vertexAttribPointer(C.a[0],3,g.FLOAT,false,40,0);g.vertexAttribPointer(C.a[1],3,g.FLOAT,false,40,12);g.vertexAttribPointer(C.a[2],4,g.FLOAT,false,40,24);
