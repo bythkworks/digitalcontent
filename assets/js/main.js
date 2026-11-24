@@ -1121,6 +1121,10 @@ mstage.insertAdjacentHTML('beforeend','<svg class="fp-route" aria-hidden="true">
 const fpRouteSvg=$('.fp-route',mstage), fpRoute=$('.fp-route path',mstage);
 mstage.insertAdjacentHTML('beforeend',PRODUCTS.map(p=>`<button class="fp-tag" data-n="${p.n}" aria-label="${p.n}번 ${p.name} 소개 열기"><b>0${p.n}</b><span>${p.name}</span></button>`).join(''));
 const fpTags=$$('.fp-tag',mstage);
+const pjMapHead=document.createElement('div');pjMapHead.className='pj-maphead';pjMapHead.innerHTML='<span>MAP · 한눈에 보기</span><b>축제 곳곳의 세 가지 제품</b><em>제품에 마우스를 올려 보세요</em>';mstage.appendChild(pjMapHead);
+const pCard=document.createElement('div');pCard.className='p-card';pCard.setAttribute('aria-hidden','true');
+pCard.innerHTML='<div class="pc-stage"></div><div class="pc-txt"><span class="pc-k"></span><b class="pc-n"></b><p class="pc-o"></p><em>클릭하면 제품 페이지로 이동</em></div>';mstage.appendChild(pCard);
+const pcStage=pCard.querySelector('.pc-stage');
 // shooting stars: the three orbs from "3가지 제품" fall into the map and become the products
 const fpStars=document.createElement('div');fpStars.className='fp-stars';fpStars.setAttribute('aria-hidden','true');
 fpStars.innerHTML=[0,1,2].map(i=>`<div class="fp-star s${i}"><i class="tail"></i><i class="head"></i></div><div class="fp-burst s${i}"><i></i><i></i></div>`).join('');mstage.appendChild(fpStars);
@@ -1170,10 +1174,11 @@ function renderProjects(p){
     if(act){const pr=PRODUCTS[act-1];ptK.textContent=`0${act} · ${pr.place}`;ptN.textContent=pr.name;ptO.textContent=pr.one;ptGo.dataset.n=act;ptGo.style.display=''}
     else if(fin){ptK.textContent='도착';ptN.textContent='공연이 열리는 운동장';ptO.textContent='';ptGo.style.display='none'}}
   let vis=0; if(act)vis=1-clamp((Math.abs(p-PJ_KN[act]-(act===2?.025:0))-.02)/.03); else if(fin)vis=eOut(range(p,PJ_KN[4]-.04,PJ_KN[4]));
-  pjTour.style.opacity=vis.toFixed(3); pjTour.style.transform=`translateY(${VW<700?0:-50}%) translateY(${((1-vis)*30).toFixed(1)}px)`;
+  vis*=1-range(p,.958,.975); pjTour.style.opacity=vis.toFixed(3); pjTour.style.transform=`translateY(${VW<700?0:-50}%) translateY(${((1-vis)*30).toFixed(1)}px)`;
   pjTour.style.filter='none'; pjTour.classList.toggle('live',vis>.6); pjTourActive=vis>.3;
   pjHead.style.opacity=(1-eIO(range(p,.05,.12))).toFixed(3); pjHead.style.pointerEvents='none';
-  fpHint.style.opacity=(eOut(range(p,.18,.24))*(1-range(p,.95,.99))).toFixed(3);
+  fpHint.style.opacity=(eOut(range(p,.18,.24))*(1-range(p,.95,.97))).toFixed(3);
+  pjMapHead.style.opacity=eIO(range(p,.975,.993)).toFixed(3);
 }
 ptGo.addEventListener('click',()=>fpOpen(+ptGo.dataset.n));
 // look around: drag sideways (touch keeps vertical scrolling)
@@ -1194,7 +1199,7 @@ function fpOverview(){const a=MGL.w/Math.max(1,MGL.h), mob=a<.9, fv=mob?30:16, t
   return {c,fv,e:[c[0]+Math.sin(r)*Math.cos(el)*D,c[1]+Math.cos(r)*Math.cos(el)*D,Math.sin(el)*D]}}
 function tickFP(now){
   const r=pjSticky.getBoundingClientRect(); if(r.bottom<0||r.top>VH||!MGL)return;
-  const p=pj.p, mob=VW<700, k=eIO(range(p,.07,PJ_KN[0])); FP.kw=k;
+  const p=pj.p, mob=VW<700, k0=eIO(range(p,.07,PJ_KN[0])), fo=eIO(range(p,.962,.993)), k=k0*(1-fo); FP.kw=k; FP.fo=fo;
   const s=FP.s, here=fpAt(s), eye=[here[0],here[1],here[2]+FP_EYE];
   let tgt=fpAt(s+46); tgt=[tgt[0],tgt[1],here[2]+FP_EYE-1.5];
   // turn toward the product at each stop, and toward the stage at the end
@@ -1206,11 +1211,11 @@ function tickFP(now){
   let dv=sub3(tgt,eye);const yr=FP.yaw*Math.PI/180,cy=Math.cos(yr),sy=Math.sin(yr);dv=[dv[0]*cy-dv[1]*sy,dv[0]*sy+dv[1]*cy,dv[2]];
   const hl=Math.hypot(dv[0],dv[1]);dv[2]+=Math.tan(-FP.pitch*Math.PI/180)*hl; tgt=[eye[0]+dv[0],eye[1]+dv[1],eye[2]+dv[2]];
   // fly in from above, then walk
-  const O=fpOverview(), kd=eIO(k), kx=eOut(Math.min(1,k*1.1)), kz=eIn(k);
+  const O=fpOverview(), kd=eIO(k), kx=fo>0?eIO(k):eOut(Math.min(1,k*1.1)), kz=fo>0?eIO(k):eIn(k);
   FP.cam=[lerp(O.e[0],eye[0],kx),lerp(O.e[1],eye[1],kx),lerp(O.e[2],eye[2],kz)];
   FP.look=[lerp(O.c[0],tgt[0],kx),lerp(O.c[1],tgt[1],kx),lerp(O.c[2],tgt[2],kz)];
   FP.fov=lerp(O.fv,mob?74:62,kd); FP.near=lerp(40,1.5,kd); FP.far=lerp(Math.hypot(...sub3(O.e,O.c))*2.2,3200,kd); FP.fog=eIn(range(k,.55,1));
-  FP.night=eIO(clamp((p-.26)/(.9-.26))); FP.crowdK=eIO(clamp((p-.3)/(.82-.3)));
+  FP.night=eIO(clamp((p-.26)/(.9-.26)))*(1-.55*fo); FP.crowdK=eIO(clamp((p-.3)/(.82-.3)));
   pjNight.style.opacity=FP.night.toFixed(3); pjSky.style.setProperty('--dusk',(Math.sin(Math.PI*clamp(FP.night*1.6))*(1-FP.night)).toFixed(3));
   pjSticky.classList.toggle('fp-dark',FP.night>.55);
   FP.items.forEach((it,i)=>{const tg=FP.act===i+1||FP.hover===i+1?1:0;it.glow=lerp(it.glow,tg,.08);
@@ -1229,6 +1234,15 @@ function tickFP(now){
     b.style.opacity=o.toFixed(3);b.style.pointerEvents=o>.4?'auto':'none';
     b.style.transform=`translate(${x.toFixed(1)}px,${(y-rr*1.15-10).toFixed(1)}px) translate(-50%,-100%) scale(${(.85+.15*it.glow).toFixed(3)})`;
     b.classList.toggle('on',it.glow>.5)});
+  // final overview: hover a product → card with its model + summary
+  const hv=FP.fo>.85?FP.hover:0;
+  if(hv){const i=hv-1,pr=PRODUCTS[i],[x,y,rr]=FP.items[i].scr;
+    if(pCard.dataset.i!==String(i)){pCard.dataset.i=i;pCard.querySelector('.pc-k').textContent=`0${pr.n} · ${CAT[pr.cat]} · ${pr.place}`;pCard.querySelector('.pc-n').textContent=pr.name;pCard.querySelector('.pc-o').textContent=pr.one}
+    if(window.Prod3D&&Prod3D.ready)Prod3D.cardFrame(i,pcStage,now/1000);
+    const W=pCard.offsetWidth||320,H=pCard.offsetHeight||300,R=mstage.getBoundingClientRect();
+    let cx=x+rr*1.4+18, cy=y-H/2; if(cx+W>R.width-60)cx=x-rr*1.4-18-W; cy=Math.max(80,Math.min(R.height-H-20,cy));
+    pCard.style.transform=`translate(${cx.toFixed(0)}px,${cy.toFixed(0)}px)`; pCard.classList.add('on')}
+  else pCard.classList.remove('on');
 }
 
 /* ======================= shared pointer tilt + epilogue card ======================= */
@@ -1251,7 +1265,7 @@ function tickPjSky(){
 }
 /* ======================= SCROLL PAUSES + SNAP ======================= */
 // mapped progress values where the scene should rest (content fully shown)
-const HOLDS={'intro':[0,.44,1],'world-a':[.04,.24,.4467,.6533,.86],'world-c':[.11,.22,.35,.45,.55,.65,.78,.92],'system':[.05,.31,.53,.8],'turn':[.07,.42,.8],'projects':[.03,.36,.595,.77,.955]};
+const HOLDS={'intro':[0,.44,1],'world-a':[.04,.24,.4467,.6533,.86],'world-c':[.11,.22,.35,.45,.55,.65,.78,.92],'system':[.05,.31,.53,.8],'turn':[.07,.42,.8],'projects':[.03,.36,.595,.77,.955,.996]};
 const HOLD_W={'intro':.07,'world-a':.05,'world-c':.05,'system':.05,'turn':.07,'projects':.045};   // raw share of the section each pause takes
 const KNOTS={};
 for(const id in HOLDS){const H=HOLDS[id],w=HOLD_W[id],mv=1-H.length*w,k=[[0,0]];let pr=0,pm=0;

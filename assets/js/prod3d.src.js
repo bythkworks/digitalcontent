@@ -119,6 +119,25 @@ const Prod3D = {
     const lb = s.blur / Math.max(.2, k); // filter runs before the scale
     f.cv.style.filter = lb > 0.15 ? `blur(${lb.toFixed(2)}px)` : 'none';
   },
+  // hover card on the final overview map: the product with its own (original) materials, turning slowly
+  cardFrame(i, host, t) {
+    const it = this.items[i]; if (!it) return;
+    this.cards = this.cards || [];
+    let c = this.cards[i];
+    if (!c || c.host !== host) {
+      if (c && c.cv.parentNode) c.cv.remove();
+      const cv = document.createElement('canvas'); cv.className = 'pc-model'; cv.setAttribute('aria-hidden', 'true'); host.appendChild(cv);
+      const rr = mkRenderer(cv, 320, 320); const sc = new THREE.Scene(); sc.environment = rr.env;
+      const l = new THREE.DirectionalLight(0xffffff, 1.6); l.position.set(-1, -2, 3);
+      sc.add(l, new THREE.HemisphereLight(0xEDE8FF, 0xF6D9C8, 0.9));
+      const obj = it.placed.clone(true); obj.visible = true; obj.position.set(0, 0, 0); obj.scale.setScalar(1); obj.children[0].rotation.set(0, 0, 0); sc.add(obj);
+      const cam = new THREE.PerspectiveCamera(30, 1, 0.1, 50); cam.up.set(0, 0, 1); cam.position.set(0, -4.6, 1.8); cam.lookAt(0, 0, 0);
+      c = this.cards[i] = { cv, rr, sc, cam, obj, host };
+    }
+    this.cards.forEach((o, k) => { if (o) o.cv.style.display = k === i ? 'block' : 'none'; });
+    c.obj.rotation.set(0.25, 0, t * 0.6);
+    c.rr.r.render(c.sc, c.cam);
+  },
   // "3가지 제품" in the QUESTION scene: the same dreamy model, spinning in place of the old orbs
   coreFrame(i, host, t) {
     const it = this.items[i]; if (!it) return;
