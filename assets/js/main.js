@@ -1485,7 +1485,6 @@ function cursorState(t){
   if(t.closest('.pin'))return['lbl','OPEN'];
   if(t.closest('.gallery button'))return['lbl','VIEW'];
   if(t.closest(CLICKABLE))return['big',''];
-  if(t.closest('.map-stage'))return['lbl',drag?'·  ·':'DRAG'];
   if(t.closest('.steps'))return['lbl','SWIPE'];
   return['',''];
 }
