@@ -522,7 +522,7 @@ const FP_STAGE=[626,226,20];                    // stage at the north edge of th
 const FP_EYE=7, FP_ITEM_Z=14;
 // PATH GUARD: two robots on the plaza floor either side of the walkway, which becomes a temporary vehicle lane
 // the truck's route (marked by the team): from the near walkway, between the two robots, on toward the stage
-const TRUCK_ROUTE=[[500,485],[504,469],[508,453],[517,426],[542,355],[556,315]];
+const TRUCK_ROUTE=[[496.5,475],[499,473.5],[501,463.5],[503.5,443.5],[507,408.5],[509.5,380],[512,350]];
 function routeAt(R,u){const L=[0];for(let i=1;i<R.length;i++)L.push(L[i-1]+Math.hypot(R[i][0]-R[i-1][0],R[i][1]-R[i-1][1]));
   const t=Math.max(0,Math.min(1,u))*L[L.length-1];let i=1;while(i<R.length-1&&L[i]<t)i++;
   const seg=L[i]-L[i-1]||1,f=(t-L[i-1])/seg,dx=(R[i][0]-R[i-1][0])/seg,dy=(R[i][1]-R[i-1][1])/seg;
@@ -1211,7 +1211,7 @@ function tickFP(now){
   if(window.Prod3D&&Prod3D.ready&&FP.kw>.9&&p>.525&&p<.69){   // delivery truck drives the marked route between the PATH GUARD robots as you scroll
     const ul=range(p,.535,.67), u=eIO(ul), TS=15, q=routeAt(TRUCK_ROUTE,u);
     const op=clamp((p-.525)/.03)*(1-eIO(range(ul,.45,.9)));                 // fades in, and fades out once past the robots
-    if(op>.005)truck={key:'TRUCK',vis:true,op,pos:[q[0],q[1],PG_LANE.g+TS*.52],rz:Math.atan2(-q[3],q[2]),scale:TS}}
+    if(op>.005)truck={key:'TRUCK',vis:true,op,pos:[q[0],q[1],PG_LANE.g+TS*.52],rz:Math.atan2(-q[3],q[2])+Math.PI,scale:TS}}
   if(window.Prod3D&&Prod3D.ready)Prod3D.frame({cam:FP.cam,look:FP.look,fov:FP.fov,w:MGL.w,h:MGL.h,t:now/1000,items:FP.items.map(it=>it.pose||{land:0}),props:truck?[truck]:[]});
   if(k<1){let d='';for(let i=0;i<FP_PATH.length;i+=2){const q=fpProject([FP_PATH[i][0],FP_PATH[i][1],FP_PATH[i][2]+1]);if(q)d+=(d?'L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1)}
     fpRoute.setAttribute('d',d);} fpRouteSvg.style.opacity=(1-eIO(range(k,0,.35))).toFixed(3);
