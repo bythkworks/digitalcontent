@@ -1803,3 +1803,36 @@ const Sound=(()=>{
 
 window.__site={map,openCard,openDetail,closeDetail};
 })();
+
+/* ---- right-side progress: the five scenes of the site ---- */
+window.SPRAIL={sections:()=>[['intro','INTRO'],['world-a','WORLD'],['world-c','EPILOGUE'],['turn','QUESTION'],['projects','PROJECTS']].map(([id,label])=>({el:document.getElementById(id),label})),
+  go:el=>jumpTo(el.id==='intro'?0:(HOLDS[el.id]?holdY(el.id,0):el.offsetTop))};
+/* right-side page progress: where you are on this page, at any time */
+(function(){
+  const cfg=window.SPRAIL||{};
+  const pick=cfg.sections||(()=>{const seen=new Set(),out=[];document.querySelectorAll(cfg.links||'header a[href^="#"]').forEach(a=>{const id=a.getAttribute('href').slice(1);if(!id||seen.has(id))return;const el=document.getElementById(id);if(!el)return;seen.add(id);out.push({el,label:(a.textContent||'').replace(/^[←↑\s]+/,'').trim()||id})});return out});
+  const goto=cfg.go||(el=>{const t=(el.closest('.pin-spacer')||el).getBoundingClientRect().top+scrollY;window.scrollTo({top:Math.max(0,t-(cfg.offset||0)),behavior:'smooth'})});
+  const top=el=>(el.closest('.pin-spacer')||el).getBoundingClientRect().top+scrollY;
+  let secs=[],rail,fill,head,now,ticks=[],cur=-1,mvT=0;
+  function build(){
+    secs=pick().filter(s=>s.el); if(!secs.length)return;
+    if(!rail){rail=document.createElement('nav');rail.className='sprail';rail.setAttribute('aria-label','페이지 진행 위치');document.body.appendChild(rail);
+      rail.addEventListener('pointerover',e=>{if(e.target.closest('.sp-tick'))rail.classList.add('hov')});rail.addEventListener('pointerout',()=>rail.classList.remove('hov'))}
+    rail.innerHTML='<div class="sp-track"><i class="sp-fill"></i>'+secs.map((s,i)=>`<button type="button" class="sp-tick" data-i="${i}" aria-label="${s.label}(으)로 이동"><span>${String(i+1).padStart(2,'0')} · ${s.label}</span></button>`).join('')+'<i class="sp-head"></i><div class="sp-now" aria-live="polite"></div></div>';
+    fill=rail.querySelector('.sp-fill');head=rail.querySelector('.sp-head');now=rail.querySelector('.sp-now');ticks=[...rail.querySelectorAll('.sp-tick')];
+    ticks.forEach(b=>b.addEventListener('click',()=>goto(secs[+b.dataset.i].el)));cur=-1;place();update()}
+  function maxY(){return Math.max(1,document.documentElement.scrollHeight-innerHeight)}
+  function place(){const M=maxY();secs.forEach((s,i)=>{s.y=Math.min(M,top(s.el));ticks[i].style.top=(s.y/M*100).toFixed(2)+'%'})}
+  function update(){if(!rail)return;const M=maxY(),y=scrollY,f=Math.min(1,Math.max(0,y/M));
+    fill.style.height=(f*100).toFixed(2)+'%';head.style.top=(f*100).toFixed(2)+'%';now.style.top=(f*100).toFixed(2)+'%';
+    let c=0;secs.forEach((s,i)=>{if(y+innerHeight*.35>=s.y)c=i});
+    ticks.forEach((t,i)=>t.classList.toggle('done',i<=c));
+    if(c!==cur){cur=c;now.innerHTML=`<b>${String(c+1).padStart(2,'0')}</b>${secs[c].label}`}
+    rail.classList.add('moving');clearTimeout(mvT);mvT=setTimeout(()=>rail.classList.remove('moving'),1200)}
+  let raf=0;const req=()=>{if(!raf)raf=requestAnimationFrame(()=>{raf=0;update()})};
+  addEventListener('scroll',req,{passive:true});
+  addEventListener('resize',()=>{place();update()});
+  const init=()=>{build();setTimeout(()=>{place();update()},800);setTimeout(()=>{place();update()},2500)};
+  if(document.readyState==='complete')init();else addEventListener('load',init);
+  window.SPRAIL_REFRESH=()=>{place();update()};
+})();
