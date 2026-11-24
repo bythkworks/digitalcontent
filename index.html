@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>College Festival 2031</title>
 <link rel="icon" type="image/png" href="assets/images/logo.png">
-<link rel="stylesheet" href="./assets/css/style.css?v=cea7debc">
+<link rel="stylesheet" href="./assets/css/style.css?v=c2a688d9">
 </head>
 <body>
 
@@ -50,8 +50,60 @@
       </div>
     </div>
 
-    <div class="portal" id="portal"><div class="scene" id="portalScene"></div></div>
-    <div class="portal-label" id="portalLabel" aria-hidden="true"><b>미래 축제의 풍경</b><small>게이트를 지나 축제로 들어갑니다</small></div>
+    <div class="portal" id="portal">
+      <div class="scene" id="portalScene">
+        <svg class="flight-defs" width="0" height="0" aria-hidden="true">
+          <defs>
+            <clipPath id="introGateOutline">
+              <path d="M57 389 C59 318 53 212 74 159 C93 115 124 110 173 115 C222 120 254 127 294 119 C352 107 430 55 470 42 C526 24 574 40 620 67 C666 94 691 126 694 165 C692 203 698 257 708 318 C716 341 730 357 742 365 L725 391 Q704 405 674 403 Q660 399 645 390 C639 340 638 288 632 246 C629 208 621 183 595 173 C547 167 510 154 467 133 C434 142 401 147 369 151 C339 154 309 167 281 170 C222 181 166 179 139 198 C116 214 104 244 99 284 L99 390 Q76 394 57 389 Z"/>
+            </clipPath>
+            <clipPath id="introVisitorsOutline">
+              <path d="M183 305 C182 300 183 296 182 291 C183 285 189 282 195 283 C201 283 205 286 204 291 C203 294 201 295 200 299 L198 306 C203 308 207 312 209 317 C211 321 212 331 213 336 L212 351 Q212 358 206 361 L207 374 L205 402 Q205 419 203 432 L202 436 Q207 438 203 441 Q197 445 185 443 L184 440 L184 428 Q184 419 186 414 L185 398 Q184 404 181 415 L179 420 Q181 426 179 433 Q182 440 177 443 C172 444 169 440 169 436 Q170 429 172 424 L172 418 Q174 410 173 399 Q171 394 173 384 L175 362 Q169 358 168 351 L168 335 Q167 325 172 318 Q175 310 183 305 Z"/>
+              <path d="M213 338 Q215 330 216 324 Q218 319 219 316 Q220 304 225 298 Q230 294 236 296 Q241 297 241 303 Q242 313 245 319 Q247 319 251 324 Q255 331 258 342 Q258 348 256 352 L257 357 Q260 362 259 368 Q258 372 251 373 L249 388 L249 412 L247 433 Q248 437 247 440 Q246 443 237 445 L232 443 Q231 447 229 448 Q222 450 221 446 L220 441 L221 431 Q223 425 226 426 L226 417 L225 399 L223 385 Q220 380 219 373 Q215 371 215 366 Q212 361 213 355 Z"/>
+            </clipPath>
+            <filter id="introPlantMatte" color-interpolation-filters="sRGB">
+              <feComponentTransfer><feFuncA type="linear" slope="1.34" intercept="-.34"/></feComponentTransfer>
+            </filter>
+            <clipPath id="introTreeCell">
+              <path d="M12 8H722V410L667 460L550 513L495 717H12Z"/>
+            </clipPath>
+            <radialGradient id="introPlantShadow">
+              <stop stop-color="#5D496E" stop-opacity=".24"/>
+              <stop offset="1" stop-color="#5D496E" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+        </svg>
+        <svg class="flight-plane flight-plaza" id="introPlazaLayer" viewBox="0 0 780 488" role="img" aria-label="파스텔빛 대학 축제 입구">
+          <image href="assets/images/intro-plaza.webp" width="780" height="488" preserveAspectRatio="xMidYMid slice"/>
+        </svg>
+        <svg class="flight-plane" id="introMidLayer" viewBox="0 0 780 488" aria-hidden="true">
+          <ellipse cx="185" cy="444" rx="21" ry="5" fill="url(#introPlantShadow)"/>
+          <ellipse cx="233" cy="448" rx="19" ry="4" fill="url(#introPlantShadow)"/>
+          <image href="assets/images/team-hero.webp" width="780" height="488" clip-path="url(#introVisitorsOutline)"/>
+        </svg>
+        <svg class="flight-plane" id="introGateLayer" viewBox="0 0 780 488" aria-hidden="true">
+          <image href="assets/images/team-hero.webp" width="780" height="488" clip-path="url(#introGateOutline)"/>
+        </svg>
+        <svg class="flight-plane" id="introTreeLayer" viewBox="0 0 780 488" aria-hidden="true">
+          <ellipse cx="49" cy="403" rx="45" ry="10" fill="url(#introPlantShadow)"/>
+          <svg x="-54" y="183" width="221" height="225" viewBox="12 12 710 702">
+            <image href="assets/images/intro-garden.webp" width="2172" height="724" clip-path="url(#introTreeCell)" filter="url(#introPlantMatte)"/>
+          </svg>
+        </svg>
+        <svg class="flight-plane" id="introRightBedLayer" viewBox="0 0 780 488" aria-hidden="true">
+          <ellipse cx="749" cy="468" rx="64" ry="10" fill="url(#introPlantShadow)"/>
+          <svg x="682" y="390" width="126" height="82" viewBox="1640 395 463 306">
+            <image href="assets/images/intro-garden.webp" width="2172" height="724" filter="url(#introPlantMatte)"/>
+          </svg>
+        </svg>
+        <svg class="flight-plane" id="introLeftBedLayer" viewBox="0 0 780 488" aria-hidden="true">
+          <ellipse cx="61" cy="477" rx="89" ry="10" fill="url(#introPlantShadow)"/>
+          <svg x="-27" y="425" width="180" height="57" viewBox="679 412 905 289">
+            <image href="assets/images/intro-garden.webp" width="2172" height="724" filter="url(#introPlantMatte)"/>
+          </svg>
+        </svg>
+      </div>
+    </div>
     <canvas id="particles" aria-hidden="true"></canvas>
     <canvas id="depthFx" aria-hidden="true"></canvas>
     <div class="veil" id="veil"></div>
@@ -94,31 +146,44 @@
       <div class="wa-deck" id="waDeck" aria-hidden="true"></div>
       <nav class="wa-prog" id="waProg" aria-label="챕터"></nav>
       <div class="wa-feat" id="waFeat" aria-label="세계관 챕터">
-        <div class="wf-arrows"><button type="button" class="wf-arr" data-d="-1" aria-label="이전 챕터"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m6 15 6-6 6 6"/></svg></button><button type="button" class="wf-arr" data-d="1" aria-label="다음 챕터"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button></div>
         <div class="wf-list" id="wfList"></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- 02 WORLD C -->
-<section id="world-c" aria-label="세계관 마무리">
-  <div class="stage"><div class="ec-bg" id="ecBg" aria-hidden="true"></div><div class="ec-wave" id="ecWave" aria-hidden="true"><i></i><i></i><i></i><i></i></div><div class="ec">
-    <div class="ec-scene"><div class="full-scene" id="wcScene"></div><span class="tag pill">축제 공간과 방문객 — 오후 7시</span></div>
-    <div class="ec-side">
-      <span class="label" id="ecLabel">02 · WORLD — EPILOGUE</span>
-      <div class="ec-phone" id="ecPhone">
-        <div class="ec-top"><i class="ec-av" aria-hidden="true"></i><div><b>나의 AI</b><small id="ecState">대기 중</small></div></div>
-        <div class="ec-thread"><div class="ec-list" id="ecList" aria-live="polite"></div></div>
-      </div>
-      <div class="to-system" id="wc6">
-        <div class="row"><span>NEXT</span><button data-go="turn">다음으로 <span aria-hidden="true">→</span></button></div>
-        <div class="hbar"><i id="wcbar"></i></div>
-      </div>
+<!-- 02 WORLD C · CONNECTED VISION (v15) — 이전 AI 대화 장면은 _modules/ai-chat-epilogue 에 보존 -->
+<section id="context-vision" aria-label="AI는 어떻게 사람과 공간의 움직임을 이해하는가">
+  <div class="cv-sticky">
+    <div class="cv-topbar"><div class="cv-wordmark"><span class="cv-mark"></span>MCU AI <span style="color:#ccc2dd;font-weight:450">/</span> CONNECTED VISION</div><div class="cv-topright">CAMPUS FESTIVAL · 2031</div></div>
+    <div class="cv-map-clip" aria-hidden="true">
+      <svg id="cv-svg" viewBox="0 0 1000 740" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <pattern id="cv-dots" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="12" cy="12" r="1.15" fill="#e6e1ee"/></pattern>
+        <linearGradient id="cv-booth-lilac" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f1eeff"/><stop offset="1" stop-color="#e8e4f6"/></linearGradient>
+        <linearGradient id="cv-booth-pink" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff3fa"/><stop offset="1" stop-color="#f6e8f5"/></linearGradient>
+        <linearGradient id="cv-booth-blue" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f0f9fc"/><stop offset="1" stop-color="#e7effa"/></linearGradient>
+        <radialGradient id="cv-user-light"><stop stop-color="#a998ee" stop-opacity=".28"/><stop offset="1" stop-color="#a998ee" stop-opacity="0"/></radialGradient>
+      </defs>
+      <rect x="-100" y="-300" width="1200" height="1350" fill="#fcfbfe"/>
+      <g id="cv-world">
+        <rect x="0" y="-350" width="1000" height="2900" fill="url(#cv-dots)" opacity=".68"/>
+        <!-- The path is deliberately narrow: this is a close-up walkway, never the whole festival map. -->
+        <rect x="328" y="-380" width="338" height="3000" rx="18" fill="#f5f4f9"/>
+        <path d="M 358 -350 V 2500 M 637 -350 V 2500" stroke="#ece7f4" stroke-width="2" stroke-dasharray="5 13" fill="none"/>
+        <g id="cv-zones"></g>
+        <g id="cv-visitors"></g>
+        <g id="cv-trail"></g>
+        <g id="cv-cameras"></g>
+        <g id="cv-walker" class="cv-person-dot"></g>
+      </g>
+      </svg>
     </div>
-  </div></div>
+    <div class="cv-copy"><div class="cv-copy-content" id="cv-copy-content" aria-live="polite"><p class="cv-step" id="cv-step">01 / 개인</p><h2 class="cv-heading" id="cv-heading">한 사람의 움직임을 읽고,</h2></div></div>
+    <div class="cv-site-note">SPATIAL INTELLIGENCE / 2031</div>
+    <div class="cv-bottom"><div class="cv-scrollhint"><span class="bar"></span><span>SCROLL TO FOLLOW</span></div><div class="cv-progress"><div class="cv-progress-track"><div class="cv-progress-fill" id="cv-progress-fill"></div></div><span class="cv-progress-index" id="cv-progress-index">01 / 03</span></div></div>
+  </div>
 </section>
-
 
 <!-- 03 SYSTEM -->
 <section id="system" aria-label="시스템">
@@ -242,7 +307,7 @@
 <script src="./assets/js/map-data.js?v=7e177d92"></script>
 <script src="./assets/js/products-glb.js?v=a3bf6576"></script>
 <script src="./assets/js/prod3d.js?v=5c32cd55"></script>
-<script src="./assets/js/main.js?v=bd3b9e06"></script>
-<script src="./assets/js/intro-flight.js?v=c060e2d9"></script>
+<script src="./assets/js/main.js?v=3982ec0a"></script>
+<script src="./assets/js/intro-flight.js?v=6b3e3953"></script>
 </body>
 </html>

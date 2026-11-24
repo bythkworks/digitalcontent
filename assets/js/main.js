@@ -141,13 +141,7 @@ let ci=0;
 h1.innerHTML=[...title].map(c=>c===' '?' ':`<span class="ch" style="animation-delay:${(.15+ci++*.035).toFixed(3)}s">${c}</span>`).join('')+
   `<span class="ch grad-text" style="animation-delay:${(.15+ci*.035+.08).toFixed(3)}s">2031</span>`;
 h1.querySelectorAll('.ch').forEach(s=>s.setAttribute('aria-hidden','true'));
-$('#portalScene').innerHTML=WORLD_ART[0];
-$('#wcScene').innerHTML=WORLD_ART[5];
-// epilogue backdrop: continues from WORLD CH.04 → evening festival → the place the person picks
-const EC_BG=[ // [base, blob1, blob2, blob3] — start → evening → the picked place (쉼터 · 무대 · 푸드 트럭)
-  ['#C9C3F2','#A9C9F0','#E9B8E0','#D9D4FF'],['#9C8FDB','#7E8BE0','#E59AC8','#F6BFA6'],
-  ['#BFD9E6','#A6DCCB','#C9C2FA','#EFE0FF'],['#8A78D8','#6F7FE6','#E688C7','#B8A0F5'],['#E9C2D6','#F5BE9E','#EC9FC4','#C8B6F4']];
-$('#ecBg').innerHTML=EC_BG.map(c=>`<div class="eb" style="--bg:${c[0]};--c1:${c[1]};--c2:${c[2]};--c3:${c[3]}"><i></i><i></i><i></i></div>`).join('');
+
 
 const intro={el:$('#intro'),p:0,t:0};
 const iTitle=$('#introTitle'),veil=$('#veil'),hint=$('#scrollHint'),introStage=$('#intro .stage');
@@ -219,17 +213,17 @@ $$('#waProg .world-art').forEach(im=>im.remove());
 // Apple-style feature list: pills on the left, the active one opens into a card
 $('#wfList').innerHTML=CHAPTERS.map((c,i)=>`<button type="button" class="wf-pill" data-i="${i}" aria-expanded="false"><span class="wf-hw"><span class="wf-clip"><span class="wf-head"><i class="wf-ic" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></i>${c.t}</span></span></span><span class="wf-bw"><span class="wf-clip"><span class="wf-body"><b>${c.t}.</b> ${c.d}</span></span></span></button>`).join('');$$('#waBg .world-art').forEach(im=>{im.alt=''});
 const waCs=$$('.wa-c'), waCards=$$('.wa-card'), waBtns=$$('#waProg button');
-const waFeat=$('#waFeat'), wfPills=$$('.wf-pill'), wfArr=$$('.wf-arr');
+const waFeat=$('#waFeat'), wfPills=$$('.wf-pill');
 function wfMeasure(){wfPills.forEach(p=>{const h=p.querySelector('.wf-head');p.style.setProperty('--pw',(Math.ceil(h.getBoundingClientRect().width)+2)+'px')})}
 wfMeasure();addEventListener('resize',wfMeasure);(document.fonts?document.fonts.ready:Promise.resolve()).then(wfMeasure);
 wfPills.forEach(p=>p.addEventListener('click',()=>scrollToY(holdY('world-a',+p.dataset.i+1))));
-wfArr.forEach(b=>b.addEventListener('click',()=>{const a=clamp((worldA.act??0)+ +b.dataset.d,0,3);scrollToY(holdY('world-a',a+1))})); const waBis=$$('.wa-bi'), waBimg=waBis.map(b=>b.firstElementChild);
+const waBis=$$('.wa-bi'), waBimg=waBis.map(b=>b.firstElementChild);
 // scattered (intro) poses: [x%, y%, zpx, rotY, rotZ, scale]
 const WA_SC=[[-34,-40,-300,22,-8,.6],[40,-50,-560,-12,7,.5],[-52,44,-420,16,9,.52],[44,42,-180,-18,-6,.62]];
 const WA_SCM=[[-26,-20,-260,16,-6,.6],[30,-26,-420,-10,6,.52],[-30,30,-360,12,7,.52],[28,26,-160,-12,-5,.62]];
 function renderWorldA(p){
   const s=clamp((p-.24)/.62)*3, act=Math.min(3,Math.round(s));
-  if(act!==worldA.act){worldA.act=act;waBtns.forEach((b,i)=>b.classList.toggle('on',i===act));waCs.forEach((c,i)=>c.setAttribute('aria-hidden',i===act?'false':'true'));chBtns.forEach((b,i)=>b.classList.toggle('on',i===act));wfPills.forEach((b,i)=>{b.classList.toggle('on',i===act);b.setAttribute('aria-expanded',String(i===act))});wfArr[0].disabled=act===0;wfArr[1].disabled=act===3}
+  if(act!==worldA.act){worldA.act=act;waBtns.forEach((b,i)=>b.classList.toggle('on',i===act));waCs.forEach((c,i)=>c.setAttribute('aria-hidden',i===act?'false':'true'));chBtns.forEach((b,i)=>b.classList.toggle('on',i===act));wfPills.forEach((b,i)=>{b.classList.toggle('on',i===act);b.setAttribute('aria-expanded',String(i===act))})}
   waProg.classList.toggle('show',p>.2&&p<.93);
 }
 function tickWorld(now){
@@ -242,7 +236,7 @@ function tickWorld(now){
   // heading: big statement → small header (desktop) / fades (mobile)
   const SC=mob?WA_SCM:WA_SC, tx=tilt.x, ty=tilt.y;
   const H=waHead.offsetHeight;
-  const ex=range(p,.93,.995), hg=eIO(range(p,.1,.17));
+  const ex=eIO(range(contextVision.getBoundingClientRect().top/VH,.72,.20)), hg=eIO(range(p,.1,.17));
   waHead.style.opacity=(1-hg).toFixed(3);waHead.style.transform=`translateY(${(-H/2-hg*60).toFixed(1)}px) scale(${(1-hg*.06).toFixed(4)})`;waHead.style.filter=hg>.01?`blur(${(hg*8).toFixed(2)}px)`:'none';
   // full-bleed cinematic background: grows out of the front card, then wipes chapter to chapter
   {const r=waDeck.getBoundingClientRect(), gi=1-g, rad=30*gi;
@@ -284,7 +278,7 @@ waBtns.forEach(b=>b.addEventListener('click',()=>scrollToY(holdY('world-a',+b.da
 {const PCOL=['#9CC8E2','#B8B6E5','#E8B0DD'];
  const WW=['ENTER','SENSE','UNDERSTAND','TOGETHER'];
  $('#ddWorld').innerHTML='<div class="dd-in">'+CHAPTERS.map((c,i)=>`<button type="button" data-jw="${i}" title="${c.t}"><b>0${i+1}</b><span>${WW[i]}</span></button>`).join('')
-   +'<hr><button type="button" data-jx="world-c"><b>05</b><span>EPILOGUE</span></button><button type="button" data-jx="turn"><b>06</b><span>QUESTION</span></button></div>';
+   +'<hr><button type="button" data-jx="context-vision"><b>05</b><span>EPILOGUE</span></button><button type="button" data-jx="turn"><b>06</b><span>QUESTION</span></button></div>';
  $('#ddProj').innerHTML='<div class="dd-in">'+PRODUCTS.map((p,i)=>`<button type="button" data-jp="${p.n}"><i style="--c:${PCOL[i]}"></i><span>${p.name}</span></button>`).join('')
    +'<hr><button type="button" data-jp="0"><i class="all"></i><span>FULL MAP</span></button></div>';
  $$('.nav-dd').forEach(dd=>dd.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;e.preventDefault();
@@ -293,63 +287,9 @@ waBtns.forEach(b=>b.addEventListener('click',()=>scrollToY(holdY('world-a',+b.da
    const li=dd.closest('li');li.classList.add('dd-off');b.blur();setTimeout(()=>li.classList.remove('dd-off'),600)}));}
 chBtns.forEach(b=>b.addEventListener('click',()=>{const i=+b.dataset.ch;const el=worldA.el;const top=el.offsetTop, h=el.offsetHeight-VH;scrollToY(holdY('world-a',i+1))}));
 
-/* ======================= WORLD C ======================= */
-/* ======================= WORLD EPILOGUE · 대화 ======================= */
-// [초안] 표시된 줄은 팀 문구로 바꿔 주세요. 나머지는 기존 에필로그 문구입니다.
-const EC_CHOICES=['조용한 쉼터','공연 무대 앞','푸드 트럭 거리'];                     // [초안]
-const EC_ROLES=[
-  {k:'개인',t:'자신의 경험을 이어가고',ic:'<svg width="22" height="22" viewBox="0 0 26 26" fill="none" stroke="#8E8AD8" stroke-width="1.8"><circle cx="13" cy="9" r="4"/><path d="M5 22c1.2-4.2 4.2-6 8-6s6.8 1.8 8 6" stroke-linecap="round"/></svg>'},
-  {k:'공간',t:'변화에 반응하며',ic:'<svg width="22" height="22" viewBox="0 0 26 26" fill="none" stroke="#7FAFD0" stroke-width="1.8"><path d="M4 21V11l9-6 9 6v10" stroke-linejoin="round"/><path d="M10 21v-6h6v6"/></svg>'},
-  {k:'운영자',t:'더 넓은 상황을 살필 수 있습니다',ic:'<svg width="22" height="22" viewBox="0 0 26 26" fill="none" stroke="#D08FC6" stroke-width="1.8"><circle cx="13" cy="13" r="8"/><circle cx="13" cy="13" r="3"/><path d="M13 2v4M13 20v4M2 13h4M20 13h4" stroke-linecap="round"/></svg>'}];
-const josa=w=>{const c=w.charCodeAt(w.length-1)-0xAC00;return c>=0&&c%28&&c%28!==8?'으로':'로'};
-const EC_MSG=[ // at: scroll progress where the message lands
-  {at:.06,who:'ai',html:'오후 7시예요. 지금 축제 공간이 가장 붐비고 있어요.'},                 // [초안]
-  {at:.15,who:'ai',kind:'choice',html:'지금 상황에 맞는 곳을 골라 봤어요.'},                    // [초안]
-  {at:.31,who:'me',reply:true},                                                                 // [초안] "○○(으)로 갈게요."
-  {at:.40,who:'me',html:'그런데 AI가 다 정해 주는 건가요?'},                                     // [초안]
-  {at:.50,who:'ai',kind:'big',html:'AI는 모든 것을<br>대신 결정하지 않습니다.'},
-  {at:.60,who:'ai',kind:'lead',html:'사람과 공간의 상황을 이해하고, 더 나은 선택을 돕습니다.'},
-  {at:.70,who:'ai',kind:'roles'}];
-const EC_PICK=.26, EC_TYPE=.045;
-const worldC={el:$('#world-c'),p:0,t:0};
-const ecList=$('#ecList'), ecState=$('#ecState'), ecLabel=$('#ecLabel'), ecPhone=$('#ecPhone'), wcScene=$('#wcScene'), wcbar=$('#wcbar'), wcNext=$('#wc6');
-const EC={pick:-1,user:-1,n:-1,typing:false};
-ecList.innerHTML=EC_MSG.map((m,i)=>{
-  let body=m.html||'';
-  if(m.kind==='choice')body+=`<div class="ec-opts">${EC_CHOICES.map((c,k)=>`<button type="button" data-k="${k}"><span>${c}</span><i aria-hidden="true"></i></button>`).join('')}</div>`;
-  if(m.kind==='roles')body=`<div class="ec-roles">${EC_ROLES.map(r=>`<div><span class="ec-ic">${r.ic}</span><b>${r.k}</b><span>${r.t}</span></div>`).join('')}</div>`;
-  if(m.reply)body='<span class="ec-reply"></span>';
-  return `<div class="ec-m ${m.who}${m.kind?' '+m.kind:''}" data-i="${i}">${m.who==='ai'?'<i class="ec-av" aria-hidden="true"></i>':''}<div class="ec-b">${body}</div></div>`}).join('')+
-  '<div class="ec-m ai typing" id="ecTyping"><i class="ec-av" aria-hidden="true"></i><div class="ec-b"><i></i><i></i><i></i></div></div>';
-const ecMs=$$('.ec-m[data-i]',ecList), ecTyping=$('#ecTyping'), ecOpts=$$('.ec-opts button',ecList), ecReply=$('.ec-reply',ecList);
-ecOpts.forEach(b=>b.addEventListener('click',()=>{EC.user=+b.dataset.k;ecSetPick(EC.user);
-  const target=EC_MSG[2].at+.01; if(worldC.p<target)scrollToY(holdY('world-c',2))}));
-function ecSetPick(k){if(k===EC.pick)return;EC.pick=k;ecOpts.forEach((b,i)=>b.classList.toggle('on',i===k));
-  if(k>=0){const c=EC_CHOICES[k];ecReply.textContent=`${c}${josa(c)} 갈게요.`}}
-function renderWorldC(p){
-  const n=EC_MSG.filter(m=>p>=m.at).length;
-  if(n!==EC.n){ecMs.forEach((m,i)=>m.classList.toggle('on',i<n));EC.n=n}
-  const nx=EC_MSG[n], typing=!!nx&&nx.who==='ai'&&p>=nx.at-EC_TYPE;
-  ecTyping.classList.toggle('on',typing); ecState.textContent=typing?'입력 중…':n?'방금 전':'대기 중';
-  // the person picks (their own tap wins; otherwise the middle option is chosen by scroll)
-  ecSetPick(p>=EC_PICK?(EC.user>=0?EC.user:1):(EC.user>=0?EC.user:-1));
-  {const sp=n===5&&!typing, w=$('#ecWave'); if(sp&&!w.classList.contains('on')){const b=$('.ec-m.big .ec-b'),st=w.getBoundingClientRect();if(b){const r=b.getBoundingClientRect();w.style.setProperty('--wx',(r.left+r.width/2-st.left).toFixed(0)+'px');w.style.setProperty('--wy',(r.top+r.height/2-st.top).toFixed(0)+'px')}}
-   w.classList.toggle('on',sp)}
-  ecPhone.classList.toggle('spot',n===5&&!typing);
-  {const pk=EC.pick, L=pk>=0&&p>=EC_PICK-.02?2+pk:n>=1||p>=.03?1:0; if(L!==EC.bgL){EC.bgL=L;$$('#ecBg .eb').forEach((e,i)=>e.classList.toggle('on',i===L))}
-   worldC.bgOut=1-range(p,.9,.99)}
-  ecPhone.classList.toggle('done',p>=EC_MSG[6].at+.04);
-  const ent=eOut(range(p,0,.06)); ecPhone.style.opacity=ent.toFixed(3); ecPhone.style.transform=`translateY(${(40*(1-ent)).toFixed(1)}px)`;
-  ecLabel.style.opacity=ent.toFixed(3);
-  const nxt=eOut(range(p,.8,.88)); wcNext.style.opacity=nxt.toFixed(3); wcNext.style.transform=`translateY(${(16*(1-nxt)).toFixed(1)}px)`;
-  wcbar.style.width=(range(p,.84,.98)*100).toFixed(2)+'%';
-  
-}
-const ecBgEl=$('#ecBg'), ecWaveEl=$('#ecWave');
-function tickWorldC(){ // gradient eases in from white while the section scrolls up, so there is no hard edge with WORLD
-  const r=worldC.el.getBoundingClientRect(); if(r.top>VH||r.bottom<0)return;
-  const inn=eIO(clamp(1-r.top/VH)); const o=(inn*(worldC.bgOut??1)).toFixed(3);
-  if(o!==worldC.bgO){worldC.bgO=o;ecBgEl.style.opacity=o;const fh=(Math.sqrt(1-clamp(1-r.top/VH))*90).toFixed(1);ecBgEl.style.webkitMaskImage=ecBgEl.style.maskImage=+fh>.1?`linear-gradient(180deg,transparent 0,#000 ${fh}vh)`:'none'}}
+/* ======================= WORLD C · CONNECTED VISION ======================= */
+// 화면은 context-vision 스크립트(메인 스크립트 끝)가 그린다. 이전 AI 대화 장면: _modules/ai-chat-epilogue
+const contextVision=$('#context-vision');
 
 /* ======================= SYSTEM ======================= */
 const nodesEl=$('#nodes'), sysDesc=$('#sysDesc');
@@ -1307,7 +1247,7 @@ function tickFP(now){
 }
 
 /* ======================= shared pointer tilt + epilogue card ======================= */
-const tilt={x:0,y:0}, wcImgBox=$('#world-c .wc-img');
+const tilt={x:0,y:0};
 function tickTilt(){tilt.x=lerp(tilt.x,tm.x,.06);tilt.y=lerp(tilt.y,tm.y,.06)}
 
 /* ---- PROJECTS sky: fades in from white as the section arrives, sun rises; fades out on leave ---- */
@@ -1326,8 +1266,8 @@ function tickPjSky(){
 }
 /* ======================= SCROLL PAUSES + SNAP ======================= */
 // mapped progress values where the scene should rest (content fully shown)
-const HOLDS={'intro':[0,.44,1],'world-a':[.04,.24,.4467,.6533,.86],'world-c':[.11,.22,.35,.45,.55,.65,.78,.92],'system':[.05,.31,.53,.8],'turn':[.07,.42,.8],'projects':[.03,.36,.595,.77,.955,.996]};
-const HOLD_W={'intro':.07,'world-a':.05,'world-c':.05,'system':.05,'turn':.07,'projects':.045};   // raw share of the section each pause takes
+const HOLDS={'intro':[0,.44,1],'world-a':[.04,.24,.4467,.6533,.86],'context-vision':[.12,.50,.88],'system':[.05,.31,.53,.8],'turn':[.07,.42,.8],'projects':[.03,.36,.595,.77,.955,.996]};
+const HOLD_W={'intro':.07,'world-a':.05,'context-vision':.05,'system':.05,'turn':.07,'projects':.045};   // raw share of the section each pause takes
 const KNOTS={};
 for(const id in HOLDS){const H=HOLDS[id],w=HOLD_W[id],mv=1-H.length*w,k=[[0,0]];let pr=0,pm=0;
   H.forEach(h=>{const r0=pr+(h-pm)*mv;k.push([r0,h],[r0+w,h]);pr=r0+w;pm=h});k.push([1,1]);KNOTS[id]=k}
@@ -1426,12 +1366,12 @@ const holdbar=document.createElement('div');holdbar.className='holdbar';holdbar.
 let hbKey='';
 function tickHoldbar(){
   let cur=null;for(const id in HOLDS){const el=$('#'+id);if(scrollY>=el.offsetTop-2&&scrollY<=el.offsetTop+el.offsetHeight-VH+2)cur=id}
-  const show=!!cur&&HOLDS[cur].length>1&&!['intro','world-a','system'].includes(cur); holdbar.classList.toggle('show',show); if(!show)return;
+  const show=!!cur&&HOLDS[cur].length>1&&!['intro','world-a','context-vision','system'].includes(cur); holdbar.classList.toggle('show',show); if(!show)return;
   const pts=HOLDS[cur].map((_,i)=>holdY(cur,i)); let a=0;pts.forEach((y,i)=>{if(scrollY>=y-VH*.35)a=i});
   const key=cur+pts.length; if(key!==hbKey){hbKey=key;holdbar.innerHTML=pts.map(()=>'<i></i>').join('')}
   [...holdbar.children].forEach((x,i)=>x.classList.toggle('on',i===a));
 }
-const scenes=[[intro,renderIntro],[worldA,renderWorldA],[worldC,renderWorldC],[system,renderSystem],[turn,renderTurn],[pj,renderProjects]];
+const scenes=[[intro,renderIntro],[worldA,renderWorldA],[system,renderSystem],[turn,renderTurn],[pj,renderProjects]];
 function progressOf(el){const top=el.offsetTop, h=el.offsetHeight-VH;return remap(el.id,clamp((scrollY-top)/h))}
 function updateChrome(){
   const y=scrollY+VH*.45; let cur=0;
@@ -1459,7 +1399,7 @@ function loop(){
     cmx=lerp(cmx,mx,.05);cmy=lerp(cmy,my,.05);
     if(!reduce)iorbs.forEach((o,i)=>o.style.transform=`translate(${(cmx*(30+i*14)).toFixed(1)}px,${(cmy*(30+i*14)).toFixed(1)}px)`);
     if(intro.p<.95||particles.list.length)tickParticles();
-    tickMap(); updateChrome(); tickHoldbar(); tickTilt(); tickWorld(performance.now()); tickWorldC(); tickTurn(performance.now()); tickSystem2(performance.now()); tickPjSky(); tickFP(performance.now()); Sound.tick();
+    tickMap(); updateChrome(); tickHoldbar(); tickTilt(); tickWorld(performance.now()); tickTurn(performance.now()); tickSystem2(performance.now()); tickPjSky(); tickFP(performance.now()); Sound.tick();
   }
   requestAnimationFrame(loop);
 }
@@ -1667,7 +1607,7 @@ function tickWorldImgs(){
   wImgs.forEach((im,k)=>{if(!im)return;const d=k-s;
     im.style.transform=`scale(${(1.04+.12*clamp(Math.abs(d))).toFixed(4)}) translate(${(fxm.x*-10).toFixed(1)}px,${(d*4+fxm.y*-8).toFixed(1)}px)`});
 }
-const wcImg=$('#wcScene .world-art');
+
 
 /* ---------- 9. System: comet along the link + pulses ---------- */
 const linkSvg=$('#linkSvg');
@@ -1727,7 +1667,6 @@ function fxLoop(now){
   tickCursor(); tickMag();
   if(!detail.classList.contains('ready')){
     drawGL(now); tickFlight(now); tickTitle(now); tickWorldImgs(); tickSystem(); tickSkew(); tickMapIdle(now);
-    if(wcImg&&!reduce)wcImg.style.translate=`${(fxm.x*-22).toFixed(1)}px ${(fxm.y*-14).toFixed(1)}px`;
     const H=document.documentElement.scrollHeight-VH; sprog.style.transform=`scaleX(${(H>0?scrollY/H:0).toFixed(4)})`;
   } else tickDetail(now);
   requestAnimationFrame(fxLoop);
@@ -1915,8 +1854,8 @@ const Sound=(()=>{
   syncUI();
   try{if(sessionStorage.getItem('cf-sound')==='1'){btn.classList.add('hint');btn.querySelector('span').textContent='소리 다시 켜기'}}catch(e){}
   // watch the page and fire cues on moments
-  const W={sec:null,ia:-1,wa:-1,ec:-1,ty:false,act:0,k:-1,hov:0,first:true};
-  const SECS=['intro','world-a','world-c','turn','projects'];
+  const W={sec:null,ia:-1,wa:-1,act:0,k:-1,hov:0,first:true};
+  const SECS=['intro','world-a','context-vision','turn','projects'];
   return {play,shimmer,fly,
     tick(){if(!on)return;
       let cur=null;for(const id of SECS){const r=$('#'+id).getBoundingClientRect();if(r.top<=VH*.5&&r.bottom>VH*.5)cur=id}
@@ -1931,9 +1870,6 @@ const Sound=(()=>{
       const ip=intro.p,ia=ip<.04?0:ip<.85?1:2; if(ia!==W.ia){if(W.ia===0&&ia===1)Sound.play('introFly');if(W.ia===1&&ia===2)Sound.play('introLand');W.ia=ia}
       // world chapter cards
       const wa=worldA.act??-1; if(wa!==W.wa){if(W.wa>=0&&wa>=0)Sound.play('card',wa>W.wa?1:-1);W.wa=wa}
-      // epilogue chat
-      const n=EC.n; if(n!==W.ec){if(W.ec>=0&&n>W.ec){const m=EC_MSG[n-1];m&&m.kind==='big'?Sound.play('key'):m&&m.who==='me'?Sound.play('msgMe'):Sound.play('msgAi')}W.ec=n}
-      const ty=$('#ecTyping')&&$('#ecTyping').classList.contains('on'); if(ty&&!W.ty)Sound.play('typing'); W.ty=ty;
       // map: dive into first person, product stops, hover
       const k=pj.p>.12?1:0; if(k!==W.k){if(W.k===0&&k===1)Sound.play('dive');W.k=k}
       if(FP.act&&FP.act!==W.act)Sound.play('stop',FP.act-1); W.act=FP.act||0;
@@ -1945,7 +1881,7 @@ window.__site={map,openCard,openDetail,closeDetail};
 })();
 
 /* ---- right-side progress: the five scenes of the site ---- */
-window.SPRAIL={sections:()=>[['intro','INTRO'],['world-a','WORLD'],['world-c','EPILOGUE'],['turn','QUESTION'],['projects','PROJECTS']].map(([id,label])=>({el:document.getElementById(id),label})),
+window.SPRAIL={sections:()=>[['intro','INTRO'],['world-a','WORLD'],['context-vision','EPILOGUE'],['turn','QUESTION'],['projects','PROJECTS']].map(([id,label])=>({el:document.getElementById(id),label})),
   go:el=>jumpTo(el.id==='intro'?0:(HOLDS[el.id]?holdY(el.id,0):el.offsetTop))};
 /* right-edge liquid-glass progress: a thin glass edge that dents in where you are, and settles flat when you stop */
 (function(){
@@ -2001,4 +1937,183 @@ window.SPRAIL={sections:()=>[['intro','INTRO'],['world-a','WORLD'],['world-c','E
   const init=()=>{build();setTimeout(()=>{place();kick()},800);setTimeout(()=>{place();kick()},2500)};
   if(document.readyState==='complete')init();else addEventListener('load',init);
   window.SPRAIL_REFRESH=()=>{place();kick()};
+})();
+
+
+/* ======================= CONNECTED VISION (v15) ======================= */
+(()=>{
+  const ns='http://www.w3.org/2000/svg';
+  const root=document.getElementById('context-vision');
+  if (!root || root.dataset.cvInitialized === 'true') return;
+  root.dataset.cvInitialized = 'true';
+  const world=document.getElementById('cv-world');
+  const mapSvg=document.getElementById('cv-svg');
+  const zones=document.getElementById('cv-zones');
+  const visitorsG=document.getElementById('cv-visitors');
+  const trailG=document.getElementById('cv-trail');
+  const camG=document.getElementById('cv-cameras');
+  const walkerG=document.getElementById('cv-walker');
+  const h=document.getElementById('cv-heading'),step=document.getElementById('cv-step');
+  const progressFill=document.getElementById('cv-progress-fill'),progressIndex=document.getElementById('cv-progress-index');
+  const copyContent=document.getElementById('cv-copy-content');
+  const svg=(tag,attrs={},target)=>{let el=document.createElementNS(ns,tag);Object.entries(attrs).forEach(([key,val])=>el.setAttribute(key,val));if(target)target.append(el);return el};
+  const txt=(x,y,s,cls,t)=>{const el=svg('text',{x,y,class:cls,'text-anchor':'middle'},t);el.textContent=s;return el};
+  const box=(x,y,w,ht,color,label,sub,type)=>{
+    const g=svg('g',{},zones);
+    svg('rect',{x:x+1,y:y+8,width:w,height:ht,rx:20,fill:'#9b84c4','fill-opacity':'.04'},g);
+    svg('rect',{x,y,width:w,height:ht,rx:19,fill:`url(#cv-booth-${color})`,class:'cv-booth-outline'},g);
+    svg('rect',{x:x+16,y:y+15,width:w-32,height:ht-30,rx:13,fill:'#fff','fill-opacity':'.28',stroke:'#fff','stroke-opacity':'.64'},g);
+    if(type==='truck'){
+      svg('rect',{x:x+63,y:y+47,width:w-126,height:67,rx:13,fill:'#fff','fill-opacity':'.73',stroke:'#d7cee8'},g);
+      svg('rect',{x:x+80,y:y+60,width:w-160,height:31,rx:5,fill:'#eed9f4'},g);
+      for(let i=0;i<3;i++)svg('rect',{x:x+91+i*23,y:y+60,width:10,height:31,fill:'#fff','fill-opacity':'.45'},g);
+      for(let i=0;i<2;i++)svg('circle',{cx:x+83+i*(w-166),cy:y+112,r:7,fill:'#c7bad5'},g);
+    }else if(type==='stage'){
+      svg('rect',{x:x+30,y:y+38,width:w-60,height:82,rx:10,fill:'#d8cfee',stroke:'#beb1da'},g);
+      svg('path',{d:`M ${x+39} ${y+104} Q ${x+w/2} ${y+58} ${x+w-39} ${y+104}`,stroke:'#b4a2d5','stroke-width':2,fill:'none'},g);
+      svg('rect',{x:x+54,y:y+49,width:w-108,height:8,rx:4,fill:'#fff','fill-opacity':'.9'},g);
+    }else if(type==='table'){
+      for(let i=0;i<3;i++){let cx=x+65+(i%2)*106,cy=y+55+Math.floor(i/2)*82;
+        svg('circle',{cx,cy,r:22,fill:'#fff',stroke:'#d4c9e3','stroke-width':2},g);
+        for(let j=0;j<4;j++){const a=j*Math.PI/2;svg('circle',{cx:cx+Math.cos(a)*36,cy:cy+Math.sin(a)*36,r:8,fill:'#dcd0ed'},g)}
+      }
+    }else if(type==='market'){
+      for(let i=0;i<3;i++){svg('rect',{x:x+25+i*(w-56)/3,y:y+47,width:(w-73)/3,height:58,rx:8,fill:'#fff',stroke:'#d4c7ea'},g);svg('rect',{x:x+29+i*(w-56)/3,y:y+54,width:(w-81)/3,height:9,rx:4,fill:'#eadcf2'},g)}
+    }else{
+      for(let i=0;i<2;i++){svg('rect',{x:x+46+i*(w-146),y:y+43,width:54,height:58,rx:12,fill:'#fff',fillOpacity:'.68',stroke:'#ddd5e8'},g)}
+    }
+    txt(x+w/2,y+ht-38,label,'cv-world-item-label',g);txt(x+w/2,y+ht-20,sub,'cv-world-item-sub',g);
+  };
+  // Festival spaces along a single walkway, not a full festival map.
+  box(55,80,250,232,'pink','FOOD TRUCK','푸드트럭 거리','truck');
+  box(683,110,255,194,'blue','WELCOME','축제 입구','market');
+  box(53,535,248,206,'lilac','POP-UP BOOTH','체험 부스','market');
+  box(693,600,254,223,'pink','FESTIVAL MARKET','플리마켓','market');
+  box(63,964,238,224,'blue','CAFE ZONE','음료 · 휴식 공간','table');
+  box(698,1040,245,214,'lilac','REST AREA','라운지','table');
+  box(62,1424,250,231,'lilac','MAIN STAGE','공연장','stage');
+  box(694,1510,259,208,'blue','MUSIC & LIGHT','공연 관람 구역','stage');
+  // Small planters and pavement details, placed to reinforce map scale.
+  const makePlanter=(x,y)=>{const g=svg('g',{},zones);svg('rect',{x,y,width:63,height:28,rx:14,fill:'#f2f5f1',stroke:'#e3e8df'},g);[16,32,48].forEach((a,i)=>svg('circle',{cx:x+a,cy:y+14,r:i===1?10:8,fill:i===1?'#b1d8bd':'#cce4ce'},g))};
+  [[337,350],[599,480],[337,880],[599,1247],[337,1702],[598,1788]].forEach(([x,y])=>makePlanter(x,y));
+  for(let y=0;y<2050;y+=240){svg('path',{d:`M 486 ${y+100} v 30`,stroke:'#ddd6e9','stroke-width':2,'stroke-linecap':'round','stroke-dasharray':'3 10',fill:'none'},zones)}
+  // Nearby visitors: deterministic, non-overlapping micro-crowds near active stalls.
+  // Dense areas vary by venue; the central walking lane remains readable.
+  const pedestrians=[];
+  let seed=42;
+  const random=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296};
+  const palette=['#d7cfe6','#dfc9dc','#ccdcea','#cfc9df','#ead5e4','#c6d9d9'];
+  const occupied=[];
+  const addVisitor=(x,y,kind,groupId)=>{
+    const g=svg('g',{},visitorsG);
+    const r=kind==='walking'?7.5+random()*1.5:7.5+random()*2;
+    svg('ellipse',{cx:0,cy:5,rx:r+2,ry:5,fill:'#cabedb','fill-opacity':'.18'},g);
+    svg('circle',{r:r.toFixed(1),fill:palette[Math.floor(random()*palette.length)],stroke:'#fff','stroke-width':1.5},g);
+    pedestrians.push({g,x,y,kind,groupId,phase:random()*Math.PI*2,speed:(random()>.48?1:-1)*(kind==='walking'?90+random()*50:2+random()*5),drift:kind==='walking'?4+random()*8:1+random()*2});
+    occupied.push({x,y});
+  };
+  const camerasRaw=[{x:332,y:223},{x:681,y:780},{x:329,y:1384}];
+  const canStand=(x,y,minGap)=>occupied.every(a=>(a.x-x)**2+(a.y-y)**2>minGap*minGap)&&
+    camerasRaw.every(c=>(c.x-x)**2+(c.y-y)**2>42**2);
+  // Cluster centres are positioned on the edge of the walkway rather than on top of booths.
+  // Queue patterns are elongated; social groups are compact and asymmetrical.
+  const crowds=[
+    {x:393,y:192,n:10,sx:31,sy:101,type:'queue'},     // food trucks
+    {x:615,y:262,n:7,sx:34,sy:68,type:'group'},      // entry
+    {x:393,y:609,n:9,sx:35,sy:94,type:'queue'},      // activity booth
+    {x:614,y:700,n:9,sx:38,sy:91,type:'group'},      // market
+    {x:394,y:1018,n:10,sx:37,sy:86,type:'group'},    // cafe
+    {x:619,y:1129,n:8,sx:36,sy:79,type:'group'},     // rest zone
+    {x:393,y:1510,n:13,sx:47,sy:155,type:'group'},  // performance audience
+    {x:614,y:1592,n:12,sx:44,sy:148,type:'group'}   // performance audience
+  ];
+  crowds.forEach((c,i)=>{
+    let added=0,attempts=0;
+    while(added<c.n&&attempts++<c.n*90){
+      const yy=c.y+(random()-.5)*c.sy*2;
+      const xx=c.x+(random()-.5)*c.sx*2;
+      if(xx<347||xx>653||!canStand(xx,yy,20.5))continue;
+      addVisitor(xx,yy,c.type,i);added++;
+    }
+  });
+  // Through traffic is sparser and travels at different speeds from seated or waiting groups.
+  for(let i=0;i<24;i++){
+    let tries=0;
+    while(tries++<70){
+      const y=-120+random()*2130;
+      const x=random()<.5?345+random()*105:550+random()*105;
+      if(!canStand(x,y,21))continue;
+      addVisitor(x,y,'walking',100+i);break;
+    }
+  }
+  const cameras=[{x:332,y:223,id:'01'},{x:681,y:780,id:'02'},{x:329,y:1384,id:'03'}].map((c,i)=>{
+    const base=svg('g',{transform:`translate(${c.x} ${c.y})`},camG);
+    svg('circle',{r:23,fill:'#fff',stroke:'#dfd5ed','stroke-width':1.7},base);
+    svg('circle',{r:15,fill:'#f3effb',stroke:'#e3daef'},base);
+    const rot=svg('g',{class:'cv-camera-head'},base);
+    const cone=svg('path',{d:'M 18 -12 L 335 -120 Q 358 0 335 120 L 18 12 Z',class:'cv-cam-sweep'},rot);
+    svg('rect',{x:-3,y:-7,width:31,height:14,rx:7,fill:'#fff',stroke:'#8374c5','stroke-width':1.8},rot);
+    svg('circle',{cx:22,cy:0,r:4,fill:'#8272c9'},rot);
+    const connection=svg('line',{x1:c.x,y1:c.y,x2:c.x,y2:c.y,stroke:'#a69ad6','stroke-width':1.4,'stroke-dasharray':'4 7','stroke-opacity':'.64'},camG);
+    return {...c,rot,base,cone,connection};
+  });
+  const trail=svg('path',{d:'',stroke:'#c0b3e6','stroke-width':2,'stroke-linecap':'round','stroke-dasharray':'2 11',fill:'none','stroke-opacity':'.7'},trailG);
+  svg('circle',{r:56,fill:'url(#cv-user-light)'},walkerG);
+  svg('circle',{r:23,fill:'#fff','fill-opacity':'.74',stroke:'#ac9de3','stroke-width':1.6},walkerG);
+  svg('circle',{r:12,fill:'#8878d5',stroke:'#fff','stroke-width':3},walkerG);
+  svg('circle',{cx:0,cy:-1,r:5,fill:'#f6e6ea'},walkerG);
+  svg('path',{d:'M -4 8 Q 0 4 4 8',stroke:'#fff','stroke-width':2,fill:'none','stroke-linecap':'round'},walkerG);
+  const chapters=[
+    {start:0,idx:'01',label:'01 / 개인',heading:'한 사람의 움직임을 읽고,'},
+    {start:.345,idx:'02',label:'02 / 공간',heading:'주변 환경의 변화를 살피며,'},
+    {start:.705,idx:'03',label:'03 / 연결',heading:'서로 다른 정보를 하나의 맥락으로 연결합니다.'}
+  ];
+  let previousChapter=-1,scrollQueued=false,lastP=-1;
+  const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+  const ease=(t)=>t*t*(3-2*t);
+  const path=(p)=>{const y=315+p*1370;const x=502+37*Math.sin(p*Math.PI*2.4)+9*Math.sin(p*Math.PI*7);return {x,y}};
+  const blend=(p,center,width)=>ease(clamp((p-center)/width+.5,0,1));
+  const update=()=>{
+    scrollQueued=false;
+    const rect=root.getBoundingClientRect();const total=Math.max(1,root.offsetHeight-window.innerHeight);
+    const p=clamp(-rect.top/total,0,1);
+    if(Math.abs(p-lastP)<.0001 && mapSvg.getAttribute('data-width')===String(window.innerWidth))return;lastP=p;mapSvg.setAttribute('data-width',String(window.innerWidth));
+    const end=clamp((p-.90)/.10,0,1);
+    const motion=p<.90?p:.90+.10*(end+end*end*(1-end));
+    const signal=1-ease(end);
+    trailG.setAttribute('opacity',signal.toFixed(3));
+    const u=path(motion);const narrow=window.innerWidth<=520;mapSvg.setAttribute('viewBox',narrow?'185 0 630 1100':'0 0 1000 740');world.setAttribute('transform',`translate(${(500-u.x)*.04} ${(narrow?695:365)-u.y})`);
+    walkerG.setAttribute('transform',`translate(${u.x} ${u.y})`);
+    const route=[];for(let i=0;i<=Math.ceil(motion*100);i++){const pp=Math.min(motion,i/100),a=path(pp);route.push((i?'L':'M')+a.x.toFixed(1)+' '+a.y.toFixed(1))};trail.setAttribute('d',route.join(' '));
+    pedestrians.forEach((a,i)=>{
+      // Scrolling drives all people, but visitors inside queues remain nearly stationary.
+      const xx=a.x+Math.sin(motion*(a.kind==='walking'?6.5:2.8)+a.phase)*a.drift;
+      const yy=a.y+motion*a.speed*(a.kind==='walking'?1:0.2);
+      a.g.setAttribute('transform',`translate(${xx.toFixed(2)} ${yy.toFixed(2)})`);
+    });
+    const weights=[1-blend(p,.345,.12),blend(p,.345,.12)*(1-blend(p,.705,.12)),blend(p,.705,.12)];
+    cameras.forEach((c,i)=>{
+      const angle=Math.atan2(u.y-c.y,u.x-c.x)*180/Math.PI;
+      c.rot.setAttribute('transform',`rotate(${angle})`);
+      const alpha=clamp(weights[i],0,1);
+      c.cone.setAttribute('opacity',(alpha*.95*signal).toFixed(2));
+      c.base.querySelectorAll('circle').forEach((el,j)=>{if(j===1)el.setAttribute('fill',alpha>.45?'#ebe5fc':'#f3effb')});
+      c.connection.setAttribute('x2',u.x);c.connection.setAttribute('y2',u.y);
+      c.connection.setAttribute('opacity',(alpha*.7*signal).toFixed(2));
+    });
+    let n=0;for(let i=0;i<chapters.length;i++)if(p>=chapters[i].start)n=i;
+    if(previousChapter!==n){previousChapter=n;const c=chapters[n];step.textContent=c.label;h.textContent=c.heading;progressIndex.textContent=c.idx+' / 03'}
+    progressFill.style.width=(p*100).toFixed(1)+'%';
+  };
+  const queue=()=>{if(!root.isConnected){
+    window.removeEventListener('scroll',queue);
+    window.removeEventListener('resize',queue);
+    window.removeEventListener('load',queue);
+    return;
+  }
+    if(!scrollQueued){scrollQueued=true;requestAnimationFrame(update)}
+  };
+  window.addEventListener('scroll',queue,{passive:true});window.addEventListener('resize',queue,{passive:true});
+  window.addEventListener('load',queue);
+  queue();
 })();
