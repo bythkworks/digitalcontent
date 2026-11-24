@@ -1282,6 +1282,7 @@ function tickFP(now){
   FP.items.forEach((it,i)=>{const tg=FP.act===i+1||FP.hover===i+1?1:0;it.glow=lerp(it.glow,tg,.08);
     it.hov=lerp(it.hov||0,FP.hover===i+1?1:0,.18);                                   // hover: +20%, clearly
     it.stopK=lerp(it.stopK||0,eIO(clamp(1-Math.abs(p-PJ_KN[i+1]-(i===1?.025:0))/.05)),.12)});   // at its stop: bigger
+  FP.focus=Math.max(0,...FP.items.map(it=>it.stopK||0))*(1-fo);   // product close-up: background goes soft
   drawMapGL(); tickStars(now,r.top,p); tickFireworks(now,FP.night>.45);
   let truck=null;
   if(window.Prod3D&&Prod3D.ready&&FP.kw>.9&&p>.525&&p<.69){   // delivery truck drives the marked route between the PATH GUARD robots as you scroll
@@ -1320,7 +1321,7 @@ function tickPjSky(){
   pjSky.style.setProperty('--sy',(30*(1-kin)).toFixed(2)+'vh');
   pjSky.style.setProperty('--ss',(.8+.2*kin).toFixed(3));
   const W=FP.shake||0, tt=performance.now()/1000, shx=W*(7*Math.sin(tt*37)+4*Math.sin(tt*23+1)), shy=W*(5*Math.sin(tt*31+2)+3*Math.sin(tt*19)), shr=W*(.55*Math.sin(tt*27)+.3*Math.sin(tt*41));
-  $$('.map-gl').forEach(cv=>{cv.style.opacity=k.toFixed(3);cv.style.transform=`translateY(${(6*(1-kin)).toFixed(2)}vh) translate(${shx.toFixed(2)}px,${shy.toFixed(2)}px) rotate(${shr.toFixed(3)}deg) scale(${(1.04-.04*kin+W*.012).toFixed(4)})`;cv.style.filter=W>.05?`blur(${(W*1.4).toFixed(2)}px)`:''})
+  $$('.map-gl').forEach(cv=>{cv.style.opacity=k.toFixed(3);cv.style.transform=`translateY(${(6*(1-kin)).toFixed(2)}vh) translate(${shx.toFixed(2)}px,${shy.toFixed(2)}px) rotate(${shr.toFixed(3)}deg) scale(${(1.04-.04*kin+W*.012).toFixed(4)})`;const bl=W*1.4+(cv.classList.contains('map-gl3')?0:(FP.focus||0)*5);cv.style.filter=bl>.05?`blur(${bl.toFixed(2)}px)`:''})
 }
 /* ======================= SCROLL PAUSES + SNAP ======================= */
 // mapped progress values where the scene should rest (content fully shown)
