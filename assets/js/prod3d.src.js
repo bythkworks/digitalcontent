@@ -92,7 +92,8 @@ const Prod3D = {
       for (let k = (s.extra || []).length; k < it.extra.length; k++) it.extra[k].visible = false;
     });
     (st.props || []).forEach(pr => { const o = this.props && this.props[pr.key]; if (!o) return; o.visible = !!pr.vis; if (!pr.vis) return; any = true;
-      o.position.set(pr.pos[0], -pr.pos[1], pr.pos[2]); o.rotation.set(0, 0, pr.rz); o.scale.setScalar(pr.scale); });
+      o.position.set(pr.pos[0], -pr.pos[1], pr.pos[2]); o.rotation.set(0, 0, pr.rz); o.scale.setScalar(pr.scale);
+      const op = pr.op ?? 1; o.traverse(c => { if (c.isMesh && c.material) { c.material.opacity = op; c.material.transparent = op < 0.999; c.material.depthWrite = op > 0.98; } }); });
     this.cv.style.visibility = any ? 'visible' : 'hidden';
     if (any) this.main.r.render(this.scene, C);
   },

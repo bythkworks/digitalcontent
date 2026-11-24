@@ -521,6 +521,12 @@ const FP_PATH=[[787.0,501.0,-1.1],[786.4,505.0,-1.2],[785.8,508.9,-1.4],[785.1,5
 const FP_STAGE=[626,226,20];                    // stage at the north edge of the playground
 const FP_EYE=7, FP_ITEM_Z=14;
 // PATH GUARD: two robots on the plaza floor either side of the walkway, which becomes a temporary vehicle lane
+// the truck's route (marked by the team): from the near walkway, between the two robots, on toward the stage
+const TRUCK_ROUTE=[[500,485],[504,469],[508,453],[517,426],[542,355],[556,315]];
+function routeAt(R,u){const L=[0];for(let i=1;i<R.length;i++)L.push(L[i-1]+Math.hypot(R[i][0]-R[i-1][0],R[i][1]-R[i-1][1]));
+  const t=Math.max(0,Math.min(1,u))*L[L.length-1];let i=1;while(i<R.length-1&&L[i]<t)i++;
+  const seg=L[i]-L[i-1]||1,f=(t-L[i-1])/seg,dx=(R[i][0]-R[i-1][0])/seg,dy=(R[i][1]-R[i-1][1])/seg;
+  return [R[i-1][0]+(R[i][0]-R[i-1][0])*f,R[i-1][1]+(R[i][1]-R[i-1][1])*f,dx,dy]}
 const PG_LANE=(()=>{const a=[493,444],b=[524,462],g=4,c=[(a[0]+b[0])/2,(a[1]+b[1])/2],w=[b[0]-a[0],b[1]-a[1]],L=Math.hypot(w[0],w[1]);
   let d=[-w[1]/L,w[0]/L]; if(d[1]>0)d=[-d[0],-d[1]];   // forward = toward the stage
   return {slots:[a,b],g,c,d,rz:Math.atan2(w[0],-w[1])}})();
@@ -1202,9 +1208,10 @@ function tickFP(now){
   FP.items.forEach((it,i)=>{const tg=FP.act===i+1||FP.hover===i+1?1:0;it.glow=lerp(it.glow,tg,.08)});
   drawMapGL(); tickStars(now,r.top,p);
   let truck=null;
-  if(window.Prod3D&&Prod3D.ready&&FP.kw>.9&&p>.53&&p<.69){   // delivery truck drives down the lane between the PATH GUARD robots as you scroll
-    const u=eIO(range(p,.545,.67)), sd=lerp(-15,170,u), C=PG_LANE.c, D=PG_LANE.d, TS=15;
-    truck={key:'TRUCK',vis:true,pos:[C[0]+D[0]*sd,C[1]+D[1]*sd,PG_LANE.g+TS*.52],rz:Math.atan2(-D[1],D[0]),scale:TS}}
+  if(window.Prod3D&&Prod3D.ready&&FP.kw>.9&&p>.525&&p<.69){   // delivery truck drives the marked route between the PATH GUARD robots as you scroll
+    const ul=range(p,.535,.67), u=eIO(ul), TS=15, q=routeAt(TRUCK_ROUTE,u);
+    const op=clamp((p-.525)/.03)*(1-eIO(range(ul,.45,.9)));                 // fades in, and fades out once past the robots
+    if(op>.005)truck={key:'TRUCK',vis:true,op,pos:[q[0],q[1],PG_LANE.g+TS*.52],rz:Math.atan2(-q[3],q[2]),scale:TS}}
   if(window.Prod3D&&Prod3D.ready)Prod3D.frame({cam:FP.cam,look:FP.look,fov:FP.fov,w:MGL.w,h:MGL.h,t:now/1000,items:FP.items.map(it=>it.pose||{land:0}),props:truck?[truck]:[]});
   if(k<1){let d='';for(let i=0;i<FP_PATH.length;i+=2){const q=fpProject([FP_PATH[i][0],FP_PATH[i][1],FP_PATH[i][2]+1]);if(q)d+=(d?'L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1)}
     fpRoute.setAttribute('d',d);} fpRouteSvg.style.opacity=(1-eIO(range(k,0,.35))).toFixed(3);
