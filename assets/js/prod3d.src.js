@@ -109,5 +109,23 @@ const Prod3D = {
     const lb = s.blur / Math.max(.2, k); // filter runs before the scale
     f.cv.style.filter = lb > 0.15 ? `blur(${lb.toFixed(2)}px)` : 'none';
   },
+  // "3가지 제품" in the QUESTION scene: the same dreamy model, spinning in place of the old orbs
+  coreFrame(i, host, t) {
+    const it = this.items[i]; if (!it) return;
+    this.cores = this.cores || [];
+    let c = this.cores[i];
+    if (!c) {
+      const cv = document.createElement('canvas'); cv.className = 't-model'; cv.setAttribute('aria-hidden', 'true'); host.appendChild(cv);
+      const rr = mkRenderer(cv, 320, 320); const sc = new THREE.Scene(); sc.environment = rr.env;
+      const l = new THREE.DirectionalLight(0xffffff, 1.5); l.position.set(-1, -2, 3);
+      const l2 = new THREE.PointLight(0xF2B6E3, 6, 0); l2.position.set(2.5, 1, -1);
+      sc.add(l, l2, new THREE.HemisphereLight(0xC9C3FF, 0xF8CAA7, 1.1));
+      const obj = it.flyObj.clone(true); sc.add(obj);
+      const cam = new THREE.PerspectiveCamera(30, 1, 0.1, 50); cam.up.set(0, 0, 1); cam.position.set(0, -4.4, 1.5); cam.lookAt(0, 0, 0);
+      c = this.cores[i] = { cv, rr, sc, cam, obj };
+    }
+    c.obj.rotation.set(0.35 + Math.sin(t * 0.6 + i) * 0.15, 0, t * 0.7 + i * 2.1);
+    c.rr.r.render(c.sc, c.cam);
+  },
 };
 window.Prod3D = Prod3D;

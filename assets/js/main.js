@@ -949,6 +949,7 @@ function tickTurn(now){
     const fo=eIn(range(p,.83+i*.018,.9+i*.015));   // launch upward, one after another
     e.style.transform=`translate(${(tm.cx*(20+i*8)+(i-1)*fo*VW*.12).toFixed(1)}px,${(tm.cy*16+Math.sin(t*1.1+i*2)*5-fo*VH*.95).toFixed(1)}px) scale(${(k*(1-.35*fo)).toFixed(4)},${(k*(1-.35*fo)*(1+fo*.9)).toFixed(4)})`;
     e.style.opacity=(1-range(p,.985,1)).toFixed(3);
+    if(window.Prod3D&&Prod3D.ready&&k>.01&&fo<.999){Prod3D.coreFrame(i,e,t);e.classList.add('has-model')}
     const r=e.getBoundingClientRect(); CC.push([r.left+r.width/2,r.top+r.height/2,r.width])});
   tLenses.forEach((l,i)=>l.style.setProperty('--a',((t*50+i*120)%360).toFixed(1)+'deg'));
   // ---- answer: warped in, crisp at rest, warped out

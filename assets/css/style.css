@@ -525,6 +525,9 @@ body{word-break:keep-all;overflow-wrap:break-word}
 .t-core:nth-child(1){--tint:rgba(156,200,226,.6);--glow:rgba(156,200,226,.5)}
 .t-core:nth-child(2){--tint:rgba(201,198,255,.6);--glow:rgba(184,182,229,.6)}
 .t-core:nth-child(3){--tint:rgba(242,182,227,.6);--glow:rgba(232,176,221,.5)}
+.t-core .t-model{position:absolute;left:-12%;top:-12%;width:124%;height:124%;z-index:2;pointer-events:none;filter:drop-shadow(0 10px 26px var(--glow,rgba(184,182,229,.55)))}
+.t-core.has-model .lens{background:radial-gradient(circle,var(--glow,rgba(184,182,229,.5)),rgba(255,255,255,0) 68%);border:0;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;opacity:.8}
+.t-core.has-model .lens::after{opacity:.55}
 .t-core i{position:absolute;inset:0;border-radius:50%;border:1px solid rgba(255,255,255,.2);animation:coreRing 4.5s linear infinite}
 .t-core i:nth-child(2){animation-delay:-2.25s}
 @keyframes coreRing{from{transform:scale(.5);opacity:.8}to{transform:scale(1.45);opacity:0}}
