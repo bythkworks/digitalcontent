@@ -1947,32 +1947,59 @@ window.__site={map,openCard,openDetail,closeDetail};
 /* ---- right-side progress: the five scenes of the site ---- */
 window.SPRAIL={sections:()=>[['intro','INTRO'],['world-a','WORLD'],['world-c','EPILOGUE'],['turn','QUESTION'],['projects','PROJECTS']].map(([id,label])=>({el:document.getElementById(id),label})),
   go:el=>jumpTo(el.id==='intro'?0:(HOLDS[el.id]?holdY(el.id,0):el.offsetTop))};
-/* right-side page progress: where you are on this page, at any time */
+/* right-edge liquid-glass progress: a thin glass edge that dents in where you are, and settles flat when you stop */
 (function(){
   const cfg=window.SPRAIL||{};
   const pick=cfg.sections||(()=>{const seen=new Set(),out=[];document.querySelectorAll(cfg.links||'header a[href^="#"]').forEach(a=>{const id=a.getAttribute('href').slice(1);if(!id||seen.has(id))return;const el=document.getElementById(id);if(!el)return;seen.add(id);out.push({el,label:(a.textContent||'').replace(/^[←↑\s]+/,'').trim()||id})});return out});
   const goto=cfg.go||(el=>{const t=(el.closest('.pin-spacer')||el).getBoundingClientRect().top+scrollY;window.scrollTo({top:Math.max(0,t-(cfg.offset||0)),behavior:'smooth'})});
-  const top=el=>(el.closest('.pin-spacer')||el).getBoundingClientRect().top+scrollY;
-  let secs=[],rail,fill,head,now,ticks=[],cur=-1,mvT=0,flT=0;
+  const topOf=el=>(el.closest('.pin-spacer')||el).getBoundingClientRect().top+scrollY;
+  const NS='http://www.w3.org/2000/svg';
+  let secs=[],rail,glass,svg,body,rim,prog,bead,now,ticks=[],cur=-1,flT=0,raf=0;
+  const S={py:0,vy:0,amp:0,last:0,lastY:scrollY,vel:0,over:false};
   function build(){
     secs=pick().filter(s=>s.el); if(!secs.length)return;
-    if(!rail){rail=document.createElement('nav');rail.className='sprail';rail.setAttribute('aria-label','페이지 진행 위치');document.body.appendChild(rail);
-      rail.addEventListener('pointerover',e=>{if(e.target.closest('.sp-tick'))rail.classList.add('hov')});rail.addEventListener('pointerout',()=>rail.classList.remove('hov'))}
-    rail.innerHTML='<div class="sp-track"><i class="sp-fill"></i>'+secs.map((s,i)=>`<button type="button" class="sp-tick" data-i="${i}" aria-label="${s.label}(으)로 이동"><span>${String(i+1).padStart(2,'0')} · ${s.label}</span></button>`).join('')+'<i class="sp-head"></i><div class="sp-now" aria-live="polite"></div></div>';
-    fill=rail.querySelector('.sp-fill');head=rail.querySelector('.sp-head');now=rail.querySelector('.sp-now');ticks=[...rail.querySelectorAll('.sp-tick')];
-    ticks.forEach(b=>b.addEventListener('click',()=>goto(secs[+b.dataset.i].el)));cur=-1;place();update()}
-  function maxY(){return Math.max(1,document.documentElement.scrollHeight-innerHeight)}
-  function place(){const M=maxY();secs.forEach((s,i)=>{s.y=Math.min(M,top(s.el));ticks[i].style.top=(s.y/M*100).toFixed(2)+'%'})}
-  function update(){if(!rail)return;const M=maxY(),y=scrollY,f=Math.min(1,Math.max(0,y/M));
-    fill.style.height=(f*100).toFixed(2)+'%';head.style.top=(f*100).toFixed(2)+'%';now.style.top=(f*100).toFixed(2)+'%';
-    let c=0;secs.forEach((s,i)=>{if(y+innerHeight*.35>=s.y)c=i});
-    ticks.forEach((t,i)=>t.classList.toggle('done',i<=c));
+    if(!rail){rail=document.createElement('nav');rail.className='sprail';rail.setAttribute('aria-label','페이지 진행 위치');document.body.appendChild(rail)}
+    const id='spg'+Math.random().toString(36).slice(2,7);
+    rail.innerHTML=`<div class="sp-glass"></div><svg aria-hidden="true"><defs>
+      <linearGradient id="${id}b" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".12"/><stop offset=".55" stop-color="#E9E6FF" stop-opacity=".42"/><stop offset="1" stop-color="#fff" stop-opacity=".72"/></linearGradient>
+      <linearGradient id="${id}p" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#7FB8E0"/><stop offset=".55" stop-color="#9C92F0"/><stop offset="1" stop-color="#E58BCB"/></linearGradient>
+      <radialGradient id="${id}d" cx=".35" cy=".35" r=".7"><stop offset="0" stop-color="#fff"/><stop offset=".45" stop-color="#F3F0FF"/><stop offset="1" stop-color="#B8B6E5"/></radialGradient></defs>
+      <path class="sp-body" fill="url(#${id}b)"/><path class="sp-prog" fill="none" stroke="url(#${id}p)" stroke-width="3" stroke-linecap="round"/>
+      <path class="sp-rim" fill="none" stroke="rgba(255,255,255,.95)" stroke-width="1.2"/><path class="sp-rim2" fill="none" stroke="rgba(90,80,170,.28)" stroke-width="1"/>
+      <circle class="sp-bead" r="5" fill="url(#${id}d)"/></svg><div class="sp-hit"></div>`+
+      secs.map((s,i)=>`<button type="button" class="sp-tick" data-i="${i}" aria-label="${s.label}(으)로 이동"><span>${String(i+1).padStart(2,'0')} · ${s.label}</span></button>`).join('')+'<div class="sp-now" aria-live="polite"></div>';
+    glass=rail.querySelector('.sp-glass');svg=rail.querySelector('svg');body=rail.querySelector('.sp-body');prog=rail.querySelector('.sp-prog');rim=rail.querySelector('.sp-rim');
+    rail.rim2=rail.querySelector('.sp-rim2');bead=rail.querySelector('.sp-bead');now=rail.querySelector('.sp-now');ticks=[...rail.querySelectorAll('.sp-tick')];
+    ticks.forEach(b=>{b.addEventListener('click',()=>goto(secs[+b.dataset.i].el));b.addEventListener('pointerenter',()=>rail.classList.add('hov'));b.addEventListener('pointerleave',()=>rail.classList.remove('hov'))});
+    rail.querySelector('.sp-hit').addEventListener('pointerenter',()=>{S.over=true;rail.classList.add('over');kick()});
+    rail.addEventListener('pointerleave',()=>{S.over=false;rail.classList.remove('over');kick()});
+    cur=-1;place();S.py=target();kick()}
+  const maxY=()=>Math.max(1,document.documentElement.scrollHeight-innerHeight);
+  const PAD=()=>Math.min(70,innerHeight*.08);
+  const target=()=>{const f=Math.min(1,Math.max(0,scrollY/maxY()));return PAD()+f*(innerHeight-2*PAD())};
+  function place(){const M=maxY(),P=PAD(),H=innerHeight-2*P;secs.forEach((s,i)=>{s.y=Math.min(M,topOf(s.el));ticks[i].style.top=(P+s.y/M*H).toFixed(1)+'px'})}
+  function kick(){S.last=performance.now();if(!raf)raf=requestAnimationFrame(frame)}
+  function frame(t){raf=0;const H=innerHeight,W=rail.clientWidth,idle=t-S.last;
+    const tgt=target(); const k=.16,d=.72; S.vy=(S.vy+(tgt-S.py)*k)*d; S.py+=S.vy;              // springy follow = liquid lag
+    const active=S.over||idle<900; S.amp+=((active?1:0)-S.amp)*(active?.18:.06);
+    const v=Math.min(1,Math.abs(S.vy)/40), depth=S.amp*(16+14*v), base=2+S.amp*5, sig=34+30*v+20*S.amp;
+    const xs=y=>W-(base+depth*Math.exp(-Math.pow((y-S.py)/sig,2)));
+    let d1=`M${W} 0`,rimD='';for(let y=0;y<=H+8;y+=6){const x=xs(Math.min(y,H)).toFixed(2);d1+=` L${x} ${Math.min(y,H)}`;rimD+=(rimD?' L':'M')+x+' '+Math.min(y,H)}
+    d1+=` L${W} ${H} Z`; body.setAttribute('d',d1); rim.setAttribute('d',rimD); rail.rim2.setAttribute('d',rimD.replace(/(\d+\.\d+) /g,(m,x)=>(+x-1).toFixed(2)+' '));
+    let pd='';for(let y=PAD();y<=S.py;y+=6){pd+=(pd?' L':'M')+(xs(y)+base*.5+.5).toFixed(2)+' '+y.toFixed(1)}prog.setAttribute('d',pd||'M0 0');prog.style.opacity=(.35+.65*S.amp).toFixed(2);
+    const bx=xs(S.py)+ (base+depth)*.42; bead.setAttribute('cx',bx.toFixed(2)); bead.setAttribute('cy',S.py.toFixed(1)); bead.setAttribute('r',(2.5+3.5*S.amp).toFixed(2));
+    glass.style.clipPath=`path('${d1}')`;
+    ticks.forEach(b=>{const y=parseFloat(b.style.top);b.style.setProperty('--tx',(W-xs(y)-2).toFixed(1)+'px');b.style.setProperty('--to',(S.amp*.9).toFixed(2))});
+    now.style.transform=`translate(${(xs(S.py)-8).toFixed(1)}px,${S.py.toFixed(1)}px) translate(-100%,-50%)`;
+    // current section
+    const y=scrollY;let c=0;secs.forEach((s,i)=>{if(y+innerHeight*.35>=s.y)c=i});
     if(c!==cur){const first=cur<0;cur=c;now.innerHTML=`<b>${String(c+1).padStart(2,'0')}</b>${secs[c].label}`;if(!first||y>10){rail.classList.add('flash');clearTimeout(flT);flT=setTimeout(()=>rail.classList.remove('flash'),1800)}}
-    rail.classList.add('moving');clearTimeout(mvT);mvT=setTimeout(()=>rail.classList.remove('moving'),1200)}
-  let raf=0;const req=()=>{if(!raf)raf=requestAnimationFrame(()=>{raf=0;update()})};
-  addEventListener('scroll',req,{passive:true});
-  addEventListener('resize',()=>{place();update()});
-  const init=()=>{build();setTimeout(()=>{place();update()},800);setTimeout(()=>{place();update()},2500)};
+    if(Math.abs(tgt-S.py)>.3||Math.abs(S.vy)>.05||S.amp>.003&&!active||active)raf=requestAnimationFrame(frame);
+    if(!active&&S.amp<.004&&Math.abs(S.vy)<.05&&Math.abs(tgt-S.py)<.3){S.amp=0;cancelAnimationFrame(raf);raf=0;draw0()}}
+  function draw0(){/* one last flat frame already drawn */}
+  addEventListener('scroll',kick,{passive:true});addEventListener('wheel',kick,{passive:true});addEventListener('touchmove',kick,{passive:true});
+  addEventListener('resize',()=>{place();kick()});
+  const init=()=>{build();setTimeout(()=>{place();kick()},800);setTimeout(()=>{place();kick()},2500)};
   if(document.readyState==='complete')init();else addEventListener('load',init);
-  window.SPRAIL_REFRESH=()=>{place();update()};
+  window.SPRAIL_REFRESH=()=>{place();kick()};
 })();
