@@ -1310,3 +1310,4 @@ body:has(#detail.open) .snd,body:has(#detail.open) .day-clock{opacity:0;pointer-
 #context-vision .cv-topbar,#context-vision .cv-step,#context-vision .cv-bottom,#context-vision .cv-site-note{display:none!important}
 #cv-zones{opacity:.42;filter:saturate(.6)}
 #context-vision .cv-heading{font-size:clamp(40px,4.4vw,68px);line-height:1.12;max-width:540px}
+#context-vision .cv-world-item-sub{display:none}
