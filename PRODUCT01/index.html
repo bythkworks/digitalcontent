@@ -298,8 +298,7 @@
 .sprail{position:fixed;right:0;top:0;bottom:0;width:90px;z-index:70;pointer-events:none;font-family:inherit}
 .sprail .sp-hit{position:absolute;right:0;top:0;bottom:0;width:26px;pointer-events:auto}
 .sprail .sp-glass{position:absolute;inset:0;-webkit-backdrop-filter:blur(10px) saturate(1.6) brightness(1.08);backdrop-filter:blur(10px) saturate(1.6) brightness(1.08)}
-.sprail svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
-.sprail .sp-bead{filter:drop-shadow(0 0 6px rgba(201,198,255,.9))}
+.sprail svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;filter:drop-shadow(-2px 0 6px rgba(90,80,170,.22))}
 .sprail .sp-tick{position:absolute;right:0;width:28px;height:18px;margin-top:-9px;border:0;padding:0;background:none;cursor:pointer;pointer-events:auto}
 .sprail .sp-tick::before{content:"";position:absolute;right:var(--tx,4px);top:50%;width:5px;height:5px;margin-top:-2.5px;border-radius:50%;background:rgba(255,255,255,.9);box-shadow:0 0 0 1px rgba(110,100,180,.35);opacity:var(--to,0);transition:transform .25s}
 .sprail .sp-tick:hover::before,.sprail .sp-tick:focus-visible::before{transform:scale(1.6)}
@@ -331,14 +330,14 @@
     const id='spg'+Math.random().toString(36).slice(2,7);
     rail.innerHTML=`<div class="sp-glass"></div><svg aria-hidden="true"><defs>
       <linearGradient id="${id}b" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".12"/><stop offset=".55" stop-color="#E9E6FF" stop-opacity=".42"/><stop offset="1" stop-color="#fff" stop-opacity=".72"/></linearGradient>
-      <linearGradient id="${id}p" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#7FB8E0"/><stop offset=".55" stop-color="#9C92F0"/><stop offset="1" stop-color="#E58BCB"/></linearGradient>
+      <linearGradient id="${id}p" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#9CC8E2"/><stop class="sp-s1" offset=".5" stop-color="#B8B6E5"/><stop class="sp-s2" offset=".5" stop-color="#E8B0DD" stop-opacity=".35"/><stop offset="1" stop-color="#F8CAA7" stop-opacity=".35"/></linearGradient>
       <radialGradient id="${id}d" cx=".35" cy=".35" r=".7"><stop offset="0" stop-color="#fff"/><stop offset=".45" stop-color="#F3F0FF"/><stop offset="1" stop-color="#B8B6E5"/></radialGradient></defs>
-      <path class="sp-body" fill="url(#${id}b)"/><path class="sp-prog" fill="none" stroke="url(#${id}p)" stroke-width="3" stroke-linecap="round"/>
+      <path class="sp-tint" fill="url(#${id}p)"/><path class="sp-body" fill="url(#${id}b)"/>
       <path class="sp-rim" fill="none" stroke="rgba(255,255,255,.95)" stroke-width="1.2"/><path class="sp-rim2" fill="none" stroke="rgba(90,80,170,.28)" stroke-width="1"/>
-      <circle class="sp-bead" r="5" fill="url(#${id}d)"/></svg><div class="sp-hit"></div>`+
+</svg><div class="sp-hit"></div>`+
       secs.map((s,i)=>`<button type="button" class="sp-tick" data-i="${i}" aria-label="${s.label}(으)로 이동"><span>${String(i+1).padStart(2,'0')} · ${s.label}</span></button>`).join('')+'<div class="sp-now" aria-live="polite"></div>';
-    glass=rail.querySelector('.sp-glass');svg=rail.querySelector('svg');body=rail.querySelector('.sp-body');prog=rail.querySelector('.sp-prog');rim=rail.querySelector('.sp-rim');
-    rail.rim2=rail.querySelector('.sp-rim2');bead=rail.querySelector('.sp-bead');now=rail.querySelector('.sp-now');ticks=[...rail.querySelectorAll('.sp-tick')];
+    glass=rail.querySelector('.sp-glass');svg=rail.querySelector('svg');body=rail.querySelector('.sp-body');prog=rail.querySelector('.sp-tint');rail.s1=rail.querySelector('.sp-s1');rail.s2=rail.querySelector('.sp-s2');rim=rail.querySelector('.sp-rim');
+    rail.rim2=rail.querySelector('.sp-rim2');now=rail.querySelector('.sp-now');ticks=[...rail.querySelectorAll('.sp-tick')];
     ticks.forEach(b=>{b.addEventListener('click',()=>goto(secs[+b.dataset.i].el));b.addEventListener('pointerenter',()=>rail.classList.add('hov'));b.addEventListener('pointerleave',()=>rail.classList.remove('hov'))});
     rail.querySelector('.sp-hit').addEventListener('pointerenter',()=>{S.over=true;rail.classList.add('over');kick()});
     rail.addEventListener('pointerleave',()=>{S.over=false;rail.classList.remove('over');kick()});
@@ -351,14 +350,14 @@
   function frame(t){raf=0;const H=innerHeight,W=rail.clientWidth,idle=t-S.last;
     const tgt=target(); const k=.16,d=.72; S.vy=(S.vy+(tgt-S.py)*k)*d; S.py+=S.vy;              // springy follow = liquid lag
     const active=S.over||idle<900; S.amp+=((active?1:0)-S.amp)*(active?.18:.06);
-    const v=Math.min(1,Math.abs(S.vy)/40), depth=S.amp*(16+14*v), base=2+S.amp*5, sig=34+30*v+20*S.amp;
+    const v=Math.min(1,Math.abs(S.vy)/40), depth=S.amp*(14+12*v), base=5+S.amp*5, sig=38+30*v+20*S.amp;
     const xs=y=>W-(base+depth*Math.exp(-Math.pow((y-S.py)/sig,2)));
     let d1=`M${W} 0`,rimD='';for(let y=0;y<=H+8;y+=6){const x=xs(Math.min(y,H)).toFixed(2);d1+=` L${x} ${Math.min(y,H)}`;rimD+=(rimD?' L':'M')+x+' '+Math.min(y,H)}
     d1+=` L${W} ${H} Z`; body.setAttribute('d',d1); rim.setAttribute('d',rimD); rail.rim2.setAttribute('d',rimD.replace(/(\d+\.\d+) /g,(m,x)=>(+x-1).toFixed(2)+' '));
-    let pd='';for(let y=PAD();y<=S.py;y+=6){pd+=(pd?' L':'M')+(xs(y)+base*.5+.5).toFixed(2)+' '+y.toFixed(1)}prog.setAttribute('d',pd||'M0 0');prog.style.opacity=(.35+.65*S.amp).toFixed(2);
-    const bx=xs(S.py)+ (base+depth)*.42; bead.setAttribute('cx',bx.toFixed(2)); bead.setAttribute('cy',S.py.toFixed(1)); bead.setAttribute('r',(2.5+3.5*S.amp).toFixed(2));
+    prog.setAttribute('d',d1); prog.style.opacity=(.6+.35*S.amp).toFixed(2);
+    const f=(S.py/H).toFixed(4); rail.s1.setAttribute('offset',f); rail.s2.setAttribute('offset',f);   // passed part saturated, the rest pale
     glass.style.clipPath=`path('${d1}')`;
-    ticks.forEach(b=>{const y=parseFloat(b.style.top);b.style.setProperty('--tx',(W-xs(y)-2).toFixed(1)+'px');b.style.setProperty('--to',(S.amp*.9).toFixed(2))});
+    ticks.forEach(b=>{const y=parseFloat(b.style.top);b.style.setProperty('--tx',(W-xs(y)-2).toFixed(1)+'px');b.style.setProperty('--to','0')});
     now.style.transform=`translate(${(xs(S.py)-8).toFixed(1)}px,${S.py.toFixed(1)}px) translate(-100%,-50%)`;
     // current section
     const y=scrollY;let c=0;secs.forEach((s,i)=>{if(y+innerHeight*.35>=s.y)c=i});
