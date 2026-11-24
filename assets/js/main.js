@@ -530,6 +530,7 @@ const TRUCK_PATH=(()=>{const R=TRUCK_ROUTE,P=[],cr=(a,b,c,d,t)=>.5*(2*b+(-a+c)*t
   P.push(R[R.length-1]);const L=[0];for(let i=1;i<P.length;i++)L.push(L[i-1]+Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]));return {P,L,T:L[L.length-1]}})();
 function pathPt(d){const {P,L,T}=TRUCK_PATH;d=Math.max(0,Math.min(T,d));let i=1;while(i<P.length-1&&L[i]<d)i++;const f=(d-L[i-1])/((L[i]-L[i-1])||1);return [P[i-1][0]+(P[i][0]-P[i-1][0])*f,P[i-1][1]+(P[i][1]-P[i-1][1])*f]}
 function routeAt(R,u){const T=TRUCK_PATH.T,d=Math.max(0,Math.min(1,u))*T,p=pathPt(d),a=pathPt(d+9),b=pathPt(d-9),dx=a[0]-b[0],dy=a[1]-b[1],l=Math.hypot(dx,dy)||1;return [p[0],p[1],dx/l,dy/l]}
+const PG_AIM_DEF=[499,475,4]; window.PG_AIM=window.PG_AIM||PG_AIM_DEF;   // PATH GUARD stop: aim so the two robots + truck sit right of the title
 const PG_LANE=(()=>{const a=[493,444],b=[524,462],g=4,c=[(a[0]+b[0])/2,(a[1]+b[1])/2],w=[b[0]-a[0],b[1]-a[1]],L=Math.hypot(w[0],w[1]);
   let d=[-w[1]/L,w[0]/L]; if(d[1]>0)d=[-d[0],-d[1]];   // forward = toward the stage
   return {slots:[a,b],g,c,d,rz:Math.atan2(w[0],-w[1])}})();
@@ -1164,7 +1165,7 @@ function renderProjects(p){
   if(st!==pj.stop){pj.stop=st;
     if(act){const pr=PRODUCTS[act-1];ptK.textContent=`0${act} · ${pr.place}`;ptN.textContent=pr.name;ptO.textContent=pr.one;ptGo.dataset.n=act;ptGo.style.display=''}
     else if(fin){ptK.textContent='도착';ptN.textContent='공연이 열리는 운동장';ptO.textContent='';ptGo.style.display='none'}}
-  let vis=0; if(act)vis=1-clamp((Math.abs(p-PJ_KN[act])-.02)/.03); else if(fin)vis=eOut(range(p,PJ_KN[4]-.04,PJ_KN[4]));
+  let vis=0; if(act)vis=1-clamp((Math.abs(p-PJ_KN[act]-(act===2?.025:0))-.02)/.03); else if(fin)vis=eOut(range(p,PJ_KN[4]-.04,PJ_KN[4]));
   pjTour.style.opacity=vis.toFixed(3); pjTour.style.transform=`translateY(${VW<700?0:-50}%) translateY(${((1-vis)*30).toFixed(1)}px)`;
   pjTour.style.filter='none'; pjTour.classList.toggle('live',vis>.6); pjTourActive=vis>.3;
   pjHead.style.opacity=(1-eIO(range(p,.05,.12))).toFixed(3); pjHead.style.pointerEvents='none';
@@ -1193,7 +1194,7 @@ function tickFP(now){
   const s=FP.s, here=fpAt(s), eye=[here[0],here[1],here[2]+FP_EYE];
   let tgt=fpAt(s+46); tgt=[tgt[0],tgt[1],here[2]+FP_EYE-1.5];
   // turn toward the product at each stop, and toward the stage at the end
-  PJ_KN.slice(1,4).forEach((kn,i)=>{const w=eIO(clamp(1-Math.abs(p-kn)/.075));if(w>0){const q=PRODUCTS[i].at;tgt=[lerp(tgt[0],q[0],w),lerp(tgt[1],q[1],w),lerp(tgt[2],q[2]+FP_ITEM_Z-1,w)]}});
+  PJ_KN.slice(1,4).forEach((kn,i)=>{const w=eIO(clamp(1-Math.abs(p-kn)/.075));if(w>0){const q=PRODUCTS[i].model==='PATHGUARD'?window.PG_AIM:PRODUCTS[i].at;tgt=[lerp(tgt[0],q[0],w),lerp(tgt[1],q[1],w),lerp(tgt[2],q[2]+FP_ITEM_Z-1,w)]}});
   const we=eIO(range(p,PJ_KN[3]+.05,PJ_KN[4])); eye[2]+=8*we; tgt=[lerp(tgt[0],FP_STAGE[0],we),lerp(tgt[1],FP_STAGE[1],we),lerp(tgt[2],FP_STAGE[2]+6,we)];
   // drag offsets ease back when the walk moves on
   if(Math.abs(s-(FP.ls??s))>.5&&now-(FP.lastDrag||0)>900){FP.yawT*=.9;FP.pitchT*=.9} FP.ls=s;
@@ -1244,7 +1245,7 @@ function tickPjSky(){
 }
 /* ======================= SCROLL PAUSES + SNAP ======================= */
 // mapped progress values where the scene should rest (content fully shown)
-const HOLDS={'intro':[0,.44,1],'world-a':[.04,.24,.4467,.6533,.86],'world-c':[.11,.22,.35,.45,.55,.65,.78,.92],'system':[.05,.31,.53,.8],'turn':[.07,.42,.8],'projects':[.03,.36,.57,.77,.955]};
+const HOLDS={'intro':[0,.44,1],'world-a':[.04,.24,.4467,.6533,.86],'world-c':[.11,.22,.35,.45,.55,.65,.78,.92],'system':[.05,.31,.53,.8],'turn':[.07,.42,.8],'projects':[.03,.36,.595,.77,.955]};
 const HOLD_W={'intro':.07,'world-a':.05,'world-c':.05,'system':.05,'turn':.07,'projects':.045};   // raw share of the section each pause takes
 const KNOTS={};
 for(const id in HOLDS){const H=HOLDS[id],w=HOLD_W[id],mv=1-H.length*w,k=[[0,0]];let pr=0,pm=0;
