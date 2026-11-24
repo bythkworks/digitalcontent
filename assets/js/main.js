@@ -1953,7 +1953,7 @@ window.SPRAIL={sections:()=>[['intro','INTRO'],['world-a','WORLD'],['world-c','E
   const pick=cfg.sections||(()=>{const seen=new Set(),out=[];document.querySelectorAll(cfg.links||'header a[href^="#"]').forEach(a=>{const id=a.getAttribute('href').slice(1);if(!id||seen.has(id))return;const el=document.getElementById(id);if(!el)return;seen.add(id);out.push({el,label:(a.textContent||'').replace(/^[←↑\s]+/,'').trim()||id})});return out});
   const goto=cfg.go||(el=>{const t=(el.closest('.pin-spacer')||el).getBoundingClientRect().top+scrollY;window.scrollTo({top:Math.max(0,t-(cfg.offset||0)),behavior:'smooth'})});
   const top=el=>(el.closest('.pin-spacer')||el).getBoundingClientRect().top+scrollY;
-  let secs=[],rail,fill,head,now,ticks=[],cur=-1,mvT=0;
+  let secs=[],rail,fill,head,now,ticks=[],cur=-1,mvT=0,flT=0;
   function build(){
     secs=pick().filter(s=>s.el); if(!secs.length)return;
     if(!rail){rail=document.createElement('nav');rail.className='sprail';rail.setAttribute('aria-label','페이지 진행 위치');document.body.appendChild(rail);
@@ -1967,7 +1967,7 @@ window.SPRAIL={sections:()=>[['intro','INTRO'],['world-a','WORLD'],['world-c','E
     fill.style.height=(f*100).toFixed(2)+'%';head.style.top=(f*100).toFixed(2)+'%';now.style.top=(f*100).toFixed(2)+'%';
     let c=0;secs.forEach((s,i)=>{if(y+innerHeight*.35>=s.y)c=i});
     ticks.forEach((t,i)=>t.classList.toggle('done',i<=c));
-    if(c!==cur){cur=c;now.innerHTML=`<b>${String(c+1).padStart(2,'0')}</b>${secs[c].label}`}
+    if(c!==cur){const first=cur<0;cur=c;now.innerHTML=`<b>${String(c+1).padStart(2,'0')}</b>${secs[c].label}`;if(!first||y>10){rail.classList.add('flash');clearTimeout(flT);flT=setTimeout(()=>rail.classList.remove('flash'),1800)}}
     rail.classList.add('moving');clearTimeout(mvT);mvT=setTimeout(()=>rail.classList.remove('moving'),1200)}
   let raf=0;const req=()=>{if(!raf)raf=requestAnimationFrame(()=>{raf=0;update()})};
   addEventListener('scroll',req,{passive:true});

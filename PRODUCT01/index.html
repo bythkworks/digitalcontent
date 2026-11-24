@@ -296,6 +296,7 @@
 <!-- right-side page progress -->
 <style id="sprail-css">/* ---- right-side page progress (one per page) ---- */
 .sprail{position:fixed;right:clamp(10px,1.6vw,24px);top:50%;z-index:70;height:min(58vh,480px);width:22px;transform:translateY(-50%);pointer-events:none;font-family:inherit}
+.sprail::before{content:"";position:absolute;right:-6px;top:-10px;bottom:-10px;width:40px;pointer-events:auto}
 .sprail .sp-track{position:absolute;left:50%;top:0;bottom:0;width:6px;margin-left:-3px;border-radius:6px;pointer-events:auto;
   background:rgba(255,255,255,.62);box-shadow:0 0 0 1px rgba(110,100,180,.22),0 4px 14px rgba(60,50,120,.18)}
 .sprail .sp-fill{position:absolute;left:0;top:0;width:100%;height:0;border-radius:6px;background:linear-gradient(180deg,#7FB8E0,#9C92F0 55%,#E58BCB)}
@@ -312,13 +313,14 @@
 .sprail .sp-tick:hover span,.sprail .sp-tick:focus-visible span{opacity:1}
 .sprail .sp-now{right:calc(50% + 18px);transition:opacity .3s}
 .sprail .sp-now b{color:#8E8AD8;margin-right:6px}
+.sprail .sp-now{opacity:0;pointer-events:none}
+.sprail.flash .sp-now,.sprail:hover .sp-now{opacity:1}
 .sprail.hov .sp-now{opacity:0}
 @media (max-width:700px){
   .sprail{right:6px;height:42vh}
   .sprail .sp-track{width:4px;margin-left:-2px}
   .sprail .sp-head{width:12px;height:12px;margin:-6px 0 0 -6px}
-  .sprail .sp-now{opacity:0;font-size:11px;padding:5px 9px}
-  .sprail.moving .sp-now{opacity:1}
+  .sprail .sp-now{font-size:11px;padding:5px 9px}
 }
 @media print{.sprail{display:none}}
 #progress{display:none!important}.rail i{display:none!important}.rail{right:calc(clamp(14px,2.4vw,34px) + 44px)!important}</style>
@@ -329,7 +331,7 @@
   const pick=cfg.sections||(()=>{const seen=new Set(),out=[];document.querySelectorAll(cfg.links||'header a[href^="#"]').forEach(a=>{const id=a.getAttribute('href').slice(1);if(!id||seen.has(id))return;const el=document.getElementById(id);if(!el)return;seen.add(id);out.push({el,label:(a.textContent||'').replace(/^[←↑\s]+/,'').trim()||id})});return out});
   const goto=cfg.go||(el=>{const t=(el.closest('.pin-spacer')||el).getBoundingClientRect().top+scrollY;window.scrollTo({top:Math.max(0,t-(cfg.offset||0)),behavior:'smooth'})});
   const top=el=>(el.closest('.pin-spacer')||el).getBoundingClientRect().top+scrollY;
-  let secs=[],rail,fill,head,now,ticks=[],cur=-1,mvT=0;
+  let secs=[],rail,fill,head,now,ticks=[],cur=-1,mvT=0,flT=0;
   function build(){
     secs=pick().filter(s=>s.el); if(!secs.length)return;
     if(!rail){rail=document.createElement('nav');rail.className='sprail';rail.setAttribute('aria-label','페이지 진행 위치');document.body.appendChild(rail);
@@ -343,7 +345,7 @@
     fill.style.height=(f*100).toFixed(2)+'%';head.style.top=(f*100).toFixed(2)+'%';now.style.top=(f*100).toFixed(2)+'%';
     let c=0;secs.forEach((s,i)=>{if(y+innerHeight*.35>=s.y)c=i});
     ticks.forEach((t,i)=>t.classList.toggle('done',i<=c));
-    if(c!==cur){cur=c;now.innerHTML=`<b>${String(c+1).padStart(2,'0')}</b>${secs[c].label}`}
+    if(c!==cur){const first=cur<0;cur=c;now.innerHTML=`<b>${String(c+1).padStart(2,'0')}</b>${secs[c].label}`;if(!first||y>10){rail.classList.add('flash');clearTimeout(flT);flT=setTimeout(()=>rail.classList.remove('flash'),1800)}}
     rail.classList.add('moving');clearTimeout(mvT);mvT=setTimeout(()=>rail.classList.remove('moving'),1200)}
   let raf=0;const req=()=>{if(!raf)raf=requestAnimationFrame(()=>{raf=0;update()})};
   addEventListener('scroll',req,{passive:true});

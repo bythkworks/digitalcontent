@@ -1181,6 +1181,7 @@ body:has(#detail.open) .snd,body:has(#detail.open) .day-clock{opacity:0;pointer-
 }
 /* ---- right-side page progress (one per page) ---- */
 .sprail{position:fixed;right:clamp(10px,1.6vw,24px);top:50%;z-index:70;height:min(58vh,480px);width:22px;transform:translateY(-50%);pointer-events:none;font-family:inherit}
+.sprail::before{content:"";position:absolute;right:-6px;top:-10px;bottom:-10px;width:40px;pointer-events:auto}
 .sprail .sp-track{position:absolute;left:50%;top:0;bottom:0;width:6px;margin-left:-3px;border-radius:6px;pointer-events:auto;
   background:rgba(255,255,255,.62);box-shadow:0 0 0 1px rgba(110,100,180,.22),0 4px 14px rgba(60,50,120,.18)}
 .sprail .sp-fill{position:absolute;left:0;top:0;width:100%;height:0;border-radius:6px;background:linear-gradient(180deg,#7FB8E0,#9C92F0 55%,#E58BCB)}
@@ -1197,13 +1198,14 @@ body:has(#detail.open) .snd,body:has(#detail.open) .day-clock{opacity:0;pointer-
 .sprail .sp-tick:hover span,.sprail .sp-tick:focus-visible span{opacity:1}
 .sprail .sp-now{right:calc(50% + 18px);transition:opacity .3s}
 .sprail .sp-now b{color:#8E8AD8;margin-right:6px}
+.sprail .sp-now{opacity:0;pointer-events:none}
+.sprail.flash .sp-now,.sprail:hover .sp-now{opacity:1}
 .sprail.hov .sp-now{opacity:0}
 @media (max-width:700px){
   .sprail{right:6px;height:42vh}
   .sprail .sp-track{width:4px;margin-left:-2px}
   .sprail .sp-head{width:12px;height:12px;margin:-6px 0 0 -6px}
-  .sprail .sp-now{opacity:0;font-size:11px;padding:5px 9px}
-  .sprail.moving .sp-now{opacity:1}
+  .sprail .sp-now{font-size:11px;padding:5px 9px}
 }
 @media print{.sprail{display:none}}
 #sprog,.dots,.holdbar{display:none!important}
