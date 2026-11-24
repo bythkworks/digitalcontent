@@ -1234,6 +1234,7 @@ body:has(#detail.open) .snd,body:has(#detail.open) .day-clock{opacity:0;pointer-
 @media (max-width:800px){.p-card{grid-template-columns:1fr;grid-template-rows:auto 1fr;padding-top:90px}.pc-stage{height:44vh}}
 /* final map at night: keep text and labels readable */
 .pj-maphead span{color:#C9C6FF}.pj-maphead b{color:#fff;text-shadow:0 2px 18px rgba(0,0,0,.55)}.pj-maphead em{color:#E3DEFF;text-shadow:0 1px 10px rgba(0,0,0,.5)}
+.pj-fw{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3}
 /* ---- "하지만," glitch ---- */
 #turn.t-glitch .t-pre .t-h{animation:gMain 1.3s steps(1,end)}
 #turn.t-glitch .t-pre .t-h::before{animation:gA 1.3s steps(1,end)}

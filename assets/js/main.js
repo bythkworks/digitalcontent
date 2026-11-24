@@ -642,6 +642,64 @@ function drawCrowd(M,t){const C=FP.crowd;if(!C)return;const g=MGL.g;
   g.vertexAttribPointer(C.a[0],3,g.FLOAT,false,40,0);g.vertexAttribPointer(C.a[1],3,g.FLOAT,false,40,12);g.vertexAttribPointer(C.a[2],4,g.FLOAT,false,40,24);
   g.drawArrays(g.TRIANGLES,0,C.n);C.a.forEach(a=>g.disableVertexAttribArray(a));}
 
+/* ---- festival dressing: string lights along the walk and the playground, sky lanterns, fireworks at night ---- */
+(function initFestLights(){
+  if(!MGL)return;const g=MGL.g;
+  const vs=`attribute vec3 aP;attribute vec2 aD;uniform mat4 uM;uniform float uT,uN,uS;varying vec3 vC;varying float vA;
+void main(){vec3 p=aP;float k=aD.x,ph=aD.y;vec3 c;
+ if(k>9.5){float H=70.;p.z+=mod(uT*(2.2+fract(ph*7.)*1.6)+ph*H,H);p.x+=sin(uT*.4+ph*6.)*3.;c=vec3(1.,.78,.55);vA=uN*smoothstep(0.,6.,mod(uT*(2.2+fract(ph*7.)*1.6)+ph*H,H))*(1.-smoothstep(56.,70.,mod(uT*(2.2+fract(ph*7.)*1.6)+ph*H,H)));}
+ else{c=k<1.?vec3(.62,.82,1.):k<2.?vec3(.85,.74,1.):k<3.?vec3(1.,.70,.88):k<4.?vec3(1.,.88,.62):vec3(.72,1.,.86);
+  float tw=.75+.25*sin(uT*2.3+ph*40.);vA=mix(.55,1.,uN)*tw;}
+ vC=c;gl_Position=uM*vec4(p,1.);gl_PointSize=clamp(uS*(k>9.5?2.6:1.25)/gl_Position.w,2.2,k>9.5?30.:20.)*(1.+uN*.5);}`;
+  const fs=`precision mediump float;varying vec3 vC;varying float vA;
+void main(){vec2 d=gl_PointCoord-.5;float r=length(d)*2.;if(r>1.)discard;float core=smoothstep(.55,0.,r),glow=pow(1.-r,2.);
+ gl_FragColor=vec4(vC*(core*1.2+glow*.8)+core*.35,(core+glow*.6)*vA);}`;
+  const mk=(t,s)=>{const o=g.createShader(t);g.shaderSource(o,s);g.compileShader(o);if(!g.getShaderParameter(o,g.COMPILE_STATUS))console.warn(g.getShaderInfoLog(o));return o};
+  const p=g.createProgram();g.attachShader(p,mk(g.VERTEX_SHADER,vs));g.attachShader(p,mk(g.FRAGMENT_SHADER,fs));g.linkProgram(p);
+  if(!g.getProgramParameter(p,g.LINK_STATUS))return;
+  let seed=11;const R=()=>(seed=(seed*16807)%2147483647)/2147483647;
+  const D=[];const bulb=(x,y,z,k)=>D.push(x,y,z,k,R());
+  const garland=(a,b,sag,col0)=>{const L=Math.hypot(b[0]-a[0],b[1]-a[1]),n=Math.max(3,Math.round(L/2.2));
+    for(let i=0;i<=n;i++){const t=i/n;bulb(a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t-sag*4*t*(1-t),(col0+i)%5)}};
+  // along the walk: poles every ~24 units on both sides
+  const P=FP_PATH,poles=[[],[]];let acc=1e9;
+  for(let i=1;i<P.length;i++){acc+=Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]);if(acc<24)continue;acc=0;
+    const j=Math.min(P.length-1,i+1),dx=P[j][0]-P[i-1][0],dy=P[j][1]-P[i-1][1],l=Math.hypot(dx,dy)||1,nx=-dy/l,ny=dx/l;
+    [1,-1].forEach((s,k)=>poles[k].push([P[i][0]+nx*10*s,P[i][1]+ny*10*s,P[i][2]+11]))}
+  poles.forEach((row,k)=>{for(let i=1;i<row.length;i++)garland(row[i-1],row[i],2.4,k*2+i)});
+  // criss-cross over the walk every other pole
+  for(let i=1;i<Math.min(poles[0].length,poles[1].length);i+=2)garland(poles[0][i],poles[1][i],3,i);
+  // playground: a ring around the pit + rays from the stage
+  const pc=[[PIT.x0-8,PIT.y0-6],[PIT.x1+8,PIT.y0-6],[PIT.x1+8,PIT.y1+8],[PIT.x0-8,PIT.y1+8]];
+  for(let i=0;i<4;i++){const a=pc[i],b=pc[(i+1)%4];garland([a[0],a[1],12],[b[0],b[1],12],2.5,i)}
+  const st=[FP_STAGE[0],FP_STAGE[1]+14,22];
+  for(let i=0;i<7;i++){const x=PIT.x0-30+(PIT.x1-PIT.x0+60)*i/6;garland(st,[x,PIT.y1+40,10],4,i)}
+  // sky lanterns over the playground (night only)
+  for(let i=0;i<90;i++){D.push(PIT.x0-60+R()*(PIT.x1-PIT.x0+120),PIT.y0-30+R()*(PIT.y1-PIT.y0+170),18+R()*6,10,R())}
+  const buf=g.createBuffer();g.bindBuffer(g.ARRAY_BUFFER,buf);g.bufferData(g.ARRAY_BUFFER,new Float32Array(D),g.STATIC_DRAW);
+  FP.lights={p,buf,n:D.length/5,u:Object.fromEntries(['uM','uT','uN','uS'].map(k=>[k,g.getUniformLocation(p,k)])),a:['aP','aD'].map(k=>g.getAttribLocation(p,k))};
+})();
+function drawFestLights(M,t){const C=FP.lights;if(!C)return;const g=MGL.g;
+  g.useProgram(C.p);g.uniformMatrix4fv(C.u.uM,false,new Float32Array(M));g.uniform1f(C.u.uT,t);g.uniform1f(C.u.uN,FP.night||0);
+  g.uniform1f(C.u.uS,MGL.h*(window.devicePixelRatio>1?1.4:1)*1.2*(1+3.2*(1-(FP.kw??1))));   // overview is far away: bigger bulbs
+  g.bindBuffer(g.ARRAY_BUFFER,C.buf);C.a.forEach(a=>g.enableVertexAttribArray(a));
+  g.vertexAttribPointer(C.a[0],3,g.FLOAT,false,20,0);g.vertexAttribPointer(C.a[1],2,g.FLOAT,false,20,12);
+  g.enable(g.BLEND);g.blendFunc(g.SRC_ALPHA,g.ONE);g.depthMask(false);
+  g.drawArrays(g.POINTS,0,C.n);
+  g.depthMask(true);g.blendFunc(g.SRC_ALPHA,g.ONE_MINUS_SRC_ALPHA);C.a.forEach(a=>g.disableVertexAttribArray(a));}
+/* fireworks: behind the map (inside the sky layer), so buildings cover them */
+const FW={cv:null,c:null,ps:[],next:0};
+function tickFireworks(now,on){
+  if(!FW.cv){FW.cv=document.createElement('canvas');FW.cv.className='pj-fw';pjSky.appendChild(FW.cv);FW.c=FW.cv.getContext('2d')}
+  const W=pjSky.clientWidth,H=pjSky.clientHeight;if(FW.cv.width!==W||FW.cv.height!==H){FW.cv.width=W;FW.cv.height=H}
+  const c=FW.c;c.clearRect(0,0,W,H);if(!on&&!FW.ps.length)return;
+  if(on&&now>FW.next){FW.next=now+500+Math.random()*900;const x=W*(.15+Math.random()*.7),y=H*(.08+Math.random()*.3),cols=['#9CC8E2','#C9C6FF','#F2B6E3','#F8CAA7','#B5F0D4'],col=cols[Math.random()*5|0],n=46;
+    for(let i=0;i<n;i++){const a=i/n*6.283,s=1.2+Math.random()*1.6;FW.ps.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,l:1,col})}}
+  c.globalCompositeOperation='lighter';
+  FW.ps=FW.ps.filter(q=>{q.x+=q.vx;q.y+=q.vy;q.vy+=.025;q.vx*=.985;q.vy*=.985;q.l-=.012;if(q.l<=0)return false;
+    c.globalAlpha=q.l*q.l;c.fillStyle=q.col;c.beginPath();c.arc(q.x,q.y,1.8+q.l*1.4,0,6.283);c.fill();return true});
+  c.globalAlpha=1;c.globalCompositeOperation='source-over'}
+
 function drawMapGL(){
   if(!MGL)return;const {g,u}=MGL;
   const a=MGL.w/Math.max(1,MGL.h), P=M4.persp(FP.fov*Math.PI/180,a,FP.near||1.5,FP.far||3200);
@@ -655,7 +713,7 @@ function drawMapGL(){
   g.drawElements(g.TRIANGLES,MGL.n,g.UNSIGNED_SHORT,0);
   g.disableVertexAttribArray(MGL.loc);
   const t=performance.now()/1000;
-  drawCrowd(M,t);
+  drawCrowd(M,t); drawFestLights(M,t);
   drawBeams(M,e,t);
   if(!FP.ready)return;
   g.useProgram(FP.ip);g.uniformMatrix4fv(FP.iu.uM,false,new Float32Array(M));g.uniform3f(FP.iu.uCam,e[0],e[1],e[2]);g.uniform3fv(FP.iu.uL,TOON_SUN);
@@ -1224,7 +1282,7 @@ function tickFP(now){
   FP.items.forEach((it,i)=>{const tg=FP.act===i+1||FP.hover===i+1?1:0;it.glow=lerp(it.glow,tg,.08);
     it.hov=lerp(it.hov||0,FP.hover===i+1?1:0,.18);                                   // hover: +20%, clearly
     it.stopK=lerp(it.stopK||0,eIO(clamp(1-Math.abs(p-PJ_KN[i+1]-(i===1?.025:0))/.05)),.12)});   // at its stop: bigger
-  drawMapGL(); tickStars(now,r.top,p);
+  drawMapGL(); tickStars(now,r.top,p); tickFireworks(now,FP.night>.45);
   let truck=null;
   if(window.Prod3D&&Prod3D.ready&&FP.kw>.9&&p>.525&&p<.69){   // delivery truck drives the marked route between the PATH GUARD robots as you scroll
     const ul=range(p,.535,.67), u=eIO(ul), TS=15, q=routeAt(TRUCK_ROUTE,u);
