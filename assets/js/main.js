@@ -659,7 +659,7 @@ function drawMapGL(){
   drawBeams(M,e,t);
   if(!FP.ready)return;
   g.useProgram(FP.ip);g.uniformMatrix4fv(FP.iu.uM,false,new Float32Array(M));g.uniform3f(FP.iu.uCam,e[0],e[1],e[2]);g.uniform3fv(FP.iu.uL,TOON_SUN);
-  FP.items.forEach((it,i)=>{const pr=PRODUCTS[i],lf=FP.lift||0,S=STAGE_SLOTS[i],q=[lerp(pr.at[0],S[0],lf),lerp(pr.at[1],S[1],lf),lerp(pr.at[2],S[2],lf)],cf=ITEM_CFG[pr.model]||{s:4,tilt:.4}, ob=lerp(3.4,1,FP.kw??1), z=q[2]+(FP_ITEM_Z+cf.s*(ob-1)*.8)*(1-lf)+Math.sin(t*1.6+i*2)*1.2, sc=cf.s*ob*(1+it.glow*.1);
+  FP.items.forEach((it,i)=>{const pr=PRODUCTS[i],lf=FP.lift||0,S=STAGE_SLOTS[i],q=[lerp(pr.at[0],S[0],lf),lerp(pr.at[1],S[1],lf),lerp(pr.at[2],S[2],lf)],cf=ITEM_CFG[pr.model]||{s:4,tilt:.4}, ob=lerp(3.4,1,FP.kw??1), z=q[2]+(FP_ITEM_Z+cf.s*(ob-1)*.8)*(1-lf)+Math.sin(t*1.6+i*2)*1.2, sc=cf.s*ob*(1+(it.stopK||0)*(pr.model==='PATHGUARD'?.3:.95))*(1+(it.hov||0)*.2);
     const L=it.land??1; it.pose={pos:[q[0],q[1],z],rz:t*.8+i*2.1+(1-Math.min(1,L))*4,tilt:cf.tilt+Math.sin(t*.7+i)*.08,scale:sc,land:L};
     if(pr.model==='PATHGUARD'){const S=PG_LANE.slots, az=PG_LANE.rz;   // standing on the plaza either side of the vehicle lane
       it.pose={pos:[S[0][0],S[0][1],PG_LANE.g+sc],rz:az+(1-Math.min(1,L))*4,tilt:0,scale:sc,land:L,extra:[{pos:[S[1][0],S[1][1],PG_LANE.g+sc],rz:az+Math.PI,tilt:0}]};
@@ -1213,7 +1213,9 @@ function tickFP(now){
   FP.night=eIO(clamp((p-.26)/(.9-.26))); FP.crowdK=eIO(clamp((p-.3)/(.82-.3)));
   pjNight.style.opacity=FP.night.toFixed(3); pjSky.style.setProperty('--dusk',(Math.sin(Math.PI*clamp(FP.night*1.6))*(1-FP.night)).toFixed(3));
   pjSticky.classList.toggle('fp-dark',FP.night>.55);
-  FP.items.forEach((it,i)=>{const tg=FP.act===i+1||FP.hover===i+1?1:0;it.glow=lerp(it.glow,tg,.08)});
+  FP.items.forEach((it,i)=>{const tg=FP.act===i+1||FP.hover===i+1?1:0;it.glow=lerp(it.glow,tg,.08);
+    it.hov=lerp(it.hov||0,FP.hover===i+1?1:0,.18);                                   // hover: +20%, clearly
+    it.stopK=lerp(it.stopK||0,eIO(clamp(1-Math.abs(p-PJ_KN[i+1]-(i===1?.025:0))/.05)),.12)});   // at its stop: bigger
   drawMapGL(); tickStars(now,r.top,p);
   let truck=null;
   if(window.Prod3D&&Prod3D.ready&&FP.kw>.9&&p>.525&&p<.69){   // delivery truck drives the marked route between the PATH GUARD robots as you scroll
