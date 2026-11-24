@@ -1123,7 +1123,7 @@ mstage.insertAdjacentHTML('beforeend',PRODUCTS.map(p=>`<button class="fp-tag" da
 const fpTags=$$('.fp-tag',mstage);
 const pjMapHead=document.createElement('div');pjMapHead.className='pj-maphead';pjMapHead.innerHTML='<span>MAP · 한눈에 보기</span><b>축제 곳곳의 세 가지 제품</b><em>제품에 마우스를 올려 보세요</em>';mstage.appendChild(pjMapHead);
 const pCard=document.createElement('div');pCard.className='p-card';pCard.setAttribute('aria-hidden','true');
-pCard.innerHTML='<div class="pc-txt"><span class="pc-k"></span><b class="pc-n"></b><p class="pc-o"></p><em>클릭하면 제품 페이지로 이동 →</em></div><div class="pc-stage"></div>';mstage.appendChild(pCard);
+pCard.innerHTML='<div class="pc-txt"><span class="pc-k"></span><b class="pc-n"></b><p class="pc-o"></p></div><div class="pc-stage"></div><i class="pc-click">CLICK</i>';mstage.appendChild(pCard);
 const pcStage=pCard.querySelector('.pc-stage');
 // shooting stars: the three orbs from "3가지 제품" fall into the map and become the products
 const fpStars=document.createElement('div');fpStars.className='fp-stars';fpStars.setAttribute('aria-hidden','true');
@@ -1195,7 +1195,7 @@ function fpHit(cx,cy){const r=mstage.getBoundingClientRect();let best=0,bd=1e9;
   FP.items.forEach((it,i)=>{const d=Math.hypot(cx-r.left-it.scr[0],cy-r.top-it.scr[1]);if(it.scr[2]>2&&d<Math.max(it.scr[2]*1.7,26)&&d<bd){bd=d;best=i+1}});return best}
 // camera
 function fpOverview(){const a=MGL.w/Math.max(1,MGL.h), mob=a<.9, fv=mob?30:16, th=Math.tan(fv*Math.PI/360), tw=th*a;
-  const D=Math.max((mob?720:1250)/(2*tw),(mob?900:820)/(2*th)), r=MAP_ROT*Math.PI/180, el=34*Math.PI/180, sh=mob?-300:0, c=[540+Math.sin(r)*sh,470+Math.cos(r)*sh,0];
+  const D=Math.max((mob?420:620)/(2*tw),(mob?520:470)/(2*th)), r=MAP_ROT*Math.PI/180, el=34*Math.PI/180, sh=mob?-110:0, c=[640+Math.sin(r)*sh,462+Math.cos(r)*sh,0];   // framed on the three products
   return {c,fv,e:[c[0]+Math.sin(r)*Math.cos(el)*D,c[1]+Math.cos(r)*Math.cos(el)*D,Math.sin(el)*D]}}
 function tickFP(now){
   const r=pjSticky.getBoundingClientRect(); if(r.bottom<0||r.top>VH||!MGL)return;
