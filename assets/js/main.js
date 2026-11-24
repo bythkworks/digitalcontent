@@ -220,7 +220,7 @@ $$('#waProg .world-art').forEach(im=>im.remove());
 $('#wfList').innerHTML=CHAPTERS.map((c,i)=>`<button type="button" class="wf-pill" data-i="${i}" aria-expanded="false"><span class="wf-hw"><span class="wf-clip"><span class="wf-head"><i class="wf-ic" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></i>${c.t}</span></span></span><span class="wf-bw"><span class="wf-clip"><span class="wf-body"><b>${c.t}.</b> ${c.d}</span></span></span></button>`).join('');$$('#waBg .world-art').forEach(im=>{im.alt=''});
 const waCs=$$('.wa-c'), waCards=$$('.wa-card'), waBtns=$$('#waProg button');
 const waFeat=$('#waFeat'), wfPills=$$('.wf-pill'), wfArr=$$('.wf-arr');
-function wfMeasure(){wfPills.forEach(p=>{const h=p.querySelector('.wf-head');p.style.setProperty('--pw',(h.scrollWidth+44)+'px')})}
+function wfMeasure(){wfPills.forEach(p=>{const h=p.querySelector('.wf-head');p.style.setProperty('--pw',(Math.ceil(h.getBoundingClientRect().width)+2)+'px')})}
 wfMeasure();addEventListener('resize',wfMeasure);(document.fonts?document.fonts.ready:Promise.resolve()).then(wfMeasure);
 wfPills.forEach(p=>p.addEventListener('click',()=>scrollToY(holdY('world-a',+p.dataset.i+1))));
 wfArr.forEach(b=>b.addEventListener('click',()=>{const a=clamp((worldA.act??0)+ +b.dataset.d,0,3);scrollToY(holdY('world-a',a+1))})); const waBis=$$('.wa-bi'), waBimg=waBis.map(b=>b.firstElementChild);

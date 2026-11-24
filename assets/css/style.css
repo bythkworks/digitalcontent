@@ -1166,7 +1166,7 @@ body:has(#detail.open) .snd,body:has(#detail.open) .day-clock{opacity:0;pointer-
 .wf-hw{grid-template-rows:1fr}.wf-bw{grid-template-rows:0fr;opacity:0}
 .wf-pill.on .wf-hw{grid-template-rows:0fr;opacity:0}.wf-pill.on .wf-bw{grid-template-rows:1fr;opacity:1;transition-delay:.08s}
 .wf-clip{display:block;overflow:hidden;min-height:0}
-.wf-head{display:flex;align-items:center;gap:12px;padding:13px 22px 13px 14px;font-size:16px;font-weight:700;letter-spacing:-.01em;white-space:nowrap}
+.wf-head{width:max-content;display:flex;align-items:center;gap:12px;padding:13px 22px 13px 14px;font-size:16px;font-weight:700;letter-spacing:-.01em;white-space:nowrap}
 .wf-ic{flex:none;width:28px;height:28px;border-radius:50%;border:1.6px solid #8E8AD8;color:#6E68C8;display:grid;place-items:center;transition:transform .35s}
 .wf-pill:hover .wf-ic{transform:rotate(90deg)}
 .wf-body{display:block;width:min(460px,calc(100vw - 110px));padding:26px 32px;font-size:16.5px;line-height:1.75;color:#4A4668;word-break:keep-all}
