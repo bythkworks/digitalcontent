@@ -945,8 +945,9 @@ function tickTurn(now){
     b.style.transform=`translate(${(dx*(1-g)+GV[i][0]*g).toFixed(2)}vw,${(dy*(1-g)+GV[i][1]*g).toFixed(2)}vh) scale(${(1-.35*g+.06*Math.sin(t*.4+i)).toFixed(3)})`});
   // ---- three glass cores (three products)
   const cOut=eIn(range(p,.86,.98)), CC=[];
-  tCores.forEach((e,i)=>{const k=eOut(range(p,.55+i*.03,.7+i*.03));
-    const fo=eIn(range(p,.83+i*.018,.9+i*.015));   // launch upward, one after another
+  tCores.forEach((e,i)=>{const k=eOut(range(p,.55+i*.03,.7+i*.03));const TL=tCores.TL||(tCores.TL={t:0});
+    if(i===0){if(p>=.795&&!TL.t)TL.t=performance.now();if(p<.76)TL.t=0}
+    const fo=TL.t?eIn(clamp((performance.now()-TL.t-i*260)/1150)):0;   // launch upward on a clock, one after another
     e.style.transform=`translate(${(tm.cx*(20+i*8)+(i-1)*fo*VW*.12).toFixed(1)}px,${(tm.cy*16+Math.sin(t*1.1+i*2)*5-fo*VH*.95).toFixed(1)}px) scale(${(k*(1-.35*fo)).toFixed(4)},${(k*(1-.35*fo)*(1+fo*.9)).toFixed(4)})`;
     e.style.opacity=(1-range(p,.985,1)).toFixed(3);
     if(window.Prod3D&&Prod3D.ready&&k>.01&&fo<.999){Prod3D.coreFrame(i,e,t);e.classList.add('has-model')}
@@ -1248,17 +1249,21 @@ addEventListener('wheel',e=>{
 addEventListener('touchstart',()=>{touching=true;SS.on=false},{passive:true});
 addEventListener('touchend',()=>{touching=false;GATE.te=performance.now();queueMagnet()},{passive:true});
 /* ---- one hard stop on "하지만," before the question: the scroll rests there for a beat ---- */
-const GATE={until:0,passed:false,lockT:0};
-function gateY(){return holdY('turn',0)}
-function gateWheel(d){const gy=gateY(),now=performance.now(),base=SS.on?SS.tgt:scrollY;
-  if(base<gy-VH*.3)GATE.passed=false;
-  if(d<=0)return false;
-  if(now<GATE.until&&Math.abs(base-gy)<VH*.6)return true;                 // resting: swallow the wheel
-  if(!GATE.passed&&base<gy-2&&base+d>=gy-2){GATE.passed=true;GATE.until=now+1500;smoothTo(gy,.08);return true}
+const GATE={te:0,lockT:0};
+// hard stops: "하지만," and the moment the three orbs launch (they fly on a clock, so the scroll waits for them)
+const GATES=[{i:0,ms:1500},{i:2,ms:1700}].map(g=>Object.assign(g,{until:0,passed:false}));
+function gateY(g){return holdY('turn',g.i)}
+function gateWheel(d){const now=performance.now(),base=SS.on?SS.tgt:scrollY;
+  for(const g of GATES){const gy=gateY(g);
+    if(base<gy-VH*.3)g.passed=false;
+    if(d<=0)continue;
+    if(now<g.until&&Math.abs(base-gy)<VH*.6)return true;
+    if(!g.passed&&base<gy-2&&base+d>=gy-2){g.passed=true;g.until=now+g.ms;smoothTo(gy,.08);return true}}
   return false}
-function gateTouch(){if(!touching&&performance.now()-(GATE.te||0)>1600)return;const gy=gateY();if(scrollY<gy-VH*.3){GATE.passed=false;return}
-  if(!GATE.passed&&lastSY<gy-2&&scrollY>gy+2&&dir>0){GATE.passed=true;const de=document.documentElement;de.style.overflow='hidden';window.scrollTo(0,gy);SS.cur=SS.tgt=gy;
-    clearTimeout(GATE.lockT);GATE.lockT=setTimeout(()=>{de.style.overflow=''},1200)}}
+function gateTouch(){if(!touching&&performance.now()-(GATE.te||0)>1600)return;
+  for(const g of GATES){const gy=gateY(g);if(scrollY<gy-VH*.3){g.passed=false;continue}
+    if(!g.passed&&lastSY<gy-2&&scrollY>gy+2&&dir>0){g.passed=true;const de=document.documentElement;de.style.overflow='hidden';window.scrollTo(0,gy);SS.cur=SS.tgt=gy;
+      clearTimeout(GATE.lockT);GATE.lockT=setTimeout(()=>{de.style.overflow=''},g.ms-300);return}}}
 function queueMagnet(){clearTimeout(snapT);snapT=setTimeout(magnet,300)}
 function magnet(){
   if(touching||detail.classList.contains('open'))return;
