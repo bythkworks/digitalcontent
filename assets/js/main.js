@@ -522,11 +522,14 @@ const FP_STAGE=[626,226,20];                    // stage at the north edge of th
 const FP_EYE=7, FP_ITEM_Z=14;
 // PATH GUARD: two robots on the plaza floor either side of the walkway, which becomes a temporary vehicle lane
 // the truck's route (marked by the team): from the near walkway, between the two robots, on toward the stage
-const TRUCK_ROUTE=[[496.5,475],[499,473.5],[501,463.5],[503.5,443.5],[507,408.5],[509.5,380],[512,350]];
-function routeAt(R,u){const L=[0];for(let i=1;i<R.length;i++)L.push(L[i-1]+Math.hypot(R[i][0]-R[i-1][0],R[i][1]-R[i-1][1]));
-  const t=Math.max(0,Math.min(1,u))*L[L.length-1];let i=1;while(i<R.length-1&&L[i]<t)i++;
-  const seg=L[i]-L[i-1]||1,f=(t-L[i-1])/seg,dx=(R[i][0]-R[i-1][0])/seg,dy=(R[i][1]-R[i-1][1])/seg;
-  return [R[i-1][0]+(R[i][0]-R[i-1][0])*f,R[i-1][1]+(R[i][1]-R[i-1][1])*f,dx,dy]}
+const TRUCK_ROUTE=[[498,494],[497.5,486],[499,476],[503,469],[507.5,454.5],[512,424],[515,380],[517,350]];
+// smooth route: Catmull-Rom through the marked points, resampled by length; heading looks a little ahead so turns ease in
+const TRUCK_PATH=(()=>{const R=TRUCK_ROUTE,P=[],cr=(a,b,c,d,t)=>.5*(2*b+(-a+c)*t+(2*a-5*b+4*c-d)*t*t+(-a+3*b-3*c+d)*t*t*t);
+  for(let i=0;i<R.length-1;i++){const p0=R[Math.max(0,i-1)],p1=R[i],p2=R[i+1],p3=R[Math.min(R.length-1,i+2)];
+    for(let k=0;k<24;k++){const t=k/24;P.push([cr(p0[0],p1[0],p2[0],p3[0],t),cr(p0[1],p1[1],p2[1],p3[1],t)])}}
+  P.push(R[R.length-1]);const L=[0];for(let i=1;i<P.length;i++)L.push(L[i-1]+Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]));return {P,L,T:L[L.length-1]}})();
+function pathPt(d){const {P,L,T}=TRUCK_PATH;d=Math.max(0,Math.min(T,d));let i=1;while(i<P.length-1&&L[i]<d)i++;const f=(d-L[i-1])/((L[i]-L[i-1])||1);return [P[i-1][0]+(P[i][0]-P[i-1][0])*f,P[i-1][1]+(P[i][1]-P[i-1][1])*f]}
+function routeAt(R,u){const T=TRUCK_PATH.T,d=Math.max(0,Math.min(1,u))*T,p=pathPt(d),a=pathPt(d+9),b=pathPt(d-9),dx=a[0]-b[0],dy=a[1]-b[1],l=Math.hypot(dx,dy)||1;return [p[0],p[1],dx/l,dy/l]}
 const PG_LANE=(()=>{const a=[493,444],b=[524,462],g=4,c=[(a[0]+b[0])/2,(a[1]+b[1])/2],w=[b[0]-a[0],b[1]-a[1]],L=Math.hypot(w[0],w[1]);
   let d=[-w[1]/L,w[0]/L]; if(d[1]>0)d=[-d[0],-d[1]];   // forward = toward the stage
   return {slots:[a,b],g,c,d,rz:Math.atan2(w[0],-w[1])}})();
