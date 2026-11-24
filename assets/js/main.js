@@ -1960,19 +1960,19 @@ window.SPRAIL={sections:()=>[['intro','INTRO'],['world-a','WORLD'],['world-c','E
     secs=pick().filter(s=>s.el); if(!secs.length)return;
     if(!rail){rail=document.createElement('nav');rail.className='sprail';rail.setAttribute('aria-label','페이지 진행 위치');document.body.appendChild(rail)}
     const id='spg'+Math.random().toString(36).slice(2,7);
-    rail.innerHTML=`<div class="sp-glass"></div><svg aria-hidden="true"><defs>
-      <linearGradient id="${id}b" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".12"/><stop offset=".55" stop-color="#E9E6FF" stop-opacity=".42"/><stop offset="1" stop-color="#fff" stop-opacity=".72"/></linearGradient>
-      <linearGradient id="${id}p" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#9CC8E2"/><stop class="sp-s1" offset=".5" stop-color="#B8B6E5"/><stop class="sp-s2" offset=".5" stop-color="#E8B0DD" stop-opacity=".35"/><stop offset="1" stop-color="#F8CAA7" stop-opacity=".35"/></linearGradient>
+    rail.innerHTML=`<svg aria-hidden="true"><defs>
+      <linearGradient id="${id}b" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".35" stop-color="#fff" stop-opacity=".08"/><stop offset=".8" stop-color="#fff" stop-opacity=".18"/><stop offset="1" stop-color="#fff" stop-opacity=".6"/></linearGradient>
+      <linearGradient id="${id}p" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#C9C6FF" stop-opacity=".9"/><stop class="sp-s1" offset=".5" stop-color="#E9B8E4" stop-opacity=".9"/><stop class="sp-s2" offset=".6" stop-color="#EDEBFF" stop-opacity=".45"/><stop offset="1" stop-color="#EDEBFF" stop-opacity=".45"/></linearGradient>
       <radialGradient id="${id}d" cx=".35" cy=".35" r=".7"><stop offset="0" stop-color="#fff"/><stop offset=".45" stop-color="#F3F0FF"/><stop offset="1" stop-color="#B8B6E5"/></radialGradient></defs>
       <path class="sp-tint" fill="url(#${id}p)"/><path class="sp-body" fill="url(#${id}b)"/>
       <path class="sp-rim" fill="none" stroke="rgba(255,255,255,.95)" stroke-width="1.2"/><path class="sp-rim2" fill="none" stroke="rgba(90,80,170,.28)" stroke-width="1"/>
 </svg><div class="sp-hit"></div>`+
       secs.map((s,i)=>`<button type="button" class="sp-tick" data-i="${i}" aria-label="${s.label}(으)로 이동"><span>${String(i+1).padStart(2,'0')} · ${s.label}</span></button>`).join('')+'<div class="sp-now" aria-live="polite"></div>';
-    glass=rail.querySelector('.sp-glass');svg=rail.querySelector('svg');body=rail.querySelector('.sp-body');prog=rail.querySelector('.sp-tint');rail.s1=rail.querySelector('.sp-s1');rail.s2=rail.querySelector('.sp-s2');rim=rail.querySelector('.sp-rim');
+    svg=rail.querySelector('svg');body=rail.querySelector('.sp-body');prog=rail.querySelector('.sp-tint');rail.s1=rail.querySelector('.sp-s1');rail.s2=rail.querySelector('.sp-s2');rim=rail.querySelector('.sp-rim');
     rail.rim2=rail.querySelector('.sp-rim2');now=rail.querySelector('.sp-now');ticks=[...rail.querySelectorAll('.sp-tick')];
-    ticks.forEach(b=>{b.addEventListener('click',()=>goto(secs[+b.dataset.i].el));b.addEventListener('pointerenter',()=>rail.classList.add('hov'));b.addEventListener('pointerleave',()=>rail.classList.remove('hov'))});
-    rail.querySelector('.sp-hit').addEventListener('pointerenter',()=>{S.over=true;rail.classList.add('over');kick()});
-    rail.addEventListener('pointerleave',()=>{S.over=false;rail.classList.remove('over');kick()});
+    ticks.forEach(b=>{b.addEventListener('click',()=>goto(secs[+b.dataset.i].el));b.addEventListener('pointerenter',()=>rail.classList.add('sp-hov'));b.addEventListener('pointerleave',()=>rail.classList.remove('sp-hov'))});
+    rail.querySelector('.sp-hit').addEventListener('pointerenter',()=>{S.over=true;rail.classList.add('sp-over');kick()});
+    rail.addEventListener('pointerleave',()=>{S.over=false;rail.classList.remove('sp-over');kick()});
     cur=-1;place();S.py=target();kick()}
   const maxY=()=>Math.max(1,document.documentElement.scrollHeight-innerHeight);
   const PAD=()=>Math.min(70,innerHeight*.08);
@@ -1987,13 +1987,12 @@ window.SPRAIL={sections:()=>[['intro','INTRO'],['world-a','WORLD'],['world-c','E
     let d1=`M${W} 0`,rimD='';for(let y=0;y<=H+8;y+=6){const x=xs(Math.min(y,H)).toFixed(2);d1+=` L${x} ${Math.min(y,H)}`;rimD+=(rimD?' L':'M')+x+' '+Math.min(y,H)}
     d1+=` L${W} ${H} Z`; body.setAttribute('d',d1); rim.setAttribute('d',rimD); rail.rim2.setAttribute('d',rimD.replace(/(\d+\.\d+) /g,(m,x)=>(+x-1).toFixed(2)+' '));
     prog.setAttribute('d',d1); prog.style.opacity=(.6+.35*S.amp).toFixed(2);
-    const f=(S.py/H).toFixed(4); rail.s1.setAttribute('offset',f); rail.s2.setAttribute('offset',f);   // passed part saturated, the rest pale
-    glass.style.clipPath=`path('${d1}')`;
+    const f=S.py/H; rail.s1.setAttribute('offset',Math.max(0,f-.01).toFixed(4)); rail.s2.setAttribute('offset',Math.min(1,f+.12).toFixed(4));   // passed part saturated, the rest pale
     ticks.forEach(b=>{const y=parseFloat(b.style.top);b.style.setProperty('--tx',(W-xs(y)-2).toFixed(1)+'px');b.style.setProperty('--to','0')});
     now.style.transform=`translate(${(xs(S.py)-8).toFixed(1)}px,${S.py.toFixed(1)}px) translate(-100%,-50%)`;
     // current section
     const y=scrollY;let c=0;secs.forEach((s,i)=>{if(y+innerHeight*.35>=s.y)c=i});
-    if(c!==cur){const first=cur<0;cur=c;now.innerHTML=`<b>${String(c+1).padStart(2,'0')}</b>${secs[c].label}`;if(!first||y>10){rail.classList.add('flash');clearTimeout(flT);flT=setTimeout(()=>rail.classList.remove('flash'),1800)}}
+    if(c!==cur){const first=cur<0;cur=c;now.innerHTML=`<b>${String(c+1).padStart(2,'0')}</b>${secs[c].label}`;if(!first||y>10){rail.classList.add('sp-flash');clearTimeout(flT);flT=setTimeout(()=>rail.classList.remove('sp-flash'),1800)}}
     if(Math.abs(tgt-S.py)>.3||Math.abs(S.vy)>.05||S.amp>.003&&!active||active)raf=requestAnimationFrame(frame);
     if(!active&&S.amp<.004&&Math.abs(S.vy)<.05&&Math.abs(tgt-S.py)<.3){S.amp=0;cancelAnimationFrame(raf);raf=0;draw0()}}
   function draw0(){/* one last flat frame already drawn */}
