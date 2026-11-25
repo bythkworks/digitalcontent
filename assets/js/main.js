@@ -946,7 +946,7 @@ function tickTurn(now){
   
   const cyP=50-(T_MOB?20:19)*range(p,.6,.86);
   const Rmax=Math.hypot(VW/2,VH*Math.max(cyP,100-cyP)/100)+60;
-  const open=eIO(range(p,.07,.25)), close=eIO(range(p,.86,.985));
+  const open=eIO(range(p,.07,.25)), close=eIO(range(p,.84,.935));
   const R=Rmax*open*(1-close);
     tDark.style.clipPath=`circle(${R.toFixed(1)}px at 50% ${cyP.toFixed(2)}%)`; tRing.style.top=cyP.toFixed(2)+'%';
   const ringO=R>1&&R<Rmax-8?Math.min(1,R/80)*(1-(open>=1&&close<=0?1:0)):0;
@@ -995,24 +995,24 @@ function tickTurn(now){
   tBlobs.forEach((b,i)=>{const dx=Math.sin(t*.13+i*1.9)*6+tm.cx*(8+i*4), dy=Math.cos(t*.11+i*1.3)*5+tm.cy*(8+i*4);
     b.style.transform=`translate(${(dx*(1-g)+GV[i][0]*g).toFixed(2)}vw,${(dy*(1-g)+GV[i][1]*g).toFixed(2)}vh) scale(${(1-.35*g+.06*Math.sin(t*.4+i)).toFixed(3)})`});
   // ---- three glass cores (three products)
-  const cOut=eIn(range(p,.86,.98)), CC=[];
+  const cOut=eIn(range(p,.84,.93)), CC=[];
   tCores.forEach((e,i)=>{const k=eOut(range(p,.55+i*.03,.7+i*.03));const TL=tCores.TL||(tCores.TL={t:0});
     if(i===0){if(p>=.795&&!TL.t)TL.t=performance.now();if(p<.76)TL.t=0}
-    const fo=TL.t?eIn(clamp((performance.now()-TL.t-i*260)/1150)):0;   // launch upward on a clock, one after another
+    const fo=TL.t?eIn(clamp((performance.now()-TL.t-i*180)/850)):0;   // launch upward on a clock, one after another
     e.style.transform=`translate(${(tm.cx*(20+i*8)+(i-1)*fo*VW*.12).toFixed(1)}px,${(tm.cy*16+Math.sin(t*1.1+i*2)*5-fo*VH*.95).toFixed(1)}px) scale(${(k*(1-.35*fo)).toFixed(4)},${(k*(1-.35*fo)*(1+fo*.9)).toFixed(4)})`;
-    e.style.opacity=(1-range(p,.985,1)).toFixed(3);
+    e.style.opacity=(1-range(p,.93,.95)).toFixed(3);
     if(window.Prod3D&&Prod3D.ready&&k>.01&&fo<.999){Prod3D.coreFrame(i,e,t);e.classList.add('has-model')}
     const r=e.getBoundingClientRect(); CC.push([r.left+r.width/2,r.top+r.height/2,r.width])});
   tLenses.forEach((l,i)=>l.style.setProperty('--a',((t*50+i*120)%360).toFixed(1)+'deg'));
   dustTick(tCores.TL&&tCores.TL.t);
   // ---- answer: warped in, crisp at rest, warped out
-  const ak=eOut(range(p,.64,.77)), ao=eIn(range(p,.84,.9)), aw=(1-ak)+ao;
+  const ak=eOut(range(p,.64,.77)), ao=eIn(range(p,.825,.86)), aw=(1-ak)+ao;
   tA.style.opacity=(ak*(1-ao)).toFixed(3);
   tA.style.transform=`translateY(${((1-ak)*34-ao*24).toFixed(1)}px)`;
   if(aw>.004){tDisp3.setAttribute('scale',(60*aw).toFixed(1));tTurb3.setAttribute('baseFrequency',`${(.012+.003*Math.sin(t*.7)).toFixed(4)} ${(.035+.008*Math.cos(t*.9)).toFixed(4)}`);
     tA.style.filter=`url(#tWarp3) blur(${(aw*8).toFixed(2)}px)`} else tA.style.filter='none';
   // ---- dust: scattered thoughts → orbit around the core
-  const conv=eIO(range(p,.46,.72)), shrink=eIn(range(p,.86,.97));
+  const conv=eIO(range(p,.46,.72)), shrink=eIn(range(p,.84,.93));
   dctx.setTransform(dDpr,0,0,dDpr,0,0); dctx.clearRect(0,0,dW,dH); dctx.globalCompositeOperation='lighter';
   const lensK=open*(1-close); if(lensK>.01){
   for(const q2 of dust){
@@ -1021,7 +1021,7 @@ function tickTurn(now){
     if(conv>0){const C=CC[q2.k]||[VW/2,VH*.3,100],ang=q2.a+t*.35*q2.sp, rad=C[2]*(.42+.5*(q2.o-.55))*(1-shrink*.9)+4;
       const tx=C[0]+Math.cos(ang)*rad, ty=C[1]+Math.sin(ang)*rad*.7;
       x=x+(tx-x)*conv; y=y+(ty-y)*conv; r=r*(1-conv)+q2.s*.9*conv}
-    const al=Math.min(1,q2.o*(conv>0?1:clamp(sc*1.4)))*lensK*(1-range(p,.95,.99));
+    const al=Math.min(1,q2.o*(conv>0?1:clamp(sc*1.4)))*lensK*(1-range(p,.92,.945));
     if(al<.02||x<-20||x>VW+20||y<-20||y>VH+20)continue;
     dctx.fillStyle=`rgba(${q2.c},${al.toFixed(3)})`; dctx.beginPath(); dctx.arc(x,y,Math.max(.4,r),0,6.283); dctx.fill();
   }}
@@ -1327,7 +1327,7 @@ addEventListener('touchend',()=>{touching=false;GATE.te=performance.now();queueM
 /* ---- one hard stop on "하지만," before the question: the scroll rests there for a beat ---- */
 const GATE={te:0,lockT:0};
 // hard stops: "하지만," and the moment the three orbs launch (they fly on a clock, so the scroll waits for them)
-const GATES=[{i:0,ms:1500},{i:2,ms:1700}].map(g=>Object.assign(g,{until:0,passed:false}));
+const GATES=[{i:0,ms:1500},{i:2,ms:1000}].map(g=>Object.assign(g,{until:0,passed:false}));
 function gateY(g){return holdY('turn',g.i)}
 function gateWheel(d){const now=performance.now(),base=SS.on?SS.tgt:scrollY;
   for(const g of GATES){const gy=gateY(g);
