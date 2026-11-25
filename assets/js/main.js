@@ -2087,6 +2087,8 @@ window.SPRAIL={sections:()=>[['intro','INTRO'],['world-a','WORLD'],['context-vis
     {start:.345,idx:'02',label:'02 / 공간',heading:'주변 환경의 변화를 살피며,'},
     {start:.705,idx:'03',label:'03 / 연결',heading:'서로 다른 정보를 하나의 맥락으로 연결합니다.'}
   ];
+  let swapT=0;const swapH=txt=>{if(!h.textContent){h.textContent=txt;return}
+    clearTimeout(swapT);copyContent.classList.add('is-changing');swapT=setTimeout(()=>{h.textContent=txt;copyContent.classList.remove('is-changing');copyContent.classList.add('is-entering');void copyContent.offsetWidth;copyContent.classList.remove('is-entering')},420)};
   let previousChapter=-1,scrollQueued=false,lastP=-1;
   const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
   const ease=(t)=>t*t*(3-2*t);
@@ -2145,7 +2147,7 @@ window.SPRAIL={sections:()=>[['intro','INTRO'],['world-a','WORLD'],['context-vis
       c.connection.setAttribute('opacity',(alpha*.7*signal).toFixed(2));
     });
     let n=0;for(let i=0;i<chapters.length;i++)if(p>=chapters[i].start)n=i;
-    if(previousChapter!==n){previousChapter=n;const c=chapters[n];step.textContent=c.label;h.textContent=c.heading;progressIndex.textContent=c.idx+' / 03'}
+    if(previousChapter!==n){previousChapter=n;const c=chapters[n];step.textContent=c.label;swapH(c.heading);progressIndex.textContent=c.idx+' / 03'}
     progressFill.style.width=(p*100).toFixed(1)+'%';
   };
   const queue=()=>{if(!root.isConnected){
