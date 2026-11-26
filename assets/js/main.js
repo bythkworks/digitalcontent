@@ -741,7 +741,7 @@ function openCard(n){
   const p=PRODUCTS[n-1]; map.sel=n; setHL(n);
   const [x,y,w,d]=p.b; map.tx=-(x+w/2-500); map.ty=-(y+d/2-500); map.zoom=Math.max(map.zoom,1.25);
   $('#pcVis').innerHTML=prodSVG(p.kind); $('#pcLabel').textContent=`PROJECT 0${p.n} · ${CAT[p.cat]} · ${p.place}`;
-  $('#pcName').textContent=p.name; $('#pcOne').textContent=p.one;
+  $('#pcName').textContent=p.name; $('#pcOne').textContent=p.one; $('#pcGo').style.display=p.n===1?'':'none';
   pcard.classList.remove('open'); void pcard.offsetWidth; pcard.classList.add('open'); warp();
 }
 function closeCard(){map.sel=null;pcard.classList.remove('open');setHL(0);map.tx=0;map.ty=0;map.zoom=Math.min(map.zoom,1)}
@@ -841,7 +841,7 @@ function switchProduct(n){
   tween(350,k=>{dBody.style.opacity=1-k;dBody.style.filter=`blur(${8*k}px)`},()=>{buildDetail(PRODUCTS[n-1]);map.sel=n;
     tween(500,k=>{dBody.style.opacity=k;dBody.style.filter=`blur(${8*(1-k)}px)`},()=>dBody.style.filter='')});
 }
-$('#pcGo').onclick=()=>openDetail(map.sel);
+$('#pcGo').onclick=()=>fpOpen(map.sel);
 $('#dBack').onclick=closeDetail;
 const lbx=$('#lightbox');
 function openLB(html){$('#lbFrame').innerHTML=html;lbx.classList.add('open');$('#lbX').focus()}
@@ -1172,7 +1172,7 @@ function renderProjects(p){
   const fin=p>PJ_KN[4]-.04;
   const st=act?act:fin?9:-1;
   if(st!==pj.stop){pj.stop=st;
-    if(act){const pr=PRODUCTS[act-1];ptK.textContent=`0${act} · ${pr.place}`;ptN.textContent=pr.name;ptO.textContent=pr.one;ptGo.dataset.n=act;ptGo.style.display=''}
+    if(act){const pr=PRODUCTS[act-1];ptK.textContent=`0${act} · ${pr.place}`;ptN.textContent=pr.name;ptO.textContent=pr.one;ptGo.dataset.n=act;ptGo.style.display=act===1?'':'none'}
     else if(fin){ptK.textContent='도착';ptN.textContent='공연이 열리는 운동장';ptO.textContent='';ptGo.style.display='none'}}
   let vis=0; if(act)vis=1-clamp((Math.abs(p-PJ_KN[act]-(act===2?.025:0))-.02)/.03); else if(fin)vis=eOut(range(p,PJ_KN[4]-.04,PJ_KN[4]));
   vis*=1-range(p,.958,.975); pjTour.style.opacity=vis.toFixed(3); pjTour.style.transform=`translateY(${VW<700?0:-50}%) translateY(${((1-vis)*30).toFixed(1)}px)`;

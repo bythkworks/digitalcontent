@@ -1295,4 +1295,4 @@ body:has(#detail.open) .snd,body:has(#detail.open) .day-clock{opacity:0;pointer-
 .nav ul li.to-project a::after{display:none}
 @media (max-width:760px){.nav .logo .team-tag{display:none}.nav ul li.to-project a{font-size:0;gap:0}.nav ul li.to-project svg{width:18px;height:18px}}
 /* personal product pages are disconnected: no EXPLORE buttons, no CLICK ring */
-#ptGo,#pcGo,.pc-click{display:none!important}
+.pc-click{display:none!important} /* 제품 1만 EXPLORE 버튼 표시 (JS에서 제어) */
