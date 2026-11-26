@@ -75,5 +75,5 @@ python3 -m http.server 8000
 ## 개인 제품 페이지
 
 - **PRODUCT01 · KNOBLE** — `PRODUCT01/` 폴더에 포함되어 있습니다. 지도에서 1번 제품(KNOBLE)을 누르면 같은 창에서 `PRODUCT01/index.html`로 이동하고, 제품 페이지 상단 `← FESTIVAL MAP`으로 돌아옵니다. 이 폴더도 외부 연결 없이 동작합니다(three.js·Lenis·폰트·영상·3D 모델 포함).
-- **FLOWAY(3번)** — 개인 사이트 https://objectroom.github.io/DigitalContent/PRODUCT03/ 로 연결(새 탭). 인터넷 연결이 필요합니다.
+- **PRODUCT03 · FLOWAY** — `PRODUCT03/` 폴더에 포함(objectroom/DigitalContent 저장소의 PRODUCT03을 가져옴). 지도에서 3번 제품을 누르면 같은 창에서 이동하고, 외부 연결 없이 동작합니다(3D 모델 내장).
 - PATH GUARD(2번)는 아직 연결하지 않았고, 클릭해도 다른 페이지로 이동하지 않습니다.
