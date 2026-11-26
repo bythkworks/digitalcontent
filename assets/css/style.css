@@ -1288,3 +1288,11 @@ body:has(#detail.open) .snd,body:has(#detail.open) .day-clock{opacity:0;pointer-
   #context-vision .iv-line{top:auto;bottom:0;transform:none;font-size:9vw}
   #context-vision .iv-fade{width:auto;left:0;right:0;top:auto;height:44%;bottom:0;background:linear-gradient(0deg,rgba(255,255,255,.95),rgba(255,255,255,0))}
 }
+
+/* team label + link up to the whole project (guide §1) */
+.nav .logo .team-tag{margin-left:10px;padding:3px 8px;border-radius:999px;font-size:10.5px;font-weight:700;letter-spacing:.08em;color:#6c5aa8;background:rgba(184,182,229,.25);border:1px solid rgba(184,182,229,.55)}
+.nav ul li.to-project a{display:inline-flex;align-items:center;gap:6px}
+.nav ul li.to-project a::after{display:none}
+@media (max-width:760px){.nav .logo .team-tag{display:none}.nav ul li.to-project a{font-size:0;gap:0}.nav ul li.to-project svg{width:18px;height:18px}}
+/* personal product pages are disconnected: no EXPLORE buttons, no CLICK ring */
+#ptGo,#pcGo,.pc-click{display:none!important}
