@@ -74,12 +74,6 @@ python3 -m http.server 8000
 
 ## 개인 제품 페이지
 
-| 폴더 | 제품 | 상태 |
-|---|---|---|
-| `PRODUCT01/` | KNOBLE | 완성 — 지도에서 1번 제품을 누르면 이동 |
-| `PRODUCT02/` | PATH GUARD | 완성 — 지도에서 2번 제품을 누르면 이동 |
-| `PRODUCT03/` | FLOWAY (페이지 표기: FLOW DIAL) | 완성 — 지도에서 3번 제품을 누르면 이동 |
-
-각 제품 페이지는 `index.html` + `assets/(images|videos|models|js|css|fonts)` 구조이고, 상대 경로만 사용합니다.
-제품 페이지 상단: `전체 프로젝트`(../../index.html) · `COLLEGE FESTIVAL 2031`(조 페이지, ../index.html).
-오프라인 테스트: 이 폴더에서 `python3 -m http.server` 실행 후 http://localhost:8000 접속 (파일 더블클릭으로도 동작).
+2026-11-26 기준으로 개인 제품 페이지(PRODUCT01~03)는 연결을 해제하고 폴더를 삭제했습니다.
+지도 위 제품(KNOBLE · PATH GUARD · FLOWAY)은 3D 모델과 한 줄 소개만 보여 주며, 클릭해도 다른 페이지로 이동하지 않습니다.
+조 페이지 상단에는 `TEAM 03` 표기와 `전체 프로젝트`(../index.html) 링크가 있습니다. 최종 통합 시 이 폴더를 `TEAM03/` 등으로 프로젝트 폴더 안에 넣으면 연결됩니다.
