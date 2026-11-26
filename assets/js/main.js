@@ -124,7 +124,7 @@ const CAT={personal:'개인',space:'공간',operator:'운영'};
 const TBD='내용 입력 필요';
 const PRODUCTS=[
  {n:1,name:'KNOBLE',model:'KNOBLE',place:'입구',cat:'personal',kind:'band',at:[766,572,-4],one:'지금의 나를, 손끝으로',
-  url:null},   // 개인 제품 페이지 (PRODUCT01/ 폴더)
+  url:'PRODUCT01/index.html'},   // 개인 제품 페이지 (PRODUCT01/ 폴더)
  {n:2,name:'PATH GUARD',model:'PATHGUARD',place:'광장',cat:'space',kind:'light',at:[520,471,4],url:null},
  {n:3,name:'FLOWAY',model:'FLOWAY',place:'운동장',cat:'operator',kind:'pod',at:[646,338,0],url:null}
 ].map(p=>Object.assign({one:'한 줄 소개 — '+TBD,problem:TBD,points:[TBD,TBD,TBD],
@@ -741,7 +741,7 @@ function openCard(n){
   const p=PRODUCTS[n-1]; map.sel=n; setHL(n);
   const [x,y,w,d]=p.b; map.tx=-(x+w/2-500); map.ty=-(y+d/2-500); map.zoom=Math.max(map.zoom,1.25);
   $('#pcVis').innerHTML=prodSVG(p.kind); $('#pcLabel').textContent=`PROJECT 0${p.n} · ${CAT[p.cat]} · ${p.place}`;
-  $('#pcName').textContent=p.name; $('#pcOne').textContent=p.one;
+  $('#pcName').textContent=p.name; $('#pcOne').textContent=p.one; $('#pcGo').style.display=p.n===1?'':'none';
   pcard.classList.remove('open'); void pcard.offsetWidth; pcard.classList.add('open'); warp();
 }
 function closeCard(){map.sel=null;pcard.classList.remove('open');setHL(0);map.tx=0;map.ty=0;map.zoom=Math.min(map.zoom,1)}
@@ -841,7 +841,7 @@ function switchProduct(n){
   tween(350,k=>{dBody.style.opacity=1-k;dBody.style.filter=`blur(${8*k}px)`},()=>{buildDetail(PRODUCTS[n-1]);map.sel=n;
     tween(500,k=>{dBody.style.opacity=k;dBody.style.filter=`blur(${8*(1-k)}px)`},()=>dBody.style.filter='')});
 }
-$('#pcGo').onclick=()=>openDetail(map.sel);
+$('#pcGo').onclick=()=>fpOpen(map.sel);
 $('#dBack').onclick=closeDetail;
 const lbx=$('#lightbox');
 function openLB(html){$('#lbFrame').innerHTML=html;lbx.classList.add('open');$('#lbX').focus()}
@@ -1164,7 +1164,7 @@ function tickStars(now,top,p){
   FP.shake=Math.max(0,...FP.items.map(it=>it.wind||0));
 }
 fpTags.forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();fpOpen(+b.dataset.n)}));
-function fpOpen(n){return; /* 개인 제품 페이지 연결 해제 (2026-11-26) */Sound.play('open');const pu=PRODUCTS[n-1]&&PRODUCTS[n-1].url;if(pu){if(!/^https?:/.test(pu)){location.href=pu;return}let w=null;try{w=window.open(pu,'_blank')}catch(e){}if(w)return;const a=document.createElement('a');a.href=pu;a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();return}const it=FP.items[n-1];if(it){const r=it.scr[2]*2.2;FP.from=[it.scr[1]-r,VW-(it.scr[0]+r),VH-(it.scr[1]+r),it.scr[0]-r].map(v=>Math.max(0,v))}openDetail(n)}
+function fpOpen(n){if(n!==1)return; /* 제품 1만 연결 (2026-11-26) */Sound.play('open');const pu=PRODUCTS[n-1]&&PRODUCTS[n-1].url;if(pu){if(!/^https?:/.test(pu)){location.href=pu;return}let w=null;try{w=window.open(pu,'_blank')}catch(e){}if(w)return;const a=document.createElement('a');a.href=pu;a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();return}const it=FP.items[n-1];if(it){const r=it.scr[2]*2.2;FP.from=[it.scr[1]-r,VW-(it.scr[0]+r),VH-(it.scr[1]+r),it.scr[0]-r].map(v=>Math.max(0,v))}openDetail(n)}
 function renderProjects(p){
   pj.p=p;
   const S=fpSK(); FP.s=fpS(p);
@@ -1172,7 +1172,7 @@ function renderProjects(p){
   const fin=p>PJ_KN[4]-.04;
   const st=act?act:fin?9:-1;
   if(st!==pj.stop){pj.stop=st;
-    if(act){const pr=PRODUCTS[act-1];ptK.textContent=`0${act} · ${pr.place}`;ptN.textContent=pr.name;ptO.textContent=pr.one;ptGo.dataset.n=act;ptGo.style.display=''}
+    if(act){const pr=PRODUCTS[act-1];ptK.textContent=`0${act} · ${pr.place}`;ptN.textContent=pr.name;ptO.textContent=pr.one;ptGo.dataset.n=act;ptGo.style.display=act===1?'':'none'}
     else if(fin){ptK.textContent='도착';ptN.textContent='공연이 열리는 운동장';ptO.textContent='';ptGo.style.display='none'}}
   let vis=0; if(act)vis=1-clamp((Math.abs(p-PJ_KN[act]-(act===2?.025:0))-.02)/.03); else if(fin)vis=eOut(range(p,PJ_KN[4]-.04,PJ_KN[4]));
   vis*=1-range(p,.958,.975); pjTour.style.opacity=vis.toFixed(3); pjTour.style.transform=`translateY(${VW<700?0:-50}%) translateY(${((1-vis)*30).toFixed(1)}px)`;
