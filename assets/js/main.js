@@ -1297,7 +1297,7 @@ function waStep(d){const y=SS.on?SS.tgt:scrollY,[a,b]=waZone();
   if(d>0?y<a-VH*.6||y>=b-2:y>b+VH*.6||y<=a+2)return false;          // outside, or leaving at the ends → normal scroll
   const now=performance.now(); if(now<WS.lock)return true;
   let i=waIdx(y); const hy=holdY('world-a',i); if(d>0?hy>y+4:hy<y-4){}else i=clamp(i+(d>0?1:-1),0,4);
-  smoothTo(holdY('world-a',i),.085); WS.lock=now+720; return true}
+  smoothTo(holdY('world-a',i),.075); WS.lock=now+520; return true}
 addEventListener('wheel',e=>{
   if(e.ctrlKey||reduce||detail.classList.contains('open')||ownScroller(e.target))return;
   const d=e.deltaY; if(Math.abs(e.deltaX)>Math.abs(d)||!d)return;
@@ -1320,14 +1320,14 @@ addEventListener('wheel',e=>{
   const d=e.deltaY*(e.deltaMode===1?32:e.deltaMode===2?VH:1);
   if(!SS.on){SS.cur=scrollY;SS.tgt=scrollY}
   if(gateWheel(d))return;
-  SS.tgt=clamp(SS.tgt+d,0,maxY());SS.k=.085;SS.on=true;if(d)dir=d>0?1:-1;queueMagnet();
+  SS.tgt=clamp(SS.tgt+clamp(d,-VH*.32,VH*.32),0,maxY());SS.k=.075;SS.on=true;if(d)dir=d>0?1:-1;queueMagnet();
 },{passive:false});
 addEventListener('touchstart',()=>{touching=true;SS.on=false},{passive:true});
 addEventListener('touchend',()=>{touching=false;GATE.te=performance.now();queueMagnet()},{passive:true});
 /* ---- one hard stop on "하지만," before the question: the scroll rests there for a beat ---- */
 const GATE={te:0,lockT:0};
 // hard stops: "하지만," and the moment the three orbs launch (they fly on a clock, so the scroll waits for them)
-const GATES=[{i:0,ms:1500},{i:2,ms:1000}].map(g=>Object.assign(g,{until:0,passed:false}));
+const GATES=[{i:0,ms:1100},{i:2,ms:1000}].map(g=>Object.assign(g,{until:0,passed:false}));
 function gateY(g){return holdY('turn',g.i)}
 function gateWheel(d){const now=performance.now(),base=SS.on?SS.tgt:scrollY;
   for(const g of GATES){const gy=gateY(g);
@@ -1340,7 +1340,7 @@ function gateTouch(){if(!touching&&performance.now()-(GATE.te||0)>1600)return;
   for(const g of GATES){const gy=gateY(g);if(scrollY<gy-VH*.3){g.passed=false;continue}
     if(!g.passed&&lastSY<gy-2&&scrollY>gy+2&&dir>0){g.passed=true;const de=document.documentElement;de.style.overflow='hidden';window.scrollTo(0,gy);SS.cur=SS.tgt=gy;
       clearTimeout(GATE.lockT);GATE.lockT=setTimeout(()=>{de.style.overflow=''},g.ms-300);return}}}
-function queueMagnet(){clearTimeout(snapT);snapT=setTimeout(magnet,300)}
+function queueMagnet(){clearTimeout(snapT);snapT=setTimeout(magnet,380)}
 function magnet(){
   if(touching||detail.classList.contains('open'))return;
   if(SS.on&&Math.abs(SS.tgt-SS.cur)>24){queueMagnet();return}
@@ -1349,7 +1349,7 @@ function magnet(){
   if(!best||bd<=2)return;
   const ahead=(best.y-y)*dir>0;                  // settle forward generously, never drag back far
   const reach=ahead?best.hw+VH*.18:best.hw*.9;
-  if(bd<reach)smoothTo(best.y,.055);
+  if(bd<reach)smoothTo(best.y,.048);
 }
 addEventListener('scroll',()=>{if(!SS.on&&!reduce)gateTouch();const d=scrollY-lastSY;if(Math.abs(d)>.5)dir=d>0?1:-1;lastSY=scrollY;
   if(SS.on&&Math.abs(scrollY-SS.set)>3){SS.on=false}      // scrollbar / external scroll takes over
