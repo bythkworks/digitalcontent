@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Knoble | 노블 — 지금의 나를 AI에게 전하는 작은 인터페이스</title>
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-tint="day">
+<div class="bgfx" aria-hidden="true"><i class="orb o1"></i><i class="orb o2"></i></div>
+
+<header class="nav" id="nav">
+  <a class="back" href="../index.html">← FESTIVAL MAP</a>
+  <a class="brand" href="#top">KNOBLE <span>노블</span></a>
+  <nav class="dots" aria-label="장면">
+    <a href="#top" data-l="노블" data-ip="0"></a><a href="#top" data-l="배경" data-ip=".2"></a><a href="#top" data-l="문제" data-ip=".56"></a><a href="#concept" data-l="사용법"></a><a href="#persona" data-l="도윤"></a><a href="#ep1" data-l="스토리"></a><a href="#structure" data-l="구조"></a><a href="#system" data-l="시스템"></a><a href="#spec" data-l="사양"></a><a href="#gallery" data-l="디자인"></a>
+  </nav>
+  <i class="progress" id="progress"></i>
+</header>
+
+<!-- 00–02 INTRO: opening → world before Knoble → problem (one continuous stage) -->
+<section class="scene" id="top" style="--len:1350vh">
+  <div class="stage intro">
+    <canvas id="heroGL" class="hero-gl" aria-label="노블 3D 모델"></canvas>
+    <div class="hero-copy" id="heroCopy">
+      <span class="eyebrow">PRODUCT 01 · 입구</span>
+      <h1>Knoble <small>노블</small></h1>
+      <p class="tag">나를 기억하는 AI에게,<br>지금의 나를 전하다.</p>
+    </div>
+    <p class="cue" id="heroCue">스크롤</p>
+    <div class="space" id="space"></div>
+    <div class="world" id="world" aria-hidden="true"></div>
+    <div class="lines" id="introLines">
+      <p data-a=".15" data-b=".27"><span class="num">2030</span>작은 기판 하나에서<br><em>AI가 돌아가는 세계</em></p>
+      <p data-a=".27" data-b=".4">내 AI와 공간의 AI가<br><em>서로 정보를 주고받아요</em></p>
+      <p data-a=".455" data-b=".535">그리고 나를,<br><em>오래 기억해요</em></p>
+      <p data-a=".565" data-b=".69">기억이 길어질수록,<br><em>추천은 과거를 향해요</em></p>
+    </div>
+    <canvas class="vortex" id="vortex" aria-hidden="true"></canvas>
+    <div class="clock" id="clock"><b></b></div>
+    <div class="frags" id="frags"><span class="frag"><i>2030</i>학과 부스 운영</span><span class="frag"><i>2029</i>축제 방문객</span><span class="frag"><i>2031 봄</i>학생회 · 축제 기획</span><span class="frag"><i>자주</i>과제 · 일정 관리 맡김</span><span class="frag"><i>2030</i>부스 재고 확인</span><span class="frag"><i>2031 봄</i>운영 점검 체크리스트</span><span class="frag"><i>2030</i>스태프 단톡방</span><span class="frag"><i>2029</i>라인업 알림</span></div>
+    <div class="tflash" id="tflash"><i></i></div>
+    <div class="night" id="night"></div>
+    <div class="kick" id="kick"><span class="k1">AI가 기억하는 나</span><b class="kne">≠</b><span class="k2">지금의 나</span></div>
+    <div class="probwrap" id="prob">
+      <blockquote class="scrub" id="quote"><span class="q1">“평소의 나는 그렇지만,</span><span class="q2">지금은 <em>이런 시간</em>을 보내고 싶어.”</span></blockquote>
+    </div>
+    <div class="loading" id="heroLoading"><i></i></div>
+  </div>
+</section>
+
+<!-- 03 CONCEPT + HOW TO USE -->
+<section class="scene" id="concept" style="--len:950vh">
+  <div class="stage demo">
+    <div class="demo-dev"><canvas id="demoCv" width="1200" height="1200" aria-label="노블 시연"></canvas>
+      <span class="ax t">활동</span><span class="ax b">휴식</span><span class="ax l">업무</span><span class="ax r">오락</span></div>
+    <div class="demo-txt">
+      <ol class="stepdots" id="stepDots"><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li></ol>
+      <div class="dt" id="demoText">
+        <section data-a="0" data-b=".1"><span class="so">그래서, 노블</span><h3>손끝으로 전하고,<br>빛으로 답해요</h3><p>업무 ↔ 오락, 휴식 ↔ 활동 — 두 개의 축</p></section>
+        <section data-a=".1" data-b=".34"><span class="so">상태 지도</span><h3 id="qTitle">업무 + 활동</h3><p id="qHelp">과제에 집중</p>
+          <ul class="fx" id="qFx"><li><em>알림</em><span></span></li><li><em>안내</em><span></span></li><li><em>환경</em><span></span></li></ul></section>
+        <section data-a=".34" data-b=".44"><span class="ask">왜 모드 버튼 네 개가 아닐까요?</span><h3>멀수록 강하게</h3><p>마음은 딱 넷으로 나뉘지 않아요. 45칸의 위치로 조합과 정도까지 전해요</p><div class="lvl" id="lvl"><i>1 약하게</i><i>2 보통</i><i>3 강하게</i></div></section>
+        <section data-a=".44" data-b=".58"><span class="ask">AI가 내 마음을 판단하나요?</span><h3>지나온 길도 읽어요</h3><p>판단이 아니라, 의도를 더 신중하게 읽기 위한 단서예요</p><p class="pcue" id="pathCue">경로 0칸 · 되돌아감 0회</p></section>
+        <section data-a=".58" data-b=".7"><span class="ask">AI 제안이 마음에 안 들면요?</span><h3>AI는 테두리로</h3><p>제안이 떠도 내 선택은 그대로. 거절하면 빛은 조용히 사라지고, 미룬 일은 내가 정한 때에 다시 와요</p></section>
+        <section data-a=".7" data-b=".8"><span class="so">확정하기</span><h3>손을 떼면, 확정</h3><p>최종 상태는 언제나 손을 뗀 그 자리. 한 번 반짝이고, 숨 쉬듯 빛나요</p></section>
+        <section data-a=".8" data-b=".9"><span class="ask">화면이 없는데 어떻게 알아요?</span><h3 id="lgTitle">기본</h3><ol class="lg" id="lg"><li style="--c:#B8B6E5">기본</li><li style="--c:#9CC8E2">경로</li><li style="--c:#E8B0DD">최종 지점</li><li style="--c:#F8CAA7">AI 제안</li><li style="--c:#A6DCCF">확정</li></ol></section>
+        <section data-a=".9" data-b="1.1"><h3>직접 해 보세요</h3><p id="tryLine">패드를 누른 채 움직여 보세요</p>
+          <label class="switch"><input type="checkbox" id="dl" checked><i></i><span>마감 1시간 전</span></label></section>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 PERSONA -->
+<section class="scene" id="persona" style="--len:380vh">
+  <div class="stage pstage">
+    <div class="paura" id="paura"></div>
+    <div class="pcore" id="pcore"><div class="pimg" aria-hidden="true"><svg viewBox="0 0 120 120"><defs><linearGradient id="pfg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c9dcf0"/><stop offset=".55" stop-color="#cdc6ef"/><stop offset="1" stop-color="#efc6e2"/></linearGradient></defs><circle cx="60" cy="60" r="60" fill="#fff"/><circle cx="60" cy="47" r="19" fill="url(#pfg)"/><path d="M22 110c3-22 19-34 38-34s35 12 38 34" fill="url(#pfg)"/></svg></div>
+      <h2 class="pname">이도윤</h2>
+      <p class="pquote" id="pquote">“AI 추천이 편하긴 한데,<br>늘 <em>지금 내 마음</em> 같진 않아.”</p></div>
+    <div class="years" id="years"><svg class="ypath" viewBox="0 0 1000 200" preserveAspectRatio="none"><defs><linearGradient id="yg" x1="0" x2="1"><stop offset="0" stop-color="#9CC8E2"/><stop offset=".5" stop-color="#B8B6E5"/><stop offset="1" stop-color="#E8B0DD"/></linearGradient></defs><path id="ypath" d="M20 150 C 250 150, 300 40, 500 60 S 800 160, 980 70" pathLength="1"/></svg>
+      <div class="yr" style="--x:14%;--y:73%"><b>1학년</b><span>축제를 즐긴 방문객</span></div>
+      <div class="yr" style="--x:50%;--y:30%"><b>2학년</b><span>학과 부스 운영</span></div>
+      <div class="yr" style="--x:86%;--y:52%"><b>3학년</b><span>학생회로 축제 기획</span></div>
+      <p class="ytoday" id="ytoday">그리고 오늘은, 다시 <em>방문객</em>으로</p></div>
+    <div class="gp" id="gp">
+      <p>기록에 맞춘 추천이 계속 반복되고</p>
+      <p>기기가 선택을 대신하는 느낌이 불편해요</p>
+      <p class="need">지금의 마음을, <em>직접</em> 전하고 싶어요</p>
+    </div>
+  </div>
+</section>
+
+<!-- 05 STORY: three scroll-driven episodes, each followed by its review -->
+<div class="story" id="story">
+<section class="chap" id="ep1"><div class="chap-slot" data-slot="0"></div></section>
+<div class="cine-pin" id="cinePin">
+  <div class="cine-head" id="cineHead"><span class="num"></span><h2></h2><p>영상 속 노블을 직접 움직여 보세요.</p></div>
+  <div class="frame" id="frame">
+    <canvas id="amb" width="64" height="36" aria-hidden="true"></canvas>
+    <div class="film" id="film">
+      <video id="vid" playsinline muted preload="auto"></video>
+      <img id="poster" class="poster" src="img/p_ep1_a.jpg" alt="">
+      <canvas id="ix" width="1920" height="1080"></canvas>
+      <div class="laptop" id="laptop"><img src="img/f_laptop.jpg" alt=""><div class="screen" id="screen"></div></div>
+    </div>
+    <div class="scrim"></div>
+    <div class="chip" id="chip"><b id="chipEp">EP 01</b><span id="chipMeta"></span></div>
+    <div class="narr" id="narr" aria-live="polite"></div>
+    <div class="notes" id="notes"></div>
+    <div class="caption" id="caption"><span class="step" id="capStep"></span><p id="capText"></p><p class="ai" id="capAI"></p></div>
+    <div class="toast" id="toast"></div>
+    <nav class="rail" id="rail" aria-label="에피소드">
+      <button data-ep="0"><i><b></b></i><span>EP 01 · 과제 마무리</span></button>
+      <button data-ep="1"><i><b></b></i><span>EP 02 · 축제 입장</span></button>
+      <button data-ep="2"><i><b></b></i><span>EP 03 · 집에서 휴식</span></button>
+    </nav>
+    <div class="ctrl"><button id="bSound">소리 켜기</button><button id="bAuto" class="gb">대신 보기</button><button id="bSkip" class="gb">건너뛰기</button></div>
+    <div class="epdone"><b id="endEp">EP 01 완료</b><p>도윤의 선택이 무엇을 바꿨는지 볼까요?</p><div><button id="bToReview">리뷰 보기 ↓</button><button id="bReplayEp">다시 보기</button></div></div>
+  </div>
+</div>
+<section class="review" id="review1">
+  <div class="rv-in">
+    <div class="rv-dev"><i class="rv-glow"></i><canvas width="360" height="360"></canvas></div>
+    <div class="rv-txt"><span class="rv-num"></span><span class="rv-state"></span><h2></h2><div class="rv-grid"></div>
+      <div class="rv-act"><button class="rv-next"></button><button class="rv-again">에피소드 다시 보기</button></div></div>
+  </div>
+</section>
+<section class="chap" id="ep2"><div class="chap-slot" data-slot="1"></div></section>
+<section class="review" id="review2">
+  <div class="rv-in">
+    <div class="rv-dev"><i class="rv-glow"></i><canvas width="360" height="360"></canvas></div>
+    <div class="rv-txt"><span class="rv-num"></span><span class="rv-state"></span><h2></h2><div class="rv-grid"></div>
+      <div class="rv-act"><button class="rv-next"></button><button class="rv-again">에피소드 다시 보기</button></div></div>
+  </div>
+</section>
+<section class="chap" id="ep3"><div class="chap-slot" data-slot="2"></div></section>
+<section class="review" id="review3">
+  <div class="rv-in">
+    <div class="rv-dev"><i class="rv-glow"></i><canvas width="360" height="360"></canvas></div>
+    <div class="rv-txt"><span class="rv-num"></span><span class="rv-state"></span><h2></h2><div class="rv-grid"></div>
+      <div class="rv-act"><button class="rv-next"></button><button class="rv-again">에피소드 다시 보기</button></div></div>
+  </div>
+</section>
+<section class="daysum" id="daysum">
+  <div class="ds-head"><span class="ds-num">ONE DAY, THREE STATES</span><h2>하루 동안 세 번 바뀐 의도</h2><p>같은 AI가, 도윤이 그린 위치에 따라 다가가기도 물러나기도 했어요.</p></div>
+  <div class="ds-body"><div class="ds-dev"><i class="rv-glow"></i><canvas id="sumCv" width="420" height="420"></canvas></div><div class="ds-rows" id="sumRows"></div></div>
+</section>
+</div>
+
+<!-- 05 STRUCTURE (3D) -->
+<section class="scene" id="structure" style="--len:500vh">
+  <div class="stage">
+    <div class="sintro" id="sIntro"><span>KNOBLE · 52 × 52 × 15.5 mm</span><h2>제품을 <em>자세히</em><br>살펴볼까요?</h2></div>
+    <canvas id="viewGL" class="view-gl" aria-label="노블 3D"></canvas>
+    <div class="labels" id="labels"></div>
+    <div class="lines low" id="structLines">
+      <p data-a="0" data-b=".22">손안에 들어오는 둥근 사각형</p>
+      <p data-a=".22" data-b=".62">여섯 개의 층</p>
+      <p data-a=".62" data-b=".8">테두리는 AI의 자리</p>
+      <p data-a=".8" data-b="1.1">직접 돌려 보세요</p>
+    </div>
+    <div class="sughint" id="sugHint"><i></i><b>테두리를 따라 끌어 보세요</b><span></span><div class="sugact"><button id="sugYes">제안 받기</button><button id="sugNo">내 선택 유지</button></div></div>
+    <div class="vtools" id="vtools">
+      <div class="seg"><button data-view="3q" class="on">3/4</button><button data-view="top">윗면</button><button data-view="side">측면</button><button data-view="bottom">바닥</button></div>
+      <div class="seg"><span>분해</span><input type="range" id="explode" min="0" max="100" value="0" aria-label="분해 정도"></div>
+      <div class="seg"><button id="vDraw">그리기</button><button id="vAI">AI 제안</button></div>
+    </div>
+    <div class="loading" id="viewLoading"><i></i></div>
+  </div>
+</section>
+
+<!-- 07 SYSTEM -->
+<section class="scene" id="system" style="--len:420vh">
+  <div class="stage sysstage">
+    <canvas id="sysCv" class="syscv"></canvas>
+    <h2 class="systitle" id="sysTitle"><span class="ask">내 데이터는 어디로 가나요?</span>손끝 → 판단 → <em>빛과 환경</em></h2>
+    <div class="sys" id="sys">
+      <div class="scol in"><span class="sk">INPUT</span><p>패드 위치 <small>두 축 좌표</small></p><p>이동 경로</p><p>머문 시간</p><p>망설임 <small>방향 전환</small></p><p>일정 · 마감 맥락</p></div>
+      <div class="score" id="score"><i class="ring"></i><b>기기 안의 AI</b><small>오프라인 MCU</small></div>
+      <div class="scol out"><span class="sk">OUTPUT</span><p>패드 빛 <small>나의 선택</small></p><p>테두리 빛 <small>AI 제안</small></p><p>알림 정책</p><p>안내의 양</p><p>조명 · 스피커</p></div>
+    </div>
+    <p class="sysnote" id="sysNote">어디로도 가지 않아요. 데이터는 <em>기기 밖으로 나가지 않아요</em></p>
+  </div>
+</section>
+
+<!-- 08 SPEC -->
+<section class="scene" id="spec" style="--len:380vh">
+  <div class="stage specstage">
+    <figure class="dimfig" id="dimFig"><img src="img/knoble_top.webp" alt="" class="toprender" id="topRender"></figure>
+    <div class="specwrap">
+      <ol class="stabs" id="sTabs"><li>본체</li><li>입력</li><li>빛</li><li>AI · 연결</li></ol>
+      <div class="sgroups" id="specList">
+        <dl class="spec"><div><dt>크기</dt><dd>52 × 52 × 15.5 mm</dd></div><div><dt>형태</dt><dd>둥근 사각 조약돌형</dd></div><div><dt>소재</dt><dd>무광 오팔 화이트 · 반투명 패드</dd></div><div><dt>패드 영역</dt><dd>약 33 mm · 손끝 하나로 닿는 크기</dd></div></dl>
+        <dl class="spec"><div><dt>패드</dt><dd>45개 · 7×7에서 모서리 4칸 제외</dd></div><div><dt>크기 · 간격</dt><dd>4.4 mm · 4.8 mm</dd></div><div><dt>감지</dt><dd>정전식 터치 · 경로 · 머문 시간</dd></div><div><dt>확정</dt><dd>손 떼기 · 길게 누르기 · 0.5 mm 눌림</dd></div></dl>
+        <dl class="spec"><div><dt>발광면</dt><dd>4색 파스텔 지도 · 패드 아래</dd></div><div><dt>확산</dt><dd>공기층 2.8 mm + 젖빛 커버, 두 번 퍼져요</dd></div><div><dt>테두리</dt><dd>AI 제안 · 방향별 혼합색</dd></div><div class="pal"><dt>상태 색</dt><dd><i style="--c:#9CC8E2">업무</i><i style="--c:#E8B0DD">오락</i><i style="--c:#F8CAA7">휴식</i><i style="--c:#B8B6E5">활동</i></dd></div></dl>
+        <dl class="spec"><div><dt>연산</dt><dd>개인 MCU · 오프라인 AI</dd></div><div><dt>개인정보</dt><dd>외부 전송 없음</dd></div><div><dt>연결</dt><dd>공간 MCU · 알림 · 조명 · 스피커</dd></div><div><dt>충전</dt><dd>USB-C</dd></div></dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 09 DESIGN · GALLERY -->
+<section class="scene" id="gallery" style="--len:320vh">
+  <div class="stage galstage">
+    <p class="gal-title">손끝과 빛만으로</p>
+    <div class="track" id="track"></div>
+  </div>
+</section>
+
+<footer class="foot" id="end">
+  <p class="end">나를 기억하는 AI에게,<br>지금의 나를 전하다.</p>
+  <div><a class="btn" href="#top">↑ 처음으로</a><a class="btn dark" href="https://claude.ai/artifact/NK65Q8KLsZjSZryCefkchW" target="_blank" rel="noopener">축제 지도로</a></div>
+  <small>College Festival 2031 · PRODUCT 01 · KNOBLE</small>
+</footer>
+
+<script src="js/lenis.min.js"></script>
+<script>{try{const l=new Lenis({lerp:.085,wheelMultiplier:.85,smoothWheel:true,anchors:{duration:1.6},syncTouch:false});window.lenis=l;const f=t=>{l.raf(t);requestAnimationFrame(f)};requestAnimationFrame(f)}catch(e){}}</script>
+<script src="js/knoble-model.js" defer></script>
+<script src="js/app.bundle.js" defer></script>
+<script src="js/more.bundle.js" defer></script>
+<script>setTimeout(()=>{if(!window.__appOK){document.documentElement.classList.add("nojs");const l=document.getElementById("heroLoading");if(l)l.style.display="none";}},9000)</script>
+</body>
+</html>
