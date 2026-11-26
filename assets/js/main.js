@@ -126,7 +126,7 @@ const PRODUCTS=[
  {n:1,name:'KNOBLE',model:'KNOBLE',place:'입구',cat:'personal',kind:'band',at:[766,572,-4],one:'지금의 나를, 손끝으로',
   url:'PRODUCT01/index.html'},   // 개인 제품 페이지 (PRODUCT01/ 폴더)
  {n:2,name:'PATH GUARD',model:'PATHGUARD',place:'광장',cat:'space',kind:'light',at:[520,471,4],url:null},
- {n:3,name:'FLOWAY',model:'FLOWAY',place:'운동장',cat:'operator',kind:'pod',at:[646,338,0],url:null}
+ {n:3,name:'FLOWAY',model:'FLOWAY',place:'운동장',cat:'operator',kind:'pod',at:[646,338,0],url:'https://objectroom.github.io/DigitalContent/PRODUCT03/'}
 ].map(p=>Object.assign({one:'한 줄 소개 — '+TBD,problem:TBD,points:[TBD,TBD,TBD],
   steps:[['단계 1',TBD],['단계 2',TBD],['단계 3',TBD],['단계 4',TBD]],sda:[TBD,TBD,TBD],
   feat:[['기능 1',TBD],['기능 2',TBD],['기능 3',TBD],['기능 4',TBD]],b:[p.at[0]-10,p.at[1]-10,20,20,p.at[2]]},p));
@@ -741,7 +741,7 @@ function openCard(n){
   const p=PRODUCTS[n-1]; map.sel=n; setHL(n);
   const [x,y,w,d]=p.b; map.tx=-(x+w/2-500); map.ty=-(y+d/2-500); map.zoom=Math.max(map.zoom,1.25);
   $('#pcVis').innerHTML=prodSVG(p.kind); $('#pcLabel').textContent=`PROJECT 0${p.n} · ${CAT[p.cat]} · ${p.place}`;
-  $('#pcName').textContent=p.name; $('#pcOne').textContent=p.one; $('#pcGo').style.display=p.n===1?'':'none';
+  $('#pcName').textContent=p.name; $('#pcOne').textContent=p.one; $('#pcGo').classList.toggle('on',!!p.url);
   pcard.classList.remove('open'); void pcard.offsetWidth; pcard.classList.add('open'); warp();
 }
 function closeCard(){map.sel=null;pcard.classList.remove('open');setHL(0);map.tx=0;map.ty=0;map.zoom=Math.min(map.zoom,1)}
@@ -1164,7 +1164,7 @@ function tickStars(now,top,p){
   FP.shake=Math.max(0,...FP.items.map(it=>it.wind||0));
 }
 fpTags.forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();fpOpen(+b.dataset.n)}));
-function fpOpen(n){if(n!==1)return; /* 제품 1만 연결 (2026-11-26) */Sound.play('open');const pu=PRODUCTS[n-1]&&PRODUCTS[n-1].url;if(pu){if(!/^https?:/.test(pu)){location.href=pu;return}let w=null;try{w=window.open(pu,'_blank')}catch(e){}if(w)return;const a=document.createElement('a');a.href=pu;a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();return}const it=FP.items[n-1];if(it){const r=it.scr[2]*2.2;FP.from=[it.scr[1]-r,VW-(it.scr[0]+r),VH-(it.scr[1]+r),it.scr[0]-r].map(v=>Math.max(0,v))}openDetail(n)}
+function fpOpen(n){if(!(PRODUCTS[n-1]&&PRODUCTS[n-1].url))return; /* 주소가 있는 제품만 개인 페이지로 연결 */Sound.play('open');const pu=PRODUCTS[n-1]&&PRODUCTS[n-1].url;if(pu){if(!/^https?:/.test(pu)){location.href=pu;return}let w=null;try{w=window.open(pu,'_blank')}catch(e){}if(w)return;const a=document.createElement('a');a.href=pu;a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();return}const it=FP.items[n-1];if(it){const r=it.scr[2]*2.2;FP.from=[it.scr[1]-r,VW-(it.scr[0]+r),VH-(it.scr[1]+r),it.scr[0]-r].map(v=>Math.max(0,v))}openDetail(n)}
 function renderProjects(p){
   pj.p=p;
   const S=fpSK(); FP.s=fpS(p);
@@ -1172,7 +1172,7 @@ function renderProjects(p){
   const fin=p>PJ_KN[4]-.04;
   const st=act?act:fin?9:-1;
   if(st!==pj.stop){pj.stop=st;
-    if(act){const pr=PRODUCTS[act-1];ptK.textContent=`0${act} · ${pr.place}`;ptN.textContent=pr.name;ptO.textContent=pr.one;ptGo.dataset.n=act;ptGo.style.display=act===1?'':'none'}
+    if(act){const pr=PRODUCTS[act-1];ptK.textContent=`0${act} · ${pr.place}`;ptN.textContent=pr.name;ptO.textContent=pr.one;ptGo.dataset.n=act;ptGo.style.display='';ptGo.classList.toggle('on',!!pr.url)}
     else if(fin){ptK.textContent='도착';ptN.textContent='공연이 열리는 운동장';ptO.textContent='';ptGo.style.display='none'}}
   let vis=0; if(act)vis=1-clamp((Math.abs(p-PJ_KN[act]-(act===2?.025:0))-.02)/.03); else if(fin)vis=eOut(range(p,PJ_KN[4]-.04,PJ_KN[4]));
   vis*=1-range(p,.958,.975); pjTour.style.opacity=vis.toFixed(3); pjTour.style.transform=`translateY(${VW<700?0:-50}%) translateY(${((1-vis)*30).toFixed(1)}px)`;
@@ -1240,7 +1240,7 @@ function tickFP(now){
   // final overview: hover a product → card with its model + summary
   const hv=FP.fo>.85?FP.hover:0;
   if(hv){const i=hv-1,pr=PRODUCTS[i],[x,y,rr]=FP.items[i].scr;
-    if(pCard.dataset.i!==String(i)){pCard.dataset.i=i;pCard.querySelector('.pc-k').textContent=`0${pr.n} · ${CAT[pr.cat]} · ${pr.place}`;pCard.querySelector('.pc-n').textContent=pr.name;pCard.querySelector('.pc-o').textContent=pr.one}
+    if(pCard.dataset.i!==String(i)){pCard.dataset.i=i;pCard.querySelector('.pc-k').textContent=`0${pr.n} · ${CAT[pr.cat]} · ${pr.place}`;pCard.querySelector('.pc-n').textContent=pr.name;pCard.querySelector('.pc-o').textContent=pr.one;pCard.classList.toggle('linked',!!pr.url)}
     if(window.Prod3D&&Prod3D.ready)Prod3D.cardFrame(i,pcStage,now/1000);
     pCard.classList.add('on')}
   else pCard.classList.remove('on');
