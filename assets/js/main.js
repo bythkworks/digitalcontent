@@ -126,7 +126,7 @@ const PRODUCTS=[
  {n:1,name:'KNOBLE',model:'KNOBLE',place:'입구',cat:'personal',kind:'band',at:[766,572,-4],one:'지금의 나를, 손끝으로',
   url:'PRODUCT01/index.html'},   // 개인 제품 페이지 (PRODUCT01/ 폴더)
  {n:2,name:'PATH GUARD',model:'PATHGUARD',place:'광장',cat:'space',kind:'light',at:[520,471,4],one:'필요한 순간, 길을 열다',
-  url:null},
+  url:'PRODUCT02/index.html'},   // 개인 제품 페이지 (PRODUCT02/ 폴더)
  {n:3,name:'FLOWAY',model:'FLOWAY',place:'운동장',cat:'operator',kind:'pod',at:[646,338,0],url:'PRODUCT03/index.html'}
 ].map(p=>Object.assign({one:'한 줄 소개 — '+TBD,problem:TBD,points:[TBD,TBD,TBD],
   steps:[['단계 1',TBD],['단계 2',TBD],['단계 3',TBD],['단계 4',TBD]],sda:[TBD,TBD,TBD],
