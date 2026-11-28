@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Knoble | 노블 — 지금의 나를 AI에게 전하는 작은 인터페이스</title>
 <link rel="stylesheet" href="fonts/fonts.css">
-<link rel="stylesheet" href="style.css">
-
 <style>
 /* ===== 터치 기기 보정: 눌리는 영역을 44px 이상으로 (보이는 크기는 그대로) ===== */
 @media (pointer:coarse){
@@ -16,18 +14,23 @@
   /* 진행 표시 점은 세로 44px 로만 넓힙니다. 가로로 넓히면 옆 점과 겹칩니다 */
 }
 </style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body data-tint="day">
 <div class="bgfx" aria-hidden="true"><i class="orb o1"></i><i class="orb o2"></i></div>
 
 <header class="nav" id="nav">
-  <a class="back" href="../index.html">← FESTIVAL MAP</a>
-  <a class="brand" href="#top">KNOBLE <span>노블</span></a>
-  <nav class="dots" aria-label="장면">
-    <a href="#top" data-l="노블" data-ip="0"></a><a href="#top" data-l="배경" data-ip=".2"></a><a href="#top" data-l="문제" data-ip=".56"></a><a href="#concept" data-l="사용법"></a><a href="#persona" data-l="도윤"></a><a href="#ep1" data-l="스토리"></a><a href="#structure" data-l="구조"></a><a href="#system" data-l="시스템"></a><a href="#spec" data-l="사양"></a><a href="#gallery" data-l="디자인"></a>
-  </nav>
-  <i class="progress" id="progress"></i>
+  <a class="logo" href="#top" data-j="intro"><span class="logo-mark" aria-hidden="true"></span>KNOBLE<span class="team-tag">PRODUCT 01</span></a>
+  <nav aria-label="주요 메뉴"><ul>
+    <li class="to-project"><a class="back" href="../index.html" title="축제 지도로 이동" aria-label="축제 지도로 이동"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M3 11.2 12 4l9 7.2M5.5 9.6V20h4.6v-5.6h3.8V20h4.6V9.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg><span>MAP</span></a></li>
+    <li class="has-dd"><a href="#top" data-j="bg">STORY</a><div class="nav-dd"><div class="dd-in"><button type="button" data-j="bg"><b>01</b><span>배경</span></button><button type="button" data-j="prob"><b>02</b><span>문제</span></button><button type="button" data-j="concept"><b>03</b><span>사용법</span></button><button type="button" data-j="persona"><b>04</b><span>도윤</span></button></div></div></li>
+    <li class="has-dd"><a href="#ep1" data-j="ep0">EPISODES</a><div class="nav-dd"><div class="dd-in"><button type="button" data-j="ep0"><b>01</b><span>과제 마무리</span></button><button type="button" data-j="ep1"><b>02</b><span>축제 입장</span></button><button type="button" data-j="ep2"><b>03</b><span>집에서 휴식</span></button><button type="button" data-j="daysum"><b>—</b><span>하루 정리</span></button></div></div></li>
+    <li class="has-dd"><a href="#structure" data-j="structure">PRODUCT</a><div class="nav-dd"><div class="dd-in"><button type="button" data-j="structure"><b>01</b><span>3D 구조</span></button><button type="button" data-j="system"><b>02</b><span>시스템</span></button><button type="button" data-j="spec"><b>03</b><span>사양</span></button><button type="button" data-j="gallery"><b>04</b><span>디자인</span></button></div></div></li>
+  </ul></nav>
 </header>
+<nav class="dots" id="dots" aria-label="섹션 이동">
+  <button data-j="intro"><span>01 INTRO</span></button><button data-j="bg"><span>02 배경</span></button><button data-j="prob"><span>03 문제</span></button><button data-j="concept"><span>04 사용법</span></button><button data-j="persona"><span>05 도윤</span></button><button data-j="ep0"><span>06 스토리</span></button><button data-j="structure"><span>07 구조</span></button><button data-j="system"><span>08 시스템</span></button><button data-j="spec"><span>09 사양</span></button><button data-j="gallery"><span>10 디자인</span></button>
+</nav>
 
 <!-- 00–02 INTRO: opening → world before Knoble → problem (one continuous stage) -->
 <section class="scene" id="top" style="--len:1350vh">
@@ -222,7 +225,7 @@
 
 <footer class="foot" id="end">
   <p class="end">나를 기억하는 AI에게,<br>지금의 나를 전하다.</p>
-  <div><a class="btn" href="#top">↑ 처음으로</a><a class="btn dark" href="https://claude.ai/artifact/NK65Q8KLsZjSZryCefkchW" target="_blank" rel="noopener">축제 지도로</a></div>
+  <div><a class="btn" href="#top">↑ 처음으로</a><a class="btn dark" href="../index.html" target="_blank" rel="noopener">축제 지도로</a></div>
   <small>College Festival 2031 · PRODUCT 01 · KNOBLE</small>
 </footer>
 
