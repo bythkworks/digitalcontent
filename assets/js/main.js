@@ -127,7 +127,8 @@ const PRODUCTS=[
   url:'PRODUCT01/index.html'},   // 개인 제품 페이지 (PRODUCT01/ 폴더)
  {n:2,name:'PATH GUARD',model:'PATHGUARD',place:'광장',cat:'space',kind:'light',at:[520,471,4],one:'필요한 순간, 길을 열다',
   url:'PRODUCT02/index.html'},   // 개인 제품 페이지 (PRODUCT02/ 폴더)
- {n:3,name:'FLOWAY',model:'FLOWAY',place:'운동장',cat:'operator',kind:'pod',at:[646,338,0],url:'PRODUCT03/index.html'}
+ {n:3,name:'FLOWAY',model:'FLOWAY',place:'운동장',cat:'operator',kind:'pod',at:[646,338,0],one:'공연 도중, 나갈 길이 필요할 때.',
+  url:'PRODUCT03/index.html'}
 ].map(p=>Object.assign({one:'한 줄 소개 — '+TBD,problem:TBD,points:[TBD,TBD,TBD],
   steps:[['단계 1',TBD],['단계 2',TBD],['단계 3',TBD],['단계 4',TBD]],sda:[TBD,TBD,TBD],
   feat:[['기능 1',TBD],['기능 2',TBD],['기능 3',TBD],['기능 4',TBD]],b:[p.at[0]-10,p.at[1]-10,20,20,p.at[2]]},p));
