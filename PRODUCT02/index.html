@@ -456,6 +456,16 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 @media (max-width:420px){.nav .brand{letter-spacing:.1em}}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
 </style>
+
+<style>
+/* ===== 터치 기기 보정: 눌리는 영역을 44px 이상으로 (보이는 크기는 그대로) ===== */
+@media (pointer:coarse){
+  .tabs a{min-height:44px;display:inline-flex;align-items:center}
+  .pv-ctrl button{min-height:44px}
+  .fest-back{min-height:44px;display:inline-flex;align-items:center}
+  .sitemenu .brand{min-height:44px;display:inline-flex;align-items:center}
+}
+</style>
 </head>
 <body data-tint="day">
 

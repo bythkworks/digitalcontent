@@ -860,7 +860,21 @@ function jumpTo(y){if(Math.abs(y-scrollY)<VH*1.6||reduce){smoothTo(y);return}
     scenes.forEach(([s,fn])=>{s.t=s.p=progressOf(s.el);fn(s.p)});
     requestAnimationFrame(()=>requestAnimationFrame(()=>v.classList.remove('on')))},320)}
 function goTo(id){const el=$('#'+id); let y=HOLDS[id]?holdY(id,0):el.offsetTop; if(id==='intro')y=0; scrollToY(y)}
-$$('[data-go]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();goTo(a.dataset.go)}));
+/* ---- touch: no hover, so the first tap opens the chapter menu, the second one jumps ---- */
+const DD={coarse:matchMedia('(hover:none)').matches,open:null};
+function ddClose(){if(DD.open){DD.open.classList.remove('dd-open');DD.open=null}}
+function ddTapOpen(a){
+  if(!DD.coarse)return false;
+  const li=a.closest('.nav li.has-dd'); if(!li||!li.querySelector('.nav-dd button'))return false;
+  if(DD.open===li){ddClose();return false}      // tapped again: let the jump through
+  ddClose();li.classList.add('dd-open');DD.open=li;return true;
+}
+addEventListener('pointerdown',e=>{if(!e.target.closest||!e.target.closest('.nav li.has-dd'))ddClose()},{passive:true,capture:true});
+addEventListener('scroll',ddClose,{passive:true});
+document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('.nav-dd button'))ddClose()},true);
+if(DD.coarse){const mh=$('.map-hint');if(mh)mh.textContent='스크롤로 걷기 · 밀어서 둘러보기 · 제품을 눌러 보세요'}
+
+$$('[data-go]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();if(ddTapOpen(a))return;goTo(a.dataset.go)}));
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.15});
 $$('main .reveal').forEach(el=>io.observe(el));
 

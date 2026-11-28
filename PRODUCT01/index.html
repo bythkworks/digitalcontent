@@ -6,6 +6,16 @@
 <title>Knoble | 노블 — 지금의 나를 AI에게 전하는 작은 인터페이스</title>
 <link rel="stylesheet" href="fonts/fonts.css">
 <link rel="stylesheet" href="style.css">
+
+<style>
+/* ===== 터치 기기 보정: 눌리는 영역을 44px 이상으로 (보이는 크기는 그대로) ===== */
+@media (pointer:coarse){
+  a[href],button,[role="button"]{min-height:44px}
+  nav a,.tabs a,.crumbs a{display:inline-flex;align-items:center}
+  p a[href],li a[href]{min-height:0}
+  /* 진행 표시 점은 세로 44px 로만 넓힙니다. 가로로 넓히면 옆 점과 겹칩니다 */
+}
+</style>
 </head>
 <body data-tint="day">
 <div class="bgfx" aria-hidden="true"><i class="orb o1"></i><i class="orb o2"></i></div>
