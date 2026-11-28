@@ -725,7 +725,21 @@ body:has(.nav.hide) .sprail{opacity:0;pointer-events:none}.sprail{transition:opa
 /* "그래서, 노블" name reveal */
 .nreveal{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;text-align:center;opacity:0;
   transform:scale(calc(1 + var(--out,0)*.18));filter:blur(calc(var(--out,0)*14px))}
-.nr-so{font:700 clamp(18px,2.2vw,30px)/1 var(--font);letter-spacing:.02em;color:var(--ink2);opacity:calc(var(--in,0));transform:translateY(calc((1 - var(--in,0))*14px));margin-bottom:clamp(8px,1.4vw,20px)}
-.nr-name{font:800 clamp(120px,22vw,340px)/.95 var(--font);letter-spacing:-.04em;background:linear-gradient(120deg,#9CC8E2 0%,#B8B6E5 35%,#E8B0DD 65%,#F8CAA7 100%);background-size:220% 100%;background-position:calc(var(--q,0)*100%) 0;
-  -webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 18px 50px rgba(184,182,229,.45)) blur(calc((1 - var(--in,0))*18px));transform:translateY(calc((1 - var(--in,0))*40px)) scale(calc(.92 + var(--in,0)*.08))}
-.nr-en{margin-top:clamp(10px,1.6vw,22px);font:700 clamp(11px,1vw,14px)/1 var(--en,var(--font));letter-spacing:.5em;color:var(--ink3);opacity:calc(var(--in,0)*.9);padding-left:.5em}
+.nr-orb{position:absolute;width:46vmax;height:46vmax;border-radius:50%;filter:blur(70px);opacity:calc(var(--in,0)*.85);mix-blend-mode:multiply;will-change:transform}
+.nr-orb.o1{left:calc(-10vmax + var(--mx,.5)*30vmax);top:calc(-14vmax + var(--my,.5)*20vmax);background:radial-gradient(circle,#9CC8E2 0,rgba(156,200,226,0) 68%)}
+.nr-orb.o2{right:calc(-12vmax + var(--mx,.5)*-26vmax + 13vmax);top:calc(-8vmax + var(--q,0)*14vmax);background:radial-gradient(circle,#E8B0DD 0,rgba(232,176,221,0) 68%)}
+.nr-orb.o3{left:calc(10vmax + var(--mx,.5)*-18vmax + 9vmax);bottom:calc(-20vmax + var(--my,.5)*-16vmax + 8vmax);background:radial-gradient(circle,#B8B6E5 0,rgba(184,182,229,0) 68%)}
+.nr-orb.o4{right:calc(-6vmax + var(--my,.5)*12vmax);bottom:calc(-18vmax + var(--mx,.5)*16vmax);width:34vmax;height:34vmax;background:radial-gradient(circle,#F8CAA7 0,rgba(248,202,167,0) 68%)}
+.nr-glass{position:relative;display:flex;flex-direction:column;align-items:center;padding:clamp(28px,4vw,60px) clamp(40px,6vw,100px) clamp(26px,3.4vw,50px);border-radius:clamp(36px,4vw,64px);
+  background:linear-gradient(135deg,rgba(255,255,255,.55),rgba(255,255,255,.18) 45%,rgba(255,255,255,.32));-webkit-backdrop-filter:blur(26px) saturate(1.7);backdrop-filter:blur(26px) saturate(1.7);
+  border:1px solid rgba(255,255,255,.75);box-shadow:inset 0 1px 0 rgba(255,255,255,.95),inset 0 -1px 0 rgba(255,255,255,.4),inset 0 0 40px rgba(255,255,255,.35),0 30px 80px rgba(110,95,180,.18);
+  opacity:var(--in,0);transform:translateY(calc((1 - var(--in,0))*30px)) rotateX(calc((var(--my,.5) - .5)*-8deg)) rotateY(calc((var(--mx,.5) - .5)*10deg));overflow:hidden}
+.nr-glass::before{content:"";position:absolute;inset:-40%;background:linear-gradient(115deg,transparent 40%,rgba(255,255,255,.55) 50%,transparent 60%);transform:translateX(calc((var(--mx,.5) - .5)*60%));pointer-events:none}
+.nreveal{perspective:1200px}
+.nr-so{position:relative;font:800 clamp(18px,2.2vw,30px)/1 var(--font);letter-spacing:.02em;color:var(--ink2);margin-bottom:clamp(6px,1vw,14px)}
+.nr-name{position:relative;font:900 clamp(120px,21vw,330px)/.95 var(--font);letter-spacing:-.05em;
+  background:linear-gradient(120deg,#7FB6DA 0%,#A9A5EC 30%,#E29BD4 60%,#F6B98E 85%,#7FB6DA 100%);background-size:260% 100%;background-position:calc((var(--mx,.5)*.6 + var(--q,0)*.4)*100%) 0;
+  -webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:1.5px rgba(255,255,255,.7);
+  filter:drop-shadow(0 2px 0 rgba(255,255,255,.8)) drop-shadow(0 20px 40px rgba(150,130,220,.4)) blur(calc((1 - var(--in,0))*16px))}
+.nr-name::after{content:attr(data-t);position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.85) 0%,rgba(255,255,255,.15) 42%,rgba(255,255,255,0) 55%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:0;pointer-events:none}
+.nr-en{position:relative;margin-top:clamp(8px,1.2vw,18px);font:800 clamp(11px,1vw,14px)/1 var(--en,var(--font));letter-spacing:.5em;color:var(--ink3);padding-left:.5em}
