@@ -722,3 +722,10 @@ body.dark-zone .nav.glass{background:rgba(20,16,40,.55);border-bottom-color:rgba
 @media (max-width:700px){.sprail{width:60px}.sprail .sp-now{font-size:11px;padding:5px 9px}}
 @media print{.sprail{display:none}}
 body:has(.nav.hide) .sprail{opacity:0;pointer-events:none}.sprail{transition:opacity .6s}
+/* "그래서, 노블" name reveal */
+.nreveal{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;text-align:center;opacity:0;
+  transform:scale(calc(1 + var(--out,0)*.18));filter:blur(calc(var(--out,0)*14px))}
+.nr-so{font:700 clamp(18px,2.2vw,30px)/1 var(--font);letter-spacing:.02em;color:var(--ink2);opacity:calc(var(--in,0));transform:translateY(calc((1 - var(--in,0))*14px));margin-bottom:clamp(8px,1.4vw,20px)}
+.nr-name{font:800 clamp(120px,22vw,340px)/.95 var(--font);letter-spacing:-.04em;background:linear-gradient(120deg,#9CC8E2 0%,#B8B6E5 35%,#E8B0DD 65%,#F8CAA7 100%);background-size:220% 100%;background-position:calc(var(--q,0)*100%) 0;
+  -webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 18px 50px rgba(184,182,229,.45)) blur(calc((1 - var(--in,0))*18px));transform:translateY(calc((1 - var(--in,0))*40px)) scale(calc(.92 + var(--in,0)*.08))}
+.nr-en{margin-top:clamp(10px,1.6vw,22px);font:700 clamp(11px,1vw,14px)/1 var(--en,var(--font));letter-spacing:.5em;color:var(--ink3);opacity:calc(var(--in,0)*.9);padding-left:.5em}
