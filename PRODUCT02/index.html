@@ -749,8 +749,12 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
       const t = dd.textContent.trim(); if (t.toUpperCase() === 'TBD' || t === '미정') dd.innerHTML = `<span class="tbd">${t}</span>`;
     });
   }
-  window.__contentReady = Promise.resolve()
-    .then(() => JSON.parse(document.getElementById('pgContent').textContent))
+  window.__contentReady = fetch('assets/content/product.json', {cache:'no-cache'})
+    .then(r => r.ok ? r.json() : Promise.reject(r.status))
+    /* file:// 에서는 fetch가 막히므로 아래 #pgContent(동일 내용)로 대체합니다.
+       서버(로컬 서버·GitHub Pages)에서는 위 fetch가 우선이므로
+       product.json만 고쳐도 그대로 반영됩니다. */
+    .catch(() => JSON.parse(document.getElementById('pgContent').textContent))
     .then(data => {
       window.PRODUCT = data;
       document.querySelectorAll('[data-t]').forEach(el => {
